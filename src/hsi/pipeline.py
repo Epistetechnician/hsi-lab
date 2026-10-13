@@ -59,6 +59,11 @@ def pilot(packet_file: Path) -> Path:
     packet, digest, d = _setup(packet_file)
     fams, npilot, lo, hi = _p(packet)
     spec = SPECS[packet.experiment]
+    if hasattr(spec, "prepare"):
+        spec.prepare(packet, d)
+    if hasattr(spec, "bind"):
+        spec.bind(packet, d)
+    off = int(packet.params.get("tune_offset", 0))
     treat, bases = arms_of(packet)
     per_family: dict[str, float] = {}
     sigma = 0.0
@@ -68,7 +73,7 @@ def pilot(packet_file: Path) -> Path:
             fd = []
             for split in (Split.FIT, Split.TUNE):
                 for i in range(npilot):
-                    seed = SEED_BASE[split] + i
+                    seed = SEED_BASE[split] + off + i
                     b = spec.run_task(base, fam, split, seed, packet)
                     t = spec.run_task(treat, fam, split, seed, packet)
                     fd.append(float(t.success) - float(b.success))
@@ -132,6 +137,9 @@ def run(packet_file: Path) -> Path:
     fams, _, _, _ = _p(packet)
     spec = SPECS[packet.experiment]
     n = min(int(lk["n_per_family"]), 20)  # type: ignore[call-overload]
+    off = int(packet.params.get("tune_offset", 0))
+    if hasattr(spec, "bind"):
+        spec.bind(packet, d)
     meter = Meter()
     rd = d / "run"
     if (rd / "episodes.jsonl").exists():
@@ -143,7 +151,7 @@ def run(packet_file: Path) -> Path:
         for arm in packet.arms:
             for fam in fams:
                 for i in range(n):
-                    r = spec.run_task(arm, fam, Split.TUNE, SEED_BASE[Split.TUNE] + i, packet)
+                    r = spec.run_task(arm, fam, Split.TUNE, SEED_BASE[Split.TUNE] + off + i, packet)
                     meter.charge(calls=int(r.stats.get("calls", 0)),
                                  bytes=int(r.stats.get("payload_bytes", 0)),
                                  limits={"calls": packet.budget.max_calls})

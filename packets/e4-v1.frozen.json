@@ -1,0 +1,66 @@
+{
+  "packet": {
+    "arms": [
+      "frozen_base",
+      "lora_candidate",
+      "memory_candidate"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E4",
+    "guardrails": [
+      "fit-family regression within floor",
+      "exploration calls matched"
+    ],
+    "hypothesis": "One reversible adapter update (LoRA) trained on tune-split worlds improves held-out compositional transfer over the frozen base without regressing fit families beyond 2 points.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "The LoRA candidate does not beat the frozen base by the threshold.",
+    "params": {
+      "adapt_lr": 0.2,
+      "adapt_steps": 200,
+      "baselines": [
+        "frozen_base"
+      ],
+      "families": [
+        "compositional_transfer"
+      ],
+      "fit_eval_n": 100,
+      "fit_regression_floor": 0.02,
+      "max_n": 400,
+      "memory_alpha": 1.0,
+      "min_n": 30,
+      "n_adapt": 60,
+      "n_pretrain": 80,
+      "pilot_tasks": 30,
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "pretrain_lr": 0.1,
+      "pretrain_steps": 300,
+      "rank": 2,
+      "support": 8,
+      "treatment": "lora_candidate",
+      "tune_offset": 500000
+    },
+    "primary_metric": "compositional_transfer_success_diff_lora_minus_base",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 1
+  },
+  "packet_digest": "d8941f993220e4802735438d3516a889e43209a1f6c37390e4b605556607b77f"
+}

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Callable
 from itertools import product
 
 from hsi.codec.base import State, Trace
@@ -26,10 +27,21 @@ def _run(h: tuple[Prim, ...], s: State) -> State:
 
 
 Transition = tuple[State, int, State]
+Chooser = Callable[[list[int]], int]  # picks one hypothesis index among the consistent ones
+
+
+def consistent(pairs: list[tuple[State, State]], first_only: bool = False) -> list[int]:
+    out = []
+    for i, h in enumerate(HYPOTHESES):
+        if all(_run(h, s) == s2 for s, s2 in pairs):
+            out.append(i)
+            if first_only:
+                break
+    return out
 
 
 class Model:
-    def __init__(self, transitions: list[Transition]) -> None:
+    def __init__(self, transitions: list[Transition], chooser: Chooser | None = None) -> None:
         obs: dict[int, list[tuple[State, State]]] = {a: [] for a in range(N_ACTIONS)}
         for s, a, s2 in transitions:
             obs[a].append((s, s2))
@@ -39,10 +51,9 @@ class Model:
             for s, s2 in pairs:
                 self.table[(s, a)] = s2
             if pairs:
-                for h in HYPOTHESES:
-                    if all(_run(h, s) == s2 for s, s2 in pairs):
-                        self.hyp[a] = h
-                        break
+                c = consistent(pairs, first_only=chooser is None)
+                if c:
+                    self.hyp[a] = HYPOTHESES[c[0] if chooser is None else chooser(c)]
 
     @classmethod
     def from_trace(cls, trace: Trace) -> Model:

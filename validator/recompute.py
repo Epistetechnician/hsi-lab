@@ -58,6 +58,25 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
             errs.append("message cap differs from packet")
         return g["max_message_bytes_used"] <= g["message_byte_cap"] \
             and g["compute_matched_fraction"] == 1.0
+    if exp == "E4":
+        q = pk["params"]
+        if g["fit_regression_floor"] != q["fit_regression_floor"]:
+            errs.append("fit floor differs from packet")
+        diff = (g["fit_success_candidate"] - g["fit_success_base"]) / g["fit_n"]
+        return diff >= -g["fit_regression_floor"] and g["compute_matched_fraction"] == 1.0
+    if exp == "E6":
+        q = pk["params"]
+        gens = q["generations"]
+        tot, ok = {}, {}
+        for r in receipt["family_results"]:
+            tot[r["arm"]] = tot.get(r["arm"], 0) + r["n"]
+            ok[r["arm"]] = ok.get(r["arm"], 0) + r["successes"]
+        r1, rg = ok["d1_replay"] / tot["d1_replay"], ok[f"d{gens}_replay"] / tot[f"d{gens}_replay"]
+        if not (close(g["rate_d1_replay"], r1) and close(g[f"rate_d{gens}_replay"], rg)):
+            errs.append("replay rates differ from family_results")
+        if g["non_collapse_floor"] != q["non_collapse_floor"]:
+            errs.append("non_collapse_floor differs from packet")
+        return g["min_replay_diversity"] >= g["diversity_floor"] and rg - r1 >= -g["non_collapse_floor"]
     if exp == "E7":
         return g["duplicate_strength_updates"] == 0 and g["compute_matched_fraction"] == 1.0
     errs.append(f"no validator rule for {exp}")

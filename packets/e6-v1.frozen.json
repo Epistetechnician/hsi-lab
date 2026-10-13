@@ -1,0 +1,70 @@
+{
+  "packet": {
+    "arms": [
+      "d1_replay",
+      "d1_no_replay",
+      "d2_replay",
+      "d2_no_replay",
+      "d3_replay",
+      "d3_no_replay"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "Original replay keeps recursive self-training from collapsing: at depth 3, training with replay beats training on synthetic data alone.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d3 with replay does not beat d3 without replay by the threshold.",
+    "params": {
+      "adapt_lr": 0.2,
+      "adapt_steps": 200,
+      "baselines": [
+        "d3_no_replay"
+      ],
+      "diversity_floor_frac": 0.5,
+      "families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "generations": 3,
+      "max_n": 400,
+      "min_n": 30,
+      "n_adapt": 60,
+      "n_pretrain": 80,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 30,
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "pretrain_lr": 0.1,
+      "pretrain_steps": 300,
+      "rank": 2,
+      "support": 8,
+      "treatment": "d3_replay",
+      "tune_offset": 500000
+    },
+    "primary_metric": "success_diff_d3_replay_minus_d3_no_replay",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 1
+  },
+  "packet_digest": "3bd1af93282b0b5b48045e4abe552427845a2555063f88b140c55ce68859467f"
+}

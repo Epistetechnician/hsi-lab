@@ -24,6 +24,9 @@ class TaskResult:
 
 
 class Spec(Protocol):
+    """Optional hooks (not in the Protocol): prepare(packet, run_dir) trains candidates during
+    `pilot`; bind(packet, run_dir) loads and digest-verifies them before run/eval."""
+
     def run_task(self, arm: str, family: str, split: Split, seed: int,
                  packet: Packet) -> TaskResult: ...
 

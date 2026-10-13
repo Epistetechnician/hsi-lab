@@ -235,7 +235,8 @@ Open questions:
 | M2 Codecs (E1) | done (pending owner review) | F6, F16–F18 for E1; full `pilot→lock→run→eval→verify-receipt→decide` loop; see docs/experiments/E1.md |
 | M3 Verified synthesis (E2) | done (pending owner review) | F8–F9; quarantine → oracle verifier → eligible/rejected; E2 result is NO_CANDIDATE, see docs/experiments/E2.md |
 | M4 Collective + relations (E3, E7) | done (pending owner review) | F10, F12–F13; E3 PROMOTE, E7 INCONCLUSIVE; see docs/experiments/E3.md, E7.md |
-| M5–M6 | not started | |
+| M5 Candidate update (E4, E6) | done (pending owner review) | F15–F17; E4 NO_CANDIDATE, E6 INCONCLUSIVE; see docs/experiments/E4.md, E6.md; MLX/LLM backbone not used |
+| M6 | not started | |
 
 Schema deviations from the PRD text: `Episode` adds `rule_family` (split is defined on it) and
 `governance` (F5). `Receipt` carries `family_results` (successes/n per family and arm) so the
@@ -263,3 +264,14 @@ runs but is exploratory: the decision compares fixed_graph with single and indep
 (3) E7 relations are context->stored-transitions with a capacity of 2 active relations; "return"
 tasks reuse hidden rules with a fresh start/goal (`RuleWorld(..., variant=1)`). (4) Pilot sample
 sizes hit `max_n=400` (flagged `underpowered` in pilot.json) for E3 and E7.
+
+M5 deviations: (1) **No LLM yet.** MLX and a checkpoint are not installed and downloading weights
+needs owner approval (open question: checkpoint). The "frozen base + LoRA adapter" contract
+(freeze, low-rank update, reversible, digest-bound, trained only on non-held-out data) is
+implemented on a pure-Python hypothesis prior (`hsi.learning`, runtime tag `hsi-prior-v1`), so a
+MLX backbone can later replace it behind the same interface. (2) Candidates are trained during
+`hsi pilot` (producer side) on tune/fit seeds in disjoint ranges, then digest-verified by `run`
+and `eval` (fail closed). (3) The pilot/run split offsets (`tune_offset`) keep pilot seeds out of
+the training seeds. (4) E6 is framed as treatment d3_replay vs baseline d3_no_replay plus a
+non-inferiority guardrail (d3_replay >= d1_replay - 2 points), because the decision rule is
+"treatment beats baseline".

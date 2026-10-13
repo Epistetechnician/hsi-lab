@@ -21,6 +21,9 @@ packages = ["src/hsi"]
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint.per-file-ignores]
+"src/hsi/learning/train.py" = ["B023"]  # closures are invoked immediately inside the loop
+
 [tool.mypy]
 strict = true
 mypy_path = "src"

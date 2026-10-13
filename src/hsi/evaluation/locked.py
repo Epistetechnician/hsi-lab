@@ -45,6 +45,8 @@ def main(run_dir: Path) -> Path:
     q = packet.params
     fams = list(q["families"])
     spec = SPECS[packet.experiment]
+    if hasattr(spec, "bind"):
+        spec.bind(packet, run_dir)
     treat, bases = arms_of(packet)
     meter, rows = Meter(), []
     res: dict[tuple[str, str], list[TaskResult]] = {}

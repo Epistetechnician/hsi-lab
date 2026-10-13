@@ -34,3 +34,8 @@ def test_relations_and_collective_never_touch_evaluator_or_custody() -> None:
     bad = ("hsi.evaluation", "hsi.pipeline", "hsi.paths", "hsi.verification", "hsi.synthesis")
     for pkg in ("relations", "collective"):
         assert not [i for i in imports(pkg) if i.startswith(bad)], pkg
+
+
+def test_learning_never_touches_evaluator_or_custody() -> None:
+    bad = ("hsi.evaluation", "hsi.pipeline", "hsi.paths", "hsi.verification", "hsi.synthesis")
+    assert not [i for i in imports("learning") if i.startswith(bad)]

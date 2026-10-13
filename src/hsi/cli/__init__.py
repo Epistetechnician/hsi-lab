@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1, E2, E3, E7)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E4, E6, E7)."""
 from __future__ import annotations
 
 import argparse
@@ -85,6 +85,39 @@ def template(exp: str) -> dict[str, object]:
                     "explore_final": 4, "relation_cap": 2, "probes": 2, "pilot_tasks": 30,
                     "min_n": 30, "max_n": 400, "treatment": "adaptive_relations",
                     "baselines": ["no_relations", "static_relations"]})
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 0}
+    if exp in ("E4", "E6"):
+        common = {"pretrain_families": ["rule_induction", "compositional_transfer"], "support": 8,
+                  "n_pretrain": 80, "n_adapt": 60, "pretrain_steps": 300, "pretrain_lr": 0.1,
+                  "adapt_steps": 200, "adapt_lr": 0.2, "rank": 2, "pilot_tasks": 30, "min_n": 30,
+                  "max_n": 400, "tune_offset": 500_000}
+    if exp == "E4":
+        t.update(
+            hypothesis="One reversible adapter update (LoRA) trained on tune-split worlds improves "
+                       "held-out compositional transfer over the frozen base without regressing "
+                       "fit families beyond 2 points.",
+            null_hypothesis="The LoRA candidate does not beat the frozen base by the threshold.",
+            arms=["frozen_base", "lora_candidate", "memory_candidate"],
+            primary_metric="compositional_transfer_success_diff_lora_minus_base",
+            guardrails=["fit-family regression within floor", "exploration calls matched"],
+            params={**common, "families": ["compositional_transfer"], "memory_alpha": 1.0,
+                    "fit_eval_n": 100, "fit_regression_floor": 0.02,
+                    "treatment": "lora_candidate", "baselines": ["frozen_base"]})
+    if exp == "E6":
+        t.update(
+            hypothesis="Original replay keeps recursive self-training from collapsing: at depth 3, "
+                       "training with replay beats training on synthetic data alone.",
+            null_hypothesis="d3 with replay does not beat d3 without replay by the threshold.",
+            arms=["d1_replay", "d1_no_replay", "d2_replay", "d2_no_replay", "d3_replay",
+                  "d3_no_replay"],
+            primary_metric="success_diff_d3_replay_minus_d3_no_replay",
+            guardrails=["generated-task diversity above pilot floor at every depth",
+                        "d3_replay not below d1_replay beyond floor"],
+            params={**common, "families": ["rule_induction", "compositional_transfer"],
+                    "generations": 3, "diversity_floor_frac": 0.5, "non_collapse_floor": 0.02,
+                    "treatment": "d3_replay", "baselines": ["d3_no_replay"]})
+    if exp in ("E4", "E6"):
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 0}
     return t
