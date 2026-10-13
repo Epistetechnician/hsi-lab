@@ -1,0 +1,64 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E4",
+  "version": 2,
+  "hypothesis": "A rank-8 LoRA adapter on a frozen Qwen2.5-1.5B-Instruct (4-bit), trained on tune-split worlds with 50% fit-world replay, improves held-out compositional transfer over the frozen model without regressing fit families beyond 2 points.",
+  "null_hypothesis": "The LoRA candidate does not beat the frozen base by the threshold.",
+  "arms": [
+    "frozen_base",
+    "lora_candidate"
+  ],
+  "primary_metric": "compositional_transfer_success_diff_lora_minus_base",
+  "threshold": 0.05,
+  "guardrails": [
+    "fit-family regression within floor",
+    "exploration calls matched"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "pretrain_families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "support": 8,
+    "n_adapt": 60,
+    "adapt_steps": 300,
+    "adapt_lr": 0.0001,
+    "rank": 8,
+    "pilot_tasks": 20,
+    "min_n": 30,
+    "max_n": 200,
+    "tune_offset": 500000,
+    "families": [
+      "compositional_transfer"
+    ],
+    "fit_eval_n": 60,
+    "fit_regression_floor": 0.02,
+    "treatment": "lora_candidate",
+    "baselines": [
+      "frozen_base"
+    ],
+    "backbone": "llm",
+    "n_replay": 60,
+    "replay_frac": 0.5,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "adapt_batch": 8
+  }
+}

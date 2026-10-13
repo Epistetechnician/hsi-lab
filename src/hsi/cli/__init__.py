@@ -21,7 +21,7 @@ E1_PARAMS = {"families": ["rule_induction", "compositional_transfer", "counterev
              "trace_len": 40, "pilot_tasks": 30, "min_n": 30, "max_n": 400}
 
 
-def template(exp: str) -> dict[str, object]:
+def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION, "experiment": exp, "version": 1,
         "hypothesis": "TODO", "null_hypothesis": "TODO", "arms": ["baseline", "treatment"],
@@ -133,6 +133,20 @@ def template(exp: str) -> dict[str, object]:
             params={**common, "families": ["rule_induction", "compositional_transfer"],
                     "generations": 3, "diversity_floor_frac": 0.5, "non_collapse_floor": 0.02,
                     "treatment": "d3_replay", "baselines": ["d3_no_replay"]})
+    if exp == "E4" and variant == "llm":
+        p = dict(t["params"])  # type: ignore[call-overload]
+        for k in ("pretrain_steps", "pretrain_lr", "n_pretrain", "memory_alpha"):
+            p.pop(k, None)
+        p.update(backbone="llm", n_adapt=60, n_replay=60, replay_frac=0.5, rank=8, lora_layers=8,
+                 lora_scale=20.0, adapt_steps=300, adapt_lr=1e-4, adapt_batch=8, pilot_tasks=20,
+                 min_n=30, max_n=200, fit_eval_n=60)
+        t.update(
+            version=2, arms=["frozen_base", "lora_candidate"],
+            hypothesis="A rank-8 LoRA adapter on a frozen Qwen2.5-1.5B-Instruct (4-bit), trained on "
+                       "tune-split worlds with 50% fit-world replay, improves held-out "
+                       "compositional transfer over the frozen model without regressing fit "
+                       "families beyond 2 points.",
+            params=p)
     if exp in ("E4", "E6"):
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 0}
@@ -197,6 +211,7 @@ def main(argv: list[str] | None = None) -> int:
     n = pk.add_parser("new")
     n.add_argument("experiment", choices=sorted(EXPERIMENTS))
     n.add_argument("out", type=Path)
+    n.add_argument("--variant", default="", choices=["", "llm"])
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)
     b = sub.add_parser("baselines")
@@ -253,7 +268,7 @@ def main(argv: list[str] | None = None) -> int:
         if a.action == "new":
             if a.out.exists():
                 raise FileExistsError(str(a.out))
-            a.out.write_text(json.dumps(template(a.experiment), indent=2) + "\n", "utf-8")
+            a.out.write_text(json.dumps(template(a.experiment, a.variant), indent=2) + "\n", "utf-8")
             print(a.out)
         elif a.action == "freeze":
             print(freeze(a.file))

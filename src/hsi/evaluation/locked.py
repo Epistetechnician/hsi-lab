@@ -79,7 +79,8 @@ def main(run_dir: Path) -> Path:
     gv, held = spec.guardrails(allr, comps, packet)
     body = Receipt(
         packet_digest=digest, source_commit=_commit(), lock_digest=ld,
-        model_digest=hashlib.sha256(b"scripted:learner-v1:codecs-v1").hexdigest(),
+        model_digest=(getattr(spec, "model_digest", lambda: None)()
+                      or hashlib.sha256(b"scripted:learner-v1:codecs-v1").hexdigest()),
         data_digest=canonical_digest(rows), seeds=packet.seeds, budget_used=meter.snapshot(),
         family_results=fr, comparisons=comps, guardrail_values=gv, threshold=packet.threshold,
         guardrails_held=held,

@@ -7,6 +7,7 @@ import stat
 import sys
 from dataclasses import replace
 from pathlib import Path
+from typing import Any
 
 from hsi.agents.learner import HYPOTHESES, Model, transitions_of
 from hsi.agents.scripted import random_policy, rollout
@@ -178,11 +179,13 @@ def prior_for(stack: Stack, arm: str, alpha: float = 1.0) -> Prior:
     raise ValueError(f"unknown arm {arm}")
 
 
-def run_prior_task(prior: Prior, arm: str, family: str, split: Split, seed: int,
+def run_prior_task(prior: Any, arm: str, family: str, split: Split, seed: int,
                    support: int) -> TaskResult:
+    """`prior` is any chooser: a Prior (pure-Python) or an LLMPrior (exposes with_context)."""
     env = RuleWorld(family, split, seed)
     tr = teacher_trace(RuleWorld(family, split, seed), support, tag="/support")
-    model = Model(transitions_of(tr), chooser=prior.choose)
+    model = Model(transitions_of(tr), chooser=prior if hasattr(prior, "with_context")
+                  else prior.choose)
     obs, info = env.reset()
     goal = tuple(int(x) for x in info["goal"])  # type: ignore[attr-defined]
     plan = model.plan(tuple(obs), goal, env.task.horizon)

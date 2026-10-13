@@ -158,6 +158,20 @@ class LLM:
         self._scale = scale
         self.enabled = True
 
+    def reset_lora(self, seed: int) -> None:
+        """Re-initialise the adapter (A random, B zero) so training starts from identity."""
+        import math
+
+        import mlx.core as mx
+
+        mx.random.seed(seed)
+        for m in self._lora:
+            d_in, r = m.lora_a.shape
+            s = 1 / math.sqrt(d_in)
+            m.lora_a = mx.random.uniform(low=-s, high=s, shape=(d_in, r))
+            m.lora_b = mx.zeros(m.lora_b.shape)
+        self.set_adapter(True)
+
     def set_adapter(self, on: bool) -> None:
         """Exact off-switch: with scale 0 the LoRA branch adds exactly zero."""
         for m in self._lora:

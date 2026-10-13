@@ -17,15 +17,38 @@ from hsi.evaluation.learned import Stack, load_stack, prepare_e4, prior_for, run
 
 class E4Spec:
     stack: Stack | None = None
+    run_dir: Path | None = None
+
+    @staticmethod
+    def _llm(packet: Packet) -> bool:
+        return packet.params.get("backbone") == "llm"
 
     def prepare(self, packet: Packet, run_dir: Path) -> None:
-        prepare_e4(packet, run_dir)
+        if self._llm(packet):
+            from hsi.evaluation.llm_stack import prepare_e4_llm
+            prepare_e4_llm(packet, run_dir)
+        else:
+            prepare_e4(packet, run_dir)
 
     def bind(self, packet: Packet, run_dir: Path) -> None:
-        self.stack = load_stack(packet, run_dir)
+        if self._llm(packet):
+            from hsi.evaluation.llm_stack import bind_e4_llm
+            bind_e4_llm(packet, run_dir)
+            self.run_dir = run_dir
+        else:
+            self.stack = load_stack(packet, run_dir)
+
+    def model_digest(self) -> str | None:
+        if self.run_dir is None:
+            return None
+        from hsi.evaluation.llm_stack import model_digest
+        return model_digest(self.run_dir)
 
     def run_task(self, arm: str, family: str, split: Split, seed: int,
                  packet: Packet) -> TaskResult:
+        if self._llm(packet):
+            from hsi.evaluation.llm_stack import run_llm_task
+            return run_llm_task(arm, family, split, seed, packet)
         assert self.stack is not None, "spec not bound"
         pr = prior_for(self.stack, arm, float(packet.params["memory_alpha"]))
         return run_prior_task(pr, arm, family, split, seed, int(packet.params["support"]))

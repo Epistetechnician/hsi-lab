@@ -81,12 +81,15 @@ def reproduce(receipt_path: Path, orig_run: Path, orig_custody: Path, out: Path 
         (tmp / "custody").mkdir(mode=0o700)
         # Dependency install is the only step that may use the network (hash-pinned by uv.lock,
         # only with --fetch); every hsi command below runs with --offline.
-        _run(["uv", "sync", "--frozen", "--quiet", *([] if fetch else ["--offline"])], src, env)
+        extras = ["--all-extras"] if "[project.optional-dependencies]" in (
+            src / "pyproject.toml").read_text() else []
+        _run(["uv", "sync", "--frozen", "--quiet", *extras, *([] if fetch else ["--offline"])],
+             src, env)
         frozen = next((p for p in sorted((src / "packets").glob("*.frozen.json"))
                        if json.loads(p.read_text())["packet_digest"] == pd), None)
         if frozen is None:
             raise PreconditionError("no frozen packet with the receipt's digest at that commit")
-        hsi = ["uv", "run", "--frozen", "--offline", "--quiet", "hsi"]
+        hsi = ["uv", "run", "--frozen", "--offline", "--quiet", *extras, "hsi"]
         _run([*hsi, "pilot", str(frozen)], src, env)
         _run([*hsi, "lock", str(frozen)], src, env)
         rd = tmp / "runs" / pd[:16]
