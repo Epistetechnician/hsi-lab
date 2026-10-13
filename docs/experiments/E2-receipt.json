@@ -1,0 +1,192 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 28480.0,
+    "failed_proposals": 31798.0,
+    "peak_mem_mb": 298.640625,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 11.217912124935538
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "real_only",
+      "ci_high": -0.19314437491005135,
+      "ci_low": -0.24793306616738972,
+      "paired_diff": -0.22053872053872053,
+      "pairs": [
+        {
+          "both": 137,
+          "family": "rule_induction",
+          "n": 297,
+          "neither": 72,
+          "only_baseline": 82,
+          "only_treatment": 6
+        },
+        {
+          "both": 46,
+          "family": "compositional_transfer",
+          "n": 297,
+          "neither": 172,
+          "only_baseline": 71,
+          "only_treatment": 8
+        },
+        {
+          "both": 132,
+          "family": "counterevidence",
+          "n": 297,
+          "neither": 79,
+          "only_baseline": 73,
+          "only_treatment": 13
+        },
+        {
+          "both": 149,
+          "family": "relational_return",
+          "n": 297,
+          "neither": 67,
+          "only_baseline": 72,
+          "only_treatment": 9
+        }
+      ],
+      "treatment_arm": "verified_synthetic"
+    },
+    {
+      "baseline_arm": "unverified_synthetic",
+      "ci_high": 0.02123697689609908,
+      "ci_low": -0.002718458377580564,
+      "paired_diff": 0.009259259259259259,
+      "pairs": [
+        {
+          "both": 130,
+          "family": "rule_induction",
+          "n": 297,
+          "neither": 150,
+          "only_baseline": 4,
+          "only_treatment": 13
+        },
+        {
+          "both": 50,
+          "family": "compositional_transfer",
+          "n": 297,
+          "neither": 238,
+          "only_baseline": 5,
+          "only_treatment": 4
+        },
+        {
+          "both": 138,
+          "family": "counterevidence",
+          "n": 297,
+          "neither": 146,
+          "only_baseline": 6,
+          "only_treatment": 7
+        },
+        {
+          "both": 150,
+          "family": "relational_return",
+          "n": 297,
+          "neither": 133,
+          "only_baseline": 6,
+          "only_treatment": 8
+        }
+      ],
+      "treatment_arm": "verified_synthetic"
+    }
+  ],
+  "data_digest": "b9239917d64fa57b94f56fb7809ac8f9b2af00bf126b1f3d650a1c18f07115c1",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "real_only",
+      "family": "rule_induction",
+      "n": 297,
+      "successes": 219
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "rule_induction",
+      "n": 297,
+      "successes": 134
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "rule_induction",
+      "n": 297,
+      "successes": 143
+    },
+    {
+      "arm": "real_only",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 117
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 55
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 54
+    },
+    {
+      "arm": "real_only",
+      "family": "counterevidence",
+      "n": 297,
+      "successes": 205
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "counterevidence",
+      "n": 297,
+      "successes": 144
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "counterevidence",
+      "n": 297,
+      "successes": 145
+    },
+    {
+      "arm": "real_only",
+      "family": "relational_return",
+      "n": 297,
+      "successes": 221
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "relational_return",
+      "n": 297,
+      "successes": 156
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "relational_return",
+      "n": 297,
+      "successes": 158
+    }
+  ],
+  "guardrail_values": {
+    "example_count_equal_fraction": 1.0,
+    "family_regression_floor": 0.02,
+    "lineage_fraction": 1.0,
+    "min_family_diff_vs_real_only": -0.2558922558922559
+  },
+  "guardrails_held": false,
+  "lock_digest": "f403776e1d298d71e85a01e7540ca7cdd02417d61553e329c22758171437c9a8",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "0a11093d5a9d6ccc4f4832ce4f64de29e7018caefb6c6f4245c8a9ed135813da",
+  "receipt_digest": "2dbc0096ca61594ab78f63140af136aabf40970b84ea3086973f4b6807e077ef",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "096f44b8ca0072f338d2477725731db4ddf1fade",
+  "threshold": 0.05
+}

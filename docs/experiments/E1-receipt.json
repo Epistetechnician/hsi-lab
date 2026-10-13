@@ -1,24 +1,64 @@
 {
-  "baseline_arm": "text",
   "budget_used": {
-    "bytes": 362000.0,
-    "calls": 24844.0,
+    "bytes": 362938.0,
+    "calls": 25214.0,
     "failed_proposals": 0.0,
-    "peak_mem_mb": 62.53125,
+    "peak_mem_mb": 65.515625,
     "retries": 0.0,
     "tokens": 0.0,
-    "wall_seconds": 6.824581875000149
+    "wall_seconds": 7.1027957500191405
   },
-  "ci_high": 0.6833982835070808,
-  "ci_low": 0.6314165313077341,
-  "data_digest": "bf55985b1a8cb9bb7736746c2987d52f1afc5be0b035e236817c2ea2e2559778",
+  "comparisons": [
+    {
+      "baseline_arm": "text",
+      "ci_high": 0.7018229257200094,
+      "ci_low": 0.6515721360083856,
+      "paired_diff": 0.6766975308641975,
+      "pairs": [
+        {
+          "both": 84,
+          "family": "rule_induction",
+          "n": 324,
+          "neither": 0,
+          "only_baseline": 0,
+          "only_treatment": 240
+        },
+        {
+          "both": 20,
+          "family": "compositional_transfer",
+          "n": 324,
+          "neither": 142,
+          "only_baseline": 4,
+          "only_treatment": 158
+        },
+        {
+          "both": 63,
+          "family": "counterevidence",
+          "n": 324,
+          "neither": 17,
+          "only_baseline": 1,
+          "only_treatment": 243
+        },
+        {
+          "both": 82,
+          "family": "relational_return",
+          "n": 324,
+          "neither": 1,
+          "only_baseline": 0,
+          "only_treatment": 241
+        }
+      ],
+      "treatment_arm": "typed_event"
+    }
+  ],
+  "data_digest": "0f7ed12f8345a46f50650978ee5b28b9efee72610605d4f2db3eb44b4f212c23",
   "decision": "PROMOTE",
   "family_results": [
     {
       "arm": "text",
       "family": "rule_induction",
       "n": 324,
-      "successes": 88
+      "successes": 84
     },
     {
       "arm": "typed_event",
@@ -30,37 +70,37 @@
       "arm": "text",
       "family": "compositional_transfer",
       "n": 324,
-      "successes": 35
+      "successes": 24
     },
     {
       "arm": "typed_event",
       "family": "compositional_transfer",
       "n": 324,
-      "successes": 188
+      "successes": 178
     },
     {
       "arm": "text",
       "family": "counterevidence",
       "n": 324,
-      "successes": 85
+      "successes": 64
     },
     {
       "arm": "typed_event",
       "family": "counterevidence",
       "n": 324,
-      "successes": 300
+      "successes": 306
     },
     {
       "arm": "text",
       "family": "relational_return",
       "n": 324,
-      "successes": 76
+      "successes": 82
     },
     {
       "arm": "typed_event",
       "family": "relational_return",
       "n": 324,
-      "successes": 324
+      "successes": 323
     }
   ],
   "guardrail_values": {
@@ -69,54 +109,18 @@
     "recon_exact_fraction": 1.0
   },
   "guardrails_held": true,
-  "lock_digest": "149cd64b1fab3b0934d44b8b9112a68c676b53eff4a532fd980935f219a9607c",
+  "lock_digest": "605281a34559d607ebce07ddb83fccf4b487392043be5e5b9e3ac13fdfe39c2e",
   "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
   "nonclaims": [
     "no general intelligence claim",
     "not a proof"
   ],
   "packet_digest": "418476a4b98fe29bf2d477677380bf13f8638593d2c72570caa1a76a7ed2d533",
-  "paired_diff": 0.6574074074074074,
-  "pairs": [
-    {
-      "both": 88,
-      "family": "rule_induction",
-      "n": 324,
-      "neither": 0,
-      "only_baseline": 0,
-      "only_treatment": 236
-    },
-    {
-      "both": 28,
-      "family": "compositional_transfer",
-      "n": 324,
-      "neither": 129,
-      "only_baseline": 7,
-      "only_treatment": 160
-    },
-    {
-      "both": 82,
-      "family": "counterevidence",
-      "n": 324,
-      "neither": 21,
-      "only_baseline": 3,
-      "only_treatment": 218
-    },
-    {
-      "both": 76,
-      "family": "relational_return",
-      "n": 324,
-      "neither": 0,
-      "only_baseline": 0,
-      "only_treatment": 248
-    }
-  ],
-  "receipt_digest": "8c90a2c993643a67a490dc83b13309b0dd6195fc9b8ffef248eaab27c81853fa",
+  "receipt_digest": "f544f972dbd01d8dfdf0a1ce1bb271d6e6cb5c25054e2e6dcd4da34d59da531d",
   "schema_version": "hsi-receipt-v1",
   "seeds": [
     0
   ],
-  "source_commit": "0c40af432967e35dcd343b738ed497fc6a4c147f",
-  "threshold": 0.05,
-  "treatment_arm": "typed_event"
+  "source_commit": "096f44b8ca0072f338d2477725731db4ddf1fade+dirty",
+  "threshold": 0.05
 }
