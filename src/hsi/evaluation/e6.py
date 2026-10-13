@@ -82,6 +82,12 @@ class E6Spec:
             for k in ("validity", "diversity"):
                 if k in cands[arm]:
                     gv[f"{k}_{arm}"] = float(cands[arm][k])
+        for arm in sorted({r.arm for r in results}):  # eval-time generation quality (gen mode)
+            rs = [r for r in results if r.arm == arm and "gen_seen" in r.stats]
+            if rs:
+                tot = sum(r.stats["gen_seen"] for r in rs)
+                gv[f"eval_valid_{arm}"] = sum(r.stats["gen_valid"] for r in rs) / tot
+                gv[f"eval_consistent_{arm}"] = sum(r.stats["gen_consistent"] for r in rs) / tot
         held = min_div >= floor and gv[f"rate_d{gens}_replay"] - gv["rate_d1_replay"] \
             >= -gv["non_collapse_floor"]
         return gv, held

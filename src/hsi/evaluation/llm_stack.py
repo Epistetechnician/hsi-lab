@@ -204,6 +204,15 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
                           "diversity": _text_entropy(texts), "validity": sum(valid) / len(valid),
                           "n_synthetic": len(take), "n_real": len(real)}
             # live weights now equal adapter g: the next loop iteration generates with it
+    if q.get("extra_arms"):  # reference: SFT on original labelled data only (no synthetic)
+        real_only = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]))
+                     for s in rng.sample(real_pool, min(n, len(real_pool)))]
+        llm.reset_lora(seed)
+        loss = llm.train_lora(real_only, int(q["adapt_steps"]), float(q["adapt_lr"]), seed,
+                              int(q["adapt_batch"]))
+        cands["real_only"] = {"generation": 0, "loss": loss, "n_synthetic": 0,
+                              "n_real": len(real_only),
+                              "digest": llm.save_adapter(ld / "real_only.safetensors")}
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
         "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",
@@ -249,8 +258,53 @@ def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Pack
     from hsi.learning.llm import LLMPrior
 
     llm = get_llm()
-    if _STATE.get("arm") != arm:
+    if arm == "frozen_base":
+        llm.set_adapter(False)
+        _STATE["arm"] = None
+    elif _STATE.get("arm") != arm:
         llm.load_adapter(_STATE["run_dir"] / "learning" / f"{arm}.safetensors")
+        llm.set_adapter(True)
         _STATE["arm"] = arm
+    if packet.params.get("eval_mode") == "generate":
+        return run_generation_task(llm, arm, family, split, seed, packet)
     return run_prior_task(LLMPrior(llm, adapter=True), arm, family, split, seed,
                           int(packet.params["support"]))
+
+
+def run_generation_task(llm: Any, arm: str, family: str, split: Split, seed: int,
+                        packet: Packet) -> TaskResult:
+    """Free-generation evaluation: the model writes a hypothesis per action; valid ones are used
+    as-is (no consistency filter). Records how often the model's text was valid / consistent."""
+    from hsi.agents.learner import Model, consistent, transitions_of
+    from hsi.agents.scripted import random_policy, rollout
+    from hsi.environment import RuleWorld
+    from hsi.evaluation.e1 import teacher_trace
+    from hsi.learning.llm import parse_hypothesis, render_prompt
+    from hsi.learning.prior import true_index
+
+    support, max_tok = int(packet.params["support"]), int(packet.params["gen_max_tokens"])
+    seen = valid = consist = 0
+
+    def propose(pairs: list[Any]) -> Any:
+        nonlocal seen, valid, consist
+        seen += 1
+        h = parse_hypothesis(llm.generate(render_prompt(pairs), max_tok))
+        if h is not None:
+            valid += 1
+            idx = true_index(h)
+            consist += idx is not None and idx in consistent(pairs)
+        return h
+
+    env = RuleWorld(family, split, seed)
+    tr = teacher_trace(RuleWorld(family, split, seed), support, tag="/support")
+    model = Model(transitions_of(tr), proposer=propose)
+    obs, info = env.reset()
+    goal = tuple(int(x) for x in info["goal"])  # type: ignore[attr-defined]
+    plan = model.plan(tuple(obs), goal, env.task.horizon)
+    acts = [(0, a) for a in plan] if plan else random_policy(env, random.Random(f"act/{arm}/{seed}"))
+    ep = rollout(env, acts)
+    ep = ep.model_copy(update={"episode_id": f"{arm}/{family}/{split.value}-{seed}"})
+    return TaskResult(arm, family, seed, ep.outcome.success, [ep],
+                      {"explore_calls": float(support), "calls": float(len(ep.steps)),
+                       "gen_seen": float(seen), "gen_valid": float(valid),
+                       "gen_consistent": float(consist)})

@@ -41,7 +41,9 @@ def consistent(pairs: list[tuple[State, State]], first_only: bool = False) -> li
 
 
 class Model:
-    def __init__(self, transitions: list[Transition], chooser: Chooser | None = None) -> None:
+    def __init__(self, transitions: list[Transition], chooser: Chooser | None = None,
+                 proposer: Callable[[list[tuple[State, State]]], tuple[Prim, ...] | None] | None = None,
+                 ) -> None:
         obs: dict[int, list[tuple[State, State]]] = {a: [] for a in range(N_ACTIONS)}
         for s, a, s2 in transitions:
             obs[a].append((s, s2))
@@ -50,7 +52,13 @@ class Model:
         for a, pairs in obs.items():
             for s, s2 in pairs:
                 self.table[(s, a)] = s2
-            if pairs:
+            if pairs and proposer is not None:
+                # free generation: whatever valid hypothesis is proposed is used, even if the
+                # evidence contradicts it; an invalid proposal leaves the action unknown
+                h = proposer(pairs)
+                if h is not None:
+                    self.hyp[a] = h
+            elif pairs:
                 c = consistent(pairs, first_only=chooser is None)
                 if c:
                     ctx = getattr(chooser, "with_context", None)  # LLM choosers see the evidence

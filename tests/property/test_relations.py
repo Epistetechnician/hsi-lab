@@ -72,3 +72,12 @@ def test_hyp_message_roundtrip_and_cap(h, cap) -> None:  # type: ignore[no-untyp
     assert len(data) <= cap
     got = decode_hyps(data) if data else {}
     assert all(h[a] == v for a, v in got.items())
+
+
+def test_proposer_hook_uses_valid_proposals_even_if_wrong_and_skips_invalid() -> None:
+    from hsi.agents.learner import Model
+
+    t = [((0, 0, 0, 0, 0), 0, (1, 0, 0, 0, 0)), ((0, 0, 0, 0, 0), 1, (0, 1, 0, 0, 0))]
+    wrong = (("swap", 0, 1, 0),)  # contradicts the evidence for action 0
+    m = Model(t, proposer=lambda pairs: wrong if pairs[0][1][0] == 1 else None)
+    assert m.hyp == {0: wrong}  # used as-is; the invalid proposal for action 1 leaves it unknown
