@@ -84,6 +84,20 @@ Guardrails: {'compute_matched_fraction': 1.0, 'fit_n': 200.0, 'fit_regression_fl
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
 
+## E5 — receipt `f0c00ae17b53`, threshold 0.05, decision PROMOTE
+
+
+fixed_graph → adaptive_graph (receipt: diff 0.4213, CI [0.3854, 0.4571])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 400 | 124 | 138 | 6 | 132 |
+| compositional_transfer | 400 | 48 | 212 | 7 | 133 |
+
+Guardrails: {'bytes_total_adaptive_graph': 21004.0, 'bytes_total_fixed_graph': 53876.0, 'compute_matched_fraction': 1.0, 'link_churn_mean_adaptive_graph': 4.5, 'link_churn_mean_fixed_graph': 0.0, 'max_message_bytes_used': 70.0, 'message_byte_cap': 72.0, 'success_per_kb_adaptive_graph': 25.44886688249857, 'success_per_kb_fixed_graph': 3.5162224367065114}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
+
 ## E6 — receipt `7a7d1247e9be`, threshold 0.05, decision NO_CANDIDATE
 
 

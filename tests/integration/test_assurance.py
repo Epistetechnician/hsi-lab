@@ -82,6 +82,5 @@ def test_bundle_validates_in_isolation(tmp_path: Path, monkeypatch: pytest.Monke
 def test_assess_reports_all_seven() -> None:
     rows = assess()
     assert [r["experiment"] for r in rows] == ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]
-    assert next(r for r in rows if r["experiment"] == "E5")["level"] == "none"
-    assert all(r["level"] in ("A2", "A3") for r in rows if r["experiment"] != "E5")
+    assert all(r["level"] in ("A2", "A3") for r in rows)
     assert "of 7" in render(rows)

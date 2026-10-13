@@ -1,0 +1,92 @@
+{
+  "budget_used": {
+    "bytes": 74880.0,
+    "calls": 16417.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 69.984375,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 7.547441874979995
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "fixed_graph",
+      "ci_high": 0.4571220078020453,
+      "ci_low": 0.3853779921979547,
+      "paired_diff": 0.42125,
+      "pairs": [
+        {
+          "both": 124,
+          "family": "rule_induction",
+          "n": 400,
+          "neither": 132,
+          "only_baseline": 6,
+          "only_treatment": 138
+        },
+        {
+          "both": 48,
+          "family": "compositional_transfer",
+          "n": 400,
+          "neither": 133,
+          "only_baseline": 7,
+          "only_treatment": 212
+        }
+      ],
+      "treatment_arm": "adaptive_graph"
+    }
+  ],
+  "data_digest": "39f235343ba7ab25b620e3bc0abca1c3464496fd70c9e1b9eed5d9ea9f1ce611",
+  "decision": "PROMOTE",
+  "family_results": [
+    {
+      "arm": "fixed_graph",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 130
+    },
+    {
+      "arm": "adaptive_graph",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 262
+    },
+    {
+      "arm": "fixed_graph",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 55
+    },
+    {
+      "arm": "adaptive_graph",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 260
+    }
+  ],
+  "guardrail_values": {
+    "bytes_total_adaptive_graph": 21004.0,
+    "bytes_total_fixed_graph": 53876.0,
+    "compute_matched_fraction": 1.0,
+    "link_churn_mean_adaptive_graph": 4.5,
+    "link_churn_mean_fixed_graph": 0.0,
+    "max_message_bytes_used": 70.0,
+    "message_byte_cap": 72.0,
+    "success_per_kb_adaptive_graph": 25.44886688249857,
+    "success_per_kb_fixed_graph": 3.5162224367065114
+  },
+  "guardrails_held": true,
+  "lock_digest": "214a3aae9fe081b70c7381c89b85316a7eedde05a05f94ec766fa076d598de68",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "65131b16f06bb4f9b696c664d1b2fdae6b4b6c86c4ba52604f74cfa8ad1c6881",
+  "receipt_digest": "f0c00ae17b537b4446f7f410154788400b5f8f374cc7ce33213c5d0098f4e026",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "8a6278383a8ccd72248b04f8f0537525d065cff9",
+  "threshold": 0.05
+}

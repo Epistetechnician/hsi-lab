@@ -1,0 +1,22 @@
+{
+  "aggregates_compared": 59,
+  "aggregates_matched": 59,
+  "excluded": [
+    "budget_used.wall_seconds",
+    "budget_used.peak_mem_mb",
+    "receipt_digest"
+  ],
+  "experiment": "E5",
+  "match": true,
+  "match_fraction": 1.0,
+  "method": "fresh clone at source_commit, fresh uv venv from uv.lock, fresh run root, original held-out lock imported",
+  "mismatches": [],
+  "original_receipt_digest": "f0c00ae17b537b4446f7f410154788400b5f8f374cc7ce33213c5d0098f4e026",
+  "packet_digest": "65131b16f06bb4f9b696c664d1b2fdae6b4b6c86c4ba52604f74cfa8ad1c6881",
+  "platform": "macOS-26.6.1-arm64-arm-64bit",
+  "python": "3.12.13",
+  "rerun_receipt_digest": "ef1a8a14258d5fe7974e2951be719e6cda46d91ae44c409743d29cf51d8c3afa",
+  "rerun_validator_ok": true,
+  "source_commit": "8a6278383a8ccd72248b04f8f0537525d065cff9",
+  "uv_lock_sha256": "8bf1c68230bfb8bfc2525e3f0bb46176f0391e8dc478f03d9ce8bc3f82da541f"
+}
