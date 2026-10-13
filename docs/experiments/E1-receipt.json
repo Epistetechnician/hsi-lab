@@ -3,10 +3,10 @@
     "bytes": 362938.0,
     "calls": 25214.0,
     "failed_proposals": 0.0,
-    "peak_mem_mb": 65.515625,
+    "peak_mem_mb": 65.6875,
     "retries": 0.0,
     "tokens": 0.0,
-    "wall_seconds": 7.1027957500191405
+    "wall_seconds": 7.109603458899073
   },
   "comparisons": [
     {
@@ -116,11 +116,11 @@
     "not a proof"
   ],
   "packet_digest": "418476a4b98fe29bf2d477677380bf13f8638593d2c72570caa1a76a7ed2d533",
-  "receipt_digest": "f544f972dbd01d8dfdf0a1ce1bb271d6e6cb5c25054e2e6dcd4da34d59da531d",
+  "receipt_digest": "99fb099bef46464f805574ec79b23485d99f166097c6fe3ef9f5a280181e8bd4",
   "schema_version": "hsi-receipt-v1",
   "seeds": [
     0
   ],
-  "source_commit": "096f44b8ca0072f338d2477725731db4ddf1fade+dirty",
+  "source_commit": "4a46429a295c1cf766641f656d1c0d3b7bab4703",
   "threshold": 0.05
 }
