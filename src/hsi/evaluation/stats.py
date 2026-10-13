@@ -23,7 +23,7 @@ def overall(pairs: list[PairedFamily]) -> tuple[float, float, float]:
     return mean, mean - Z95 * se, mean + Z95 * se
 
 
-def decide(lo: float, hi: float, threshold: float, guardrails_held: bool) -> Outcome:
-    if not guardrails_held or hi < threshold:
+def decide(cis: list[tuple[float, float]], threshold: float, guardrails_held: bool) -> Outcome:
+    if not guardrails_held or any(hi < threshold for _, hi in cis):
         return Outcome.NO_CANDIDATE
-    return Outcome.PROMOTE if lo >= threshold else Outcome.INCONCLUSIVE
+    return Outcome.PROMOTE if all(lo >= threshold for lo, _ in cis) else Outcome.INCONCLUSIVE

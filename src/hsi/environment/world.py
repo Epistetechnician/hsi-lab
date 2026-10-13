@@ -129,6 +129,10 @@ class RuleWorld:
             _apply(p, out)
         return tuple(out)
 
+    def transition(self, s: State, a: int) -> State:
+        """Oracle: exact next state (used by the verifier)."""
+        return self._next(s, a)
+
     def _bfs_all(self, start: State) -> dict[State, int]:
         dist = {start: 0}
         q = deque([start])

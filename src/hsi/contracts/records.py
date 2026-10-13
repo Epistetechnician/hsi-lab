@@ -50,6 +50,7 @@ class Episode(Strict):
     rule_family: str
     split: Split
     seed: int
+    start: list[int]
     steps: list[Step]
     outcome: EpisodeOutcome
     origin: Origin
@@ -127,6 +128,15 @@ class PairedFamily(Strict):
     neither: int = Field(ge=0)
 
 
+class Comparison(Strict):
+    baseline_arm: str
+    treatment_arm: str
+    pairs: list[PairedFamily]
+    paired_diff: float
+    ci_low: float
+    ci_high: float
+
+
 class Receipt(Strict):
     schema_version: str = RECEIPT_V
     packet_digest: str
@@ -136,14 +146,9 @@ class Receipt(Strict):
     data_digest: str
     seeds: list[int]
     budget_used: dict[str, float]
-    baseline_arm: str
-    treatment_arm: str
     family_results: list[FamilyResult]
-    pairs: list[PairedFamily]
+    comparisons: list[Comparison] = Field(min_length=1)
     guardrail_values: dict[str, float]
-    paired_diff: float
-    ci_low: float
-    ci_high: float
     threshold: float
     guardrails_held: bool
     decision: Outcome

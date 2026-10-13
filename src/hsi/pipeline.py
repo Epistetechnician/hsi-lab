@@ -25,9 +25,11 @@ from hsi.errors import (
     PreconditionError,
     RecomputeError,
 )
-from hsi.evaluation.e1 import run_task
+from hsi.evaluation.base import arms_of
+from hsi.evaluation.registry import SPECS
 from hsi.experience import Ledger
 from hsi.paths import REPO, custody_root, run_root
+from hsi.verification import DecisionLog
 
 OUTCOMES = {"PROMOTE", "NO_CANDIDATE", "INCONCLUSIVE"}
 
@@ -38,8 +40,8 @@ def rundir(digest: str) -> Path:
 
 def _setup(packet_file: Path) -> tuple[Packet, str, Path]:
     packet, digest = load_frozen(packet_file)
-    if packet.experiment != "E1":
-        raise PreconditionError(f"{packet.experiment} not implemented yet (E1 only)")
+    if packet.experiment not in SPECS:
+        raise PreconditionError(f"{packet.experiment} not implemented yet ({sorted(SPECS)})")
     d = rundir(digest)
     d.mkdir(parents=True, exist_ok=True)
     pf = d / "packet.frozen.json"
@@ -48,33 +50,33 @@ def _setup(packet_file: Path) -> tuple[Packet, str, Path]:
     return packet, digest, d
 
 
-def _p(packet: Packet) -> tuple[list[str], int, int, int, int]:
+def _p(packet: Packet) -> tuple[list[str], int, int, int]:
     q = packet.params
-    return (list(q["families"]), int(q["trace_len"]), int(q["pilot_tasks"]),
-            int(q["min_n"]), int(q["max_n"]))
+    return list(q["families"]), int(q["pilot_tasks"]), int(q["min_n"]), int(q["max_n"])
 
 
 def pilot(packet_file: Path) -> Path:
     packet, digest, d = _setup(packet_file)
-    fams, tl, npilot, lo, hi = _p(packet)
-    base, treat = packet.arms[0], packet.arms[1]
-    bb = packet.budget.max_message_bytes
-    diffs: list[float] = []
+    fams, npilot, lo, hi = _p(packet)
+    spec = SPECS[packet.experiment]
+    treat, bases = arms_of(packet)
     per_family: dict[str, float] = {}
-    for fam in fams:
-        fd = []
-        for split in (Split.FIT, Split.TUNE):
-            for i in range(npilot):
-                seed = SEED_BASE[split] + i
-                b = run_task(base, fam, split, seed, bb, tl)
-                t = run_task(treat, fam, split, seed, bb, tl)
-                fd.append(float(t.success) - float(b.success))
-        mean = sum(fd) / len(fd)
-        per_family[fam] = mean
-        diffs += [(x - mean) ** 2 for x in fd]
-    sigma = math.sqrt(sum(diffs) / max(1, len(diffs) - len(fams)))
-    h = packet.threshold / 2
-    need = math.ceil((1.96 * sigma / h) ** 2 / len(fams))
+    sigma = 0.0
+    for base in bases:
+        sq: list[float] = []
+        for fam in fams:
+            fd = []
+            for split in (Split.FIT, Split.TUNE):
+                for i in range(npilot):
+                    seed = SEED_BASE[split] + i
+                    b = spec.run_task(base, fam, split, seed, packet)
+                    t = spec.run_task(treat, fam, split, seed, packet)
+                    fd.append(float(t.success) - float(b.success))
+            mean = sum(fd) / len(fd)
+            per_family[f"{base}/{fam}"] = mean
+            sq += [(x - mean) ** 2 for x in fd]
+        sigma = max(sigma, math.sqrt(sum(sq) / max(1, len(sq) - len(fams))))
+    need = math.ceil((1.96 * sigma / (packet.threshold / 2)) ** 2 / len(fams))
     n = min(hi, max(lo, need))
     out = {"packet_digest": digest, "sigma": sigma, "per_family_mean_diff": per_family,
            "required_n": need, "n_per_family": n, "underpowered": need > hi,
@@ -127,29 +129,38 @@ def run(packet_file: Path) -> Path:
     lk = load_json(d / "lock.public.json")
     if lk["packet_digest"] != digest:
         raise DigestError("lock/packet mismatch")
-    fams, tl, _, _, _ = _p(packet)
-    bb = packet.budget.max_message_bytes
+    fams, _, _, _ = _p(packet)
+    spec = SPECS[packet.experiment]
     n = min(int(lk["n_per_family"]), 20)  # type: ignore[call-overload]
     meter = Meter()
-    led = Ledger(d / "run" / "episodes.jsonl") if not (d / "run" / "episodes.jsonl").exists() \
-        else None
-    if led is None:
+    rd = d / "run"
+    if (rd / "episodes.jsonl").exists():
         raise ExistsError("run already exists")
+    led, exl, qled = (Ledger(rd / f"{x}.jsonl") for x in ("episodes", "examples", "quarantine"))
+    dlog = DecisionLog(rd / "decisions.jsonl")
     try:
         for arm in packet.arms:
             for fam in fams:
                 for i in range(n):
-                    r = run_task(arm, fam, Split.TUNE, SEED_BASE[Split.TUNE] + i, bb, tl)
-                    meter.charge(calls=len(r.episode.steps), bytes=r.payload_bytes,
+                    r = spec.run_task(arm, fam, Split.TUNE, SEED_BASE[Split.TUNE] + i, packet)
+                    meter.charge(calls=int(r.stats.get("calls", 0)),
+                                 bytes=int(r.stats.get("payload_bytes", 0)),
                                  limits={"calls": packet.budget.max_calls})
-                    if r.payload_bytes > bb:
-                        raise BudgetExceeded(f"{arm} payload {r.payload_bytes} > {bb}")
-                    led.append(r.episode)
+                    meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
+                    spec.check_budget(r, packet)
+                    for ep in r.episodes:
+                        led.append(ep)
+                    for ep in r.examples:
+                        exl.append(ep)
+                    for ep in r.quarantine:
+                        qled.append(ep)
+                    for rec in r.decisions:
+                        dlog.append(rec)
     except BudgetExceeded as e:
         raise BudgetError(str(e)) from e
     manifest = {"packet_digest": digest, "lock_digest": lk["lock_digest"],
-                "n_per_family": lk["n_per_family"], "arms": packet.arms, "byte_budget": bb,
-                "ledger_head": led.head, "resources": meter.snapshot()}
+                "n_per_family": lk["n_per_family"], "arms": packet.arms,
+                "ledger_head": led.head, "decision_log_head": dlog.head, "resources": meter.snapshot()}
     manifest["run_digest"] = canonical_digest({k: v for k, v in manifest.items() if k != "resources"})
     write_json(d / "run" / "manifest.json", manifest)
     return d

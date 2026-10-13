@@ -1,0 +1,57 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E2",
+  "version": 1,
+  "hypothesis": "Oracle-verified synthetic examples give higher held-out success than unverified synthetic and real-only examples at equal example count.",
+  "null_hypothesis": "Verified synthetic does not beat both baselines by the threshold.",
+  "arms": [
+    "real_only",
+    "unverified_synthetic",
+    "verified_synthetic"
+  ],
+  "primary_metric": "heldout_success_diff_verified_minus_baseline",
+  "threshold": 0.05,
+  "guardrails": [
+    "no family regresses vs real_only beyond the floor",
+    "equal example count",
+    "full lineage"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "families": [
+      "rule_induction",
+      "compositional_transfer",
+      "counterevidence",
+      "relational_return"
+    ],
+    "trace_len": 12,
+    "pilot_tasks": 30,
+    "min_n": 30,
+    "max_n": 400,
+    "examples": 12,
+    "real_seed": 6,
+    "max_proposals": 60,
+    "family_regression_floor": 0.02,
+    "treatment": "verified_synthetic",
+    "baselines": [
+      "real_only",
+      "unverified_synthetic"
+    ]
+  }
+}

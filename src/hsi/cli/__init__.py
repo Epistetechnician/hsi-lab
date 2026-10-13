@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2: `pilot|lock|run|eval|verify-receipt|decide` (E1)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1, E2)."""
 from __future__ import annotations
 
 import argparse
@@ -43,6 +43,21 @@ def template(exp: str) -> dict[str, object]:
             params=E1_PARAMS)
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 200}
+    if exp == "E2":
+        t.update(
+            hypothesis="Oracle-verified synthetic examples give higher held-out success than "
+                       "unverified synthetic and real-only examples at equal example count.",
+            null_hypothesis="Verified synthetic does not beat both baselines by the threshold.",
+            arms=["real_only", "unverified_synthetic", "verified_synthetic"],
+            primary_metric="heldout_success_diff_verified_minus_baseline",
+            guardrails=["no family regresses vs real_only beyond the floor",
+                        "equal example count", "full lineage"],
+            params={**E1_PARAMS, "trace_len": 12, "examples": 12, "real_seed": 6,
+                    "max_proposals": 60, "family_regression_floor": 0.02,
+                    "treatment": "verified_synthetic",
+                    "baselines": ["real_only", "unverified_synthetic"]})
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 0}
     return t
 
 

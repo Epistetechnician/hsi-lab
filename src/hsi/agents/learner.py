@@ -25,13 +25,14 @@ def _run(h: tuple[Prim, ...], s: State) -> State:
     return tuple(t)
 
 
+Transition = tuple[State, int, State]
+
+
 class Model:
-    def __init__(self, trace: Trace) -> None:
+    def __init__(self, transitions: list[Transition]) -> None:
         obs: dict[int, list[tuple[State, State]]] = {a: [] for a in range(N_ACTIONS)}
-        prev = trace.initial
-        for a, s in trace.steps:
-            obs[a].append((prev, s))
-            prev = s
+        for s, a, s2 in transitions:
+            obs[a].append((s, s2))
         self.hyp: dict[int, tuple[Prim, ...]] = {}
         self.table: dict[tuple[State, int], State] = {}
         for a, pairs in obs.items():
@@ -42,6 +43,14 @@ class Model:
                     if all(_run(h, s) == s2 for s, s2 in pairs):
                         self.hyp[a] = h
                         break
+
+    @classmethod
+    def from_trace(cls, trace: Trace) -> Model:
+        out, prev = [], trace.initial
+        for a, s in trace.steps:
+            out.append((prev, a, s))
+            prev = s
+        return cls(out)
 
     def next(self, s: State, a: int) -> State:
         if a in self.hyp:

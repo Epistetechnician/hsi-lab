@@ -18,6 +18,45 @@ def close(a, b):
     return math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-12)
 
 
+def stats(pairs, errs, succ, base, treat):
+    ds, vs = [], []
+    for p in pairs:
+        n, ot, ob = p["n"], p["only_treatment"], p["only_baseline"]
+        f = p["family"]
+        if p["both"] + ot + ob + p["neither"] != n:
+            errs.append(f"pair table sums {f}")
+        if succ[(f, treat)] != p["both"] + ot:
+            errs.append(f"treatment successes {f}")
+        if succ[(f, base)] != p["both"] + ob:
+            errs.append(f"baseline successes {f}")
+        ds.append((ot - ob) / n)
+        vs.append((ot + ob - (ot - ob) ** 2 / n) / n**2)
+    k = len(ds)
+    mean = sum(ds) / k
+    se = math.sqrt(sum(vs)) / k
+    return ds, mean, mean - 1.96 * se, mean + 1.96 * se
+
+
+def guardrails(exp, pk, receipt, comps_ds, errs):
+    g = receipt["guardrail_values"]
+    if exp == "E1":
+        if g["byte_budget"] != pk["budget"]["max_message_bytes"]:
+            errs.append("byte budget differs from packet")
+        return g["recon_exact_fraction"] == 1.0 and g["max_payload_bytes"] <= g["byte_budget"]
+    if exp == "E2":
+        treat = pk["params"].get("treatment", pk["arms"][1])
+        ds = comps_ds[("real_only", treat)]
+        floor = pk["params"]["family_regression_floor"]
+        if not close(g["min_family_diff_vs_real_only"], min(ds)):
+            errs.append("min_family_diff_vs_real_only")
+        if g["family_regression_floor"] != floor:
+            errs.append("floor differs from packet")
+        return (min(ds) >= -floor and g["example_count_equal_fraction"] == 1.0
+                and g["lineage_fraction"] == 1.0)
+    errs.append(f"no validator rule for {exp}")
+    return False
+
+
 def check(receipt, frozen):
     errs = []
     body = {k: v for k, v in receipt.items() if k != "receipt_digest"}
@@ -30,40 +69,29 @@ def check(receipt, frozen):
     pk = frozen["packet"]
     if receipt["threshold"] != pk["threshold"] or receipt["nonclaims"] != pk["nonclaims"]:
         errs.append("threshold/nonclaims differ from packet")
-    if [receipt["baseline_arm"], receipt["treatment_arm"]] != pk["arms"][:2]:
-        errs.append("arms differ from packet")
+    treat = pk["params"].get("treatment", pk["arms"][1])
+    bases = pk["params"].get("baselines", [pk["arms"][0]])
+    if [(c["baseline_arm"], c["treatment_arm"]) for c in receipt["comparisons"]] != [
+            (b, treat) for b in bases]:
+        errs.append("comparisons differ from packet")
     succ = {(r["family"], r["arm"]): r["successes"] for r in receipt["family_results"]}
-    ds, vs = [], []
-    for p in receipt["pairs"]:
-        n, ot, ob = p["n"], p["only_treatment"], p["only_baseline"]
-        if p["both"] + ot + ob + p["neither"] != n:
-            errs.append(f"pair table sums {p['family']}")
-        f = p["family"]
-        if succ[(f, receipt["treatment_arm"])] != p["both"] + ot:
-            errs.append(f"treatment successes {f}")
-        if succ[(f, receipt["baseline_arm"])] != p["both"] + ob:
-            errs.append(f"baseline successes {f}")
-        ds.append((ot - ob) / n)
-        vs.append((ot + ob - (ot - ob) ** 2 / n) / n**2)
-    k = len(ds)
-    mean = sum(ds) / k
-    se = math.sqrt(sum(vs)) / k
-    lo, hi = mean - 1.96 * se, mean + 1.96 * se
-    for name, got, want in (("paired_diff", receipt["paired_diff"], mean),
-                            ("ci_low", receipt["ci_low"], lo), ("ci_high", receipt["ci_high"], hi)):
-        if not close(got, want):
-            errs.append(f"{name}: receipt {got} != recomputed {want}")
-    g = receipt["guardrail_values"]
-    held = g["recon_exact_fraction"] == 1.0 and g["max_payload_bytes"] <= g["byte_budget"]
+    cis, comps_ds = [], {}
+    for c in receipt["comparisons"]:
+        ds, mean, lo, hi = stats(c["pairs"], errs, succ, c["baseline_arm"], c["treatment_arm"])
+        comps_ds[(c["baseline_arm"], c["treatment_arm"])] = ds
+        for name, got, want in (("paired_diff", c["paired_diff"], mean), ("ci_low", c["ci_low"], lo),
+                                ("ci_high", c["ci_high"], hi)):
+            if not close(got, want):
+                errs.append(f"{c['baseline_arm']} {name}: receipt {got} != recomputed {want}")
+        cis.append((lo, hi))
+    held = guardrails(pk["experiment"], pk, receipt, comps_ds, errs)
     if held != receipt["guardrails_held"]:
         errs.append("guardrails_held")
-    if g["byte_budget"] != pk["budget"]["max_message_bytes"]:
-        errs.append("byte budget differs from packet")
     thr = pk["threshold"]
-    if not held or hi < thr:
+    if not held or any(hi < thr for _, hi in cis):
         dec = "NO_CANDIDATE"
     else:
-        dec = "PROMOTE" if lo >= thr else "INCONCLUSIVE"
+        dec = "PROMOTE" if all(lo >= thr for lo, _ in cis) else "INCONCLUSIVE"
     if dec != receipt["decision"]:
         errs.append(f"decision: receipt {receipt['decision']} != recomputed {dec}")
     return errs

@@ -56,7 +56,7 @@ def test_lock_requires_pilot_and_run_requires_lock(env: Path) -> None:
 def test_tampered_receipt_fails_recompute(env: Path) -> None:
     rc = full(env)
     r = json.loads(rc.read_text())
-    r["ci_low"] += 0.1
+    r["comparisons"][0]["ci_low"] += 0.1
     rc.write_text(json.dumps(r))
     assert main(["verify-receipt", str(rc)]) == 10
 
@@ -64,8 +64,8 @@ def test_tampered_receipt_fails_recompute(env: Path) -> None:
 def test_tampered_receipt_with_fixed_digest_still_caught(env: Path) -> None:
     rc = full(env)
     r = json.loads(rc.read_text())
-    r["pairs"][0]["only_treatment"] += 1
-    r["pairs"][0]["neither"] -= 1
+    r["comparisons"][0]["pairs"][0]["only_treatment"] += 1
+    r["comparisons"][0]["pairs"][0]["neither"] -= 1
     body = {k: v for k, v in r.items() if k != "receipt_digest"}
     from hsi.contracts.packet import canonical_digest
     r["receipt_digest"] = canonical_digest(body)
@@ -94,17 +94,19 @@ def test_tampered_packet_stops_run(env: Path) -> None:
 
 
 def test_over_budget_arm_stops_run(env: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    import hsi.pipeline as pl
+    import dataclasses
+
+    from hsi.evaluation import e1
     f = str(env / "p.frozen.json")
     main(["pilot", f])
     main(["lock", f])
-    orig = pl.run_task
+    orig = e1.run_task_e1
 
     def fat(*a, **k):  # type: ignore[no-untyped-def]
         r = orig(*a, **k)
-        return type(r)(r.arm, r.family, r.seed, r.success, 9999, r.recon_exact, r.episode)
+        return dataclasses.replace(r, stats={**r.stats, "payload_bytes": 9999.0})
 
-    monkeypatch.setattr(pl, "run_task", fat)
+    monkeypatch.setattr(e1, "run_task_e1", fat)
     assert main(["run", f]) == 6
 
 

@@ -35,6 +35,7 @@ POLICIES: dict[str, Policy] = {"random": random_policy, "greedy": greedy_policy,
 
 def rollout(env: RuleWorld, plan: list[tuple[int, int]], origin: Origin = Origin.OBSERVED) -> Episode:
     obs, _ = env.reset()
+    start = list(obs)
     steps: list[Step] = []
     ok = False
     for agent, a in plan:
@@ -47,7 +48,7 @@ def rollout(env: RuleWorld, plan: list[tuple[int, int]], origin: Origin = Origin
     t = env.task
     return Episode(
         episode_id=f"{t.family}-{t.split.value}-{t.seed}", env_version=ENV_VERSION,
-        family=t.family, rule_family=t.rule_family, split=t.split, seed=t.seed, steps=steps,
+        family=t.family, rule_family=t.rule_family, split=t.split, seed=t.seed, start=start, steps=steps,
         outcome=EpisodeOutcome(success=ok, steps=len(steps), oracle_steps=env.oracle_steps()),
         origin=origin, parent_ids=[], generation_depth=0, governance="synthetic-local",
         eligibility=Eligibility.ELIGIBLE, prev_digest="", digest="")
