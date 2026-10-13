@@ -144,3 +144,16 @@ frozen_base → lora_candidate (receipt: diff 0.0000, CI [-0.0460, 0.0460])
 Guardrails: {'compute_matched_fraction': 1.0, 'fit_n': 120.0, 'fit_regression_floor': 0.02, 'fit_success_base': 75.0, 'fit_success_candidate': 92.0}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-llm — receipt `8bd0f0588fd9`, threshold 0.05, decision NO_CANDIDATE
+
+d3_no_replay → d3_replay (receipt: diff -0.0150, CI [-0.0791, 0.0491])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 100 | 55 | 3 | 15 | 27 |
+| compositional_transfer | 100 | 16 | 18 | 9 | 57 |
+
+Guardrails: {'diversity_d3_no_replay': -0.0, 'diversity_d3_replay': -0.0, 'diversity_floor': 0.08675854327372498, 'min_replay_diversity': -0.0, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.425, 'rate_d3_replay': 0.46, 'validity_d3_no_replay': 0.0, 'validity_d3_replay': 0.0}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)

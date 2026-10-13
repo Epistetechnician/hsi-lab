@@ -1,0 +1,140 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 10022.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 1125.125,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 1900.02160550002
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d3_no_replay",
+      "ci_high": 0.0490758144700479,
+      "ci_low": -0.0790758144700479,
+      "paired_diff": -0.015,
+      "pairs": [
+        {
+          "both": 55,
+          "family": "rule_induction",
+          "n": 100,
+          "neither": 27,
+          "only_baseline": 15,
+          "only_treatment": 3
+        },
+        {
+          "both": 16,
+          "family": "compositional_transfer",
+          "n": 100,
+          "neither": 57,
+          "only_baseline": 9,
+          "only_treatment": 18
+        }
+      ],
+      "treatment_arm": "d3_replay"
+    }
+  ],
+  "data_digest": "0d52d2b670b9e81408dfcb3f6171748ae2f37fc115d10e55248ae4a62d0f69d8",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "d1_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 63
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 68
+    },
+    {
+      "arm": "d2_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 57
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 69
+    },
+    {
+      "arm": "d3_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 58
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 70
+    },
+    {
+      "arm": "d1_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 22
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 28
+    },
+    {
+      "arm": "d2_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 29
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 30
+    },
+    {
+      "arm": "d3_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 34
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 25
+    }
+  ],
+  "guardrail_values": {
+    "diversity_d3_no_replay": -0.0,
+    "diversity_d3_replay": -0.0,
+    "diversity_floor": 0.08675854327372498,
+    "min_replay_diversity": -0.0,
+    "non_collapse_floor": 0.02,
+    "rate_d1_replay": 0.425,
+    "rate_d3_replay": 0.46,
+    "validity_d3_no_replay": 0.0,
+    "validity_d3_replay": 0.0
+  },
+  "guardrails_held": false,
+  "lock_digest": "db5d916c45f3f3e7b9be062992448d47c3b36689aca5e4d4b0f9856a1e29fd03",
+  "model_digest": "809ce73dcfc10d55710790d9e45440a0d61fd71dba914602e222c85d55ee2ec1",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "8131068afea0fdc7bfb902a49039ff6c286036e44373d49819aec2f1041619b8",
+  "receipt_digest": "8bd0f0588fd992d8412c12560a59a669c0102456d789ba5232e94c8279a195d0",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "ef551dea9537db36f01ca0e700acb7b4a07896b2",
+  "threshold": 0.05
+}

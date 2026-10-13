@@ -300,3 +300,9 @@ E4 on the MLX backbone (packet e4-v2): NO_CANDIDATE; adapter +14 points on fit w
 held-out compositional transfer. Receipt `docs/experiments/E4-llm-receipt.json`, reproduced
 (A3) in a fresh environment including adapter training. Checkpoint question resolved: Qwen2.5-1.5B
 (Apache-2.0); the 3B variant is not Apache-licensed. E6 has not been re-run on the LLM.
+
+E6 on the MLX backbone (packet e6-v2): NO_CANDIDATE; the unconstrained generator collapsed by depth 3
+(validity 0%, signature diversity 0.0 with and without replay, guardrail fails) while held-out
+success stayed flat (0.43-0.50) because evaluation selects among evidence-consistent hypotheses.
+Receipt `docs/experiments/E6-llm-receipt.json`, reproduced (A3) in a fresh environment including
+generation and adapter training. See docs/experiments/E6-llm.md.
