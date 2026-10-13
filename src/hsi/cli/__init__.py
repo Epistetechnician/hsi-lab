@@ -1,0 +1,102 @@
+"""`hsi` command line. M0 implements `packet new`, `packet freeze`, and `packet check`."""
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from pathlib import Path
+
+from pydantic import ValidationError
+
+from hsi.contracts.packet import EXPERIMENTS, SCHEMA_VERSION, Packet, canonical_digest
+
+EXIT_INVALID, EXIT_DIGEST, EXIT_EXISTS, EXIT_UNIMPLEMENTED = 2, 3, 4, 5
+
+
+def _reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
+    out: dict[str, object] = {}
+    for k, v in pairs:
+        if k in out:
+            raise ValueError(f"duplicate key {k}")
+        out[k] = v
+    return out
+
+
+def load_json(path: Path) -> dict[str, object]:
+    data = json.loads(path.read_text("utf-8"), object_pairs_hook=_reject_duplicates)
+    if not isinstance(data, dict):
+        raise ValueError("top-level JSON must be an object")  # noqa: TRY004
+    return data
+
+
+def template(exp: str) -> dict[str, object]:
+    return {
+        "schema_version": SCHEMA_VERSION, "experiment": exp, "version": 1,
+        "hypothesis": "TODO", "null_hypothesis": "TODO", "arms": ["baseline", "treatment"],
+        "primary_metric": "held_out_success_rate", "threshold": 0.05,
+        "guardrails": ["TODO"],
+        "budget": {"max_tokens": 0, "max_calls": 0, "max_wall_seconds": 3600,
+                   "max_message_bytes": 0},
+        "seeds": [0], "stop_rules": ["any digest, schema, split, or budget mismatch"],
+        "claim_ceiling": "LocalSyntheticExperimentOnly",
+        "nonclaims": ["no general intelligence claim", "not a proof"],
+    }
+
+
+def freeze(src: Path) -> Path:
+    packet = Packet.model_validate(load_json(src), strict=False)
+    body = packet.model_dump(mode="json")
+    frozen = {"packet": body, "packet_digest": canonical_digest(body)}
+    dst = src.with_suffix(".frozen.json")
+    if dst.exists():
+        raise FileExistsError(str(dst))
+    dst.write_text(json.dumps(frozen, indent=2, sort_keys=True) + "\n", "utf-8")
+    dst.chmod(0o444)
+    return dst
+
+
+def check(path: Path) -> str:
+    data = load_json(path)
+    if set(data) != {"packet", "packet_digest"}:
+        raise ValueError("frozen packet must have exactly packet and packet_digest")
+    Packet.model_validate(data["packet"], strict=False)
+    if canonical_digest(data["packet"]) != data["packet_digest"]:
+        raise RuntimeError("digest mismatch")
+    return str(data["packet_digest"])
+
+
+def main(argv: list[str] | None = None) -> int:
+    p = argparse.ArgumentParser(prog="hsi")
+    sub = p.add_subparsers(dest="cmd", required=True)
+    pk = sub.add_parser("packet").add_subparsers(dest="action", required=True)
+    n = pk.add_parser("new")
+    n.add_argument("experiment", choices=sorted(EXPERIMENTS))
+    n.add_argument("out", type=Path)
+    pk.add_parser("freeze").add_argument("file", type=Path)
+    pk.add_parser("check").add_argument("file", type=Path)
+    for cmd in ("pilot", "lock", "run", "eval", "verify-receipt", "decide"):
+        sub.add_parser(cmd).add_argument("args", nargs="*")
+    a = p.parse_args(argv)
+    try:
+        if a.cmd != "packet":
+            print(f"hsi {a.cmd}: not implemented until a later milestone", file=sys.stderr)
+            return EXIT_UNIMPLEMENTED
+        if a.action == "new":
+            if a.out.exists():
+                raise FileExistsError(str(a.out))
+            a.out.write_text(json.dumps(template(a.experiment), indent=2) + "\n", "utf-8")
+            print(a.out)
+        elif a.action == "freeze":
+            print(freeze(a.file))
+        else:
+            print(check(a.file))
+        return 0
+    except FileExistsError as e:
+        print(f"error: exists: {e}", file=sys.stderr)
+        return EXIT_EXISTS
+    except RuntimeError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return EXIT_DIGEST
+    except (ValueError, ValidationError) as e:
+        print(f"error: invalid: {e}", file=sys.stderr)
+        return EXIT_INVALID
