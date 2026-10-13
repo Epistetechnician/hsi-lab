@@ -18,7 +18,7 @@ LEVELS = [
            + " matches 100% of aggregates"),
     ("A4", "Rerun by an independent party/machine plus a human spot-check"),
 ]
-ALL = ["E1", "E2", "E3", "E4", "E5", "E6", "E7"]
+ALL = ["E1", "E2", "E3", "E4", "E4-llm", "E5", "E6", "E7"]  # E4-llm: MLX-backbone variant
 
 
 def _packet_for(digest: str) -> Path | None:
@@ -67,9 +67,10 @@ def render(rows: list[dict[str, object]]) -> str:
     for r in rows:
         out.append(f"| {r['experiment']} | {r.get('decision', '—')} | {r['level']} | "
                    f"{r.get('commit', '—')} | {r['note']} |")
-    done = sum(1 for r in rows if r["level"] in ("A2", "A3"))
-    a3 = sum(1 for r in rows if r["level"] == "A3")
+    base = [r for r in rows if r["experiment"] != "E4-llm"]
+    done = sum(1 for r in base if r["level"] in ("A2", "A3"))
+    a3 = sum(1 for r in base if r["level"] == "A3")
     out += ["", f"Experiments with an independently recomputed receipt: {done} of 7. "
             + f"Clean-rerun reproduced (A3): {a3} of 7. A4 (independent party + human spot-check) "
-            + "has not been performed for any experiment."]
+            + "has not been performed for any experiment. E4-llm is the MLX-backbone variant of E4."]
     return "\n".join(out) + "\n"

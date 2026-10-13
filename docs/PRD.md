@@ -295,3 +295,8 @@ the prompt KV cache shared across candidates (~4 ms/candidate); LoRA via mlx-lm 
 exact (tested), base weights digest-pinned. Zero-shot hypothesis-selection accuracy of the base
 model on unseen worlds: ~0.73 (fit-type), ~0.38 (tune-type). Not yet wired into an E4/E6 packet.
 LLM tests run with `HSI_LLM_TESTS=1 uv run --extra mlx pytest tests/integration/test_llm_backend.py`.
+
+E4 on the MLX backbone (packet e4-v2): NO_CANDIDATE; adapter +14 points on fit worlds, 0.000 on
+held-out compositional transfer. Receipt `docs/experiments/E4-llm-receipt.json`, reproduced
+(A3) in a fresh environment including adapter training. Checkpoint question resolved: Qwen2.5-1.5B
+(Apache-2.0); the 3B variant is not Apache-licensed. E6 has not been re-run on the LLM.

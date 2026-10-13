@@ -132,3 +132,15 @@ static_relations → adaptive_relations (receipt: diff 0.1425, CI [0.1102, 0.174
 Guardrails: {'compute_matched_fraction': 1.0, 'duplicate_strength_updates': 0.0}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E4-llm — receipt `153878642bdb`, threshold 0.05, decision NO_CANDIDATE
+
+frozen_base → lora_candidate (receipt: diff 0.0000, CI [-0.0460, 0.0460])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| compositional_transfer | 200 | 44 | 11 | 11 | 134 |
+
+Guardrails: {'compute_matched_fraction': 1.0, 'fit_n': 120.0, 'fit_regression_floor': 0.02, 'fit_success_base': 75.0, 'fit_success_candidate': 92.0}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
