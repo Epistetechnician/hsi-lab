@@ -7,7 +7,7 @@ recomputed receipt; negative results are first-class.
 
 PRD: docs/PRD.md
 
-## Status (M0–M1)
+## Status (M0–M2)
 Packet CLI, rule-world environment, digest-chained ledger, scripted baselines (`hsi baselines`). Other commands exit 5
 (not implemented).
 

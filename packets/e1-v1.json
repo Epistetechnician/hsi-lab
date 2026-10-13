@@ -1,0 +1,46 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E1",
+  "version": 1,
+  "hypothesis": "The typed-event codec yields higher held-out success than the text codec at an equal byte budget.",
+  "null_hypothesis": "Held-out success difference (typed_event - text) is below the threshold.",
+  "arms": [
+    "text",
+    "typed_event"
+  ],
+  "primary_metric": "heldout_success_diff_typed_minus_text",
+  "threshold": 0.05,
+  "guardrails": [
+    "lossless_roundtrip",
+    "payload_within_byte_budget"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 200
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "families": [
+      "rule_induction",
+      "compositional_transfer",
+      "counterevidence",
+      "relational_return"
+    ],
+    "trace_len": 40,
+    "pilot_tasks": 30,
+    "min_n": 30,
+    "max_n": 400
+  }
+}

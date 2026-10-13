@@ -196,3 +196,6 @@ class RuleWorld:
         done = self._reached(tuple(self._s))
         return self._obs(), 1.0 if done else 0.0, done, (not done and self._t >= self.task.horizon), {
             "blocked": blocked}
+
+
+apply_prim = _apply

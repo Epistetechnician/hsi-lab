@@ -118,6 +118,15 @@ class FamilyResult(Strict):
     successes: int = Field(ge=0)
 
 
+class PairedFamily(Strict):
+    family: str
+    n: int = Field(ge=1)
+    both: int = Field(ge=0)
+    only_treatment: int = Field(ge=0)
+    only_baseline: int = Field(ge=0)
+    neither: int = Field(ge=0)
+
+
 class Receipt(Strict):
     schema_version: str = RECEIPT_V
     packet_digest: str
@@ -127,7 +136,11 @@ class Receipt(Strict):
     data_digest: str
     seeds: list[int]
     budget_used: dict[str, float]
+    baseline_arm: str
+    treatment_arm: str
     family_results: list[FamilyResult]
+    pairs: list[PairedFamily]
+    guardrail_values: dict[str, float]
     paired_diff: float
     ci_low: float
     ci_high: float

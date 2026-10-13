@@ -44,6 +44,7 @@ class Packet(Strict):
     stop_rules: list[str] = Field(min_length=1)
     claim_ceiling: str = Field(min_length=1)
     nonclaims: list[str] = Field(min_length=1)
+    params: dict[str, Any]
 
     @field_validator("schema_version")
     @classmethod

@@ -232,10 +232,17 @@ Open questions:
 | --- | --- | --- |
 | M0 Repo and packet | done | scaffold, packet schema, `packet new/freeze/check`, ADR 0001 |
 | M1 Environment + ledger | done (pending owner review) | F1–F5, F19; `hsi baselines`; oracle 100%, random/greedy well below |
-| M2 Codecs (E1) | next | F6 text + typed-event codecs, matched-byte E1 run |
+| M2 Codecs (E1) | done (pending owner review) | F6, F16–F18 for E1; full `pilot→lock→run→eval→verify-receipt→decide` loop; see docs/experiments/E1.md |
 | M3–M6 | not started | |
 
 Schema deviations from the PRD text: `Episode` adds `rule_family` (split is defined on it) and
 `governance` (F5). `Receipt` carries `family_results` (successes/n per family and arm) so the
 validator can recompute intervals from aggregates. Seed families: fit `[0,1e6)`, tune `[1e6,2e6)`,
 held-out `[2e6,…)`; `RuleWorld` rejects a seed outside its split's range.
+
+M2 deviations: (1) the interval is an analytic paired (McNemar-style) normal CI over family means,
+not a bootstrap, so the validator recomputes it from aggregate paired counts; (2) the effect
+threshold lives in the packet and is frozen before the pilot (the pilot only sets sample size);
+(3) `run` exercises all arms on the tune split and enforces budgets; the locked evaluator
+(`python -m hsi.evaluation.locked`, separate process) is the only reader of custody and scores
+held-out; (4) custody isolation is owner-only file modes plus process separation, not an OS sandbox.

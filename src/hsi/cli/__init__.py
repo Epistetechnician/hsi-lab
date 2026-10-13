@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2: `pilot|lock|run|eval|verify-receipt|decide` (E1)."""
 from __future__ import annotations
 
 import argparse
@@ -8,29 +8,21 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from hsi import pipeline
+from hsi.contracts.io import load_json
 from hsi.contracts.packet import EXPERIMENTS, SCHEMA_VERSION, Packet, canonical_digest
+from hsi.errors import HsiError
 
-EXIT_INVALID, EXIT_DIGEST, EXIT_EXISTS, EXIT_UNIMPLEMENTED = 2, 3, 4, 5
-
-
-def _reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
-    out: dict[str, object] = {}
-    for k, v in pairs:
-        if k in out:
-            raise ValueError(f"duplicate key {k}")
-        out[k] = v
-    return out
+EXIT_INVALID, EXIT_DIGEST, EXIT_EXISTS = 2, 3, 4
 
 
-def load_json(path: Path) -> dict[str, object]:
-    data = json.loads(path.read_text("utf-8"), object_pairs_hook=_reject_duplicates)
-    if not isinstance(data, dict):
-        raise ValueError("top-level JSON must be an object")  # noqa: TRY004
-    return data
+E1_PARAMS = {"families": ["rule_induction", "compositional_transfer", "counterevidence",
+                          "relational_return"],
+             "trace_len": 40, "pilot_tasks": 30, "min_n": 30, "max_n": 400}
 
 
 def template(exp: str) -> dict[str, object]:
-    return {
+    t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION, "experiment": exp, "version": 1,
         "hypothesis": "TODO", "null_hypothesis": "TODO", "arms": ["baseline", "treatment"],
         "primary_metric": "held_out_success_rate", "threshold": 0.05,
@@ -39,8 +31,19 @@ def template(exp: str) -> dict[str, object]:
                    "max_message_bytes": 0},
         "seeds": [0], "stop_rules": ["any digest, schema, split, or budget mismatch"],
         "claim_ceiling": "LocalSyntheticExperimentOnly",
-        "nonclaims": ["no general intelligence claim", "not a proof"],
+        "nonclaims": ["no general intelligence claim", "not a proof"], "params": {},
     }
+    if exp == "E1":
+        t.update(
+            hypothesis="The typed-event codec yields higher held-out success than the text codec "
+                       "at an equal byte budget.",
+            null_hypothesis="Held-out success difference (typed_event - text) is below the threshold.",
+            arms=["text", "typed_event"], primary_metric="heldout_success_diff_typed_minus_text",
+            guardrails=["lossless_roundtrip", "payload_within_byte_budget"],
+            params=E1_PARAMS)
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 200}
+    return t
 
 
 def freeze(src: Path) -> Path:
@@ -106,16 +109,21 @@ def main(argv: list[str] | None = None) -> int:
     b = sub.add_parser("baselines")
     b.add_argument("out", type=Path)
     b.add_argument("-n", type=int, default=50)
-    for cmd in ("pilot", "lock", "run", "eval", "verify-receipt", "decide"):
-        sub.add_parser(cmd).add_argument("args", nargs="*")
+    for cmd in ("pilot", "lock", "run", "eval", "verify-receipt"):
+        sub.add_parser(cmd).add_argument("path", type=Path)
+    dc = sub.add_parser("decide")
+    dc.add_argument("path", type=Path)
+    dc.add_argument("outcome")
     a = p.parse_args(argv)
     try:
         if a.cmd == "baselines":
             print(baselines(a.out, a.n))
             return 0
         if a.cmd != "packet":
-            print(f"hsi {a.cmd}: not implemented until a later milestone", file=sys.stderr)
-            return EXIT_UNIMPLEMENTED
+            fn = {"pilot": pipeline.pilot, "lock": pipeline.lock, "run": pipeline.run,
+                  "eval": pipeline.evaluate, "verify-receipt": pipeline.verify_receipt}
+            print(pipeline.decide(a.path, a.outcome) if a.cmd == "decide" else fn[a.cmd](a.path))
+            return 0
         if a.action == "new":
             if a.out.exists():
                 raise FileExistsError(str(a.out))
@@ -126,6 +134,9 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(check(a.file))
         return 0
+    except HsiError as e:
+        print(f"error: {type(e).__name__}: {e}", file=sys.stderr)
+        return e.code
     except FileExistsError as e:
         print(f"error: exists: {e}", file=sys.stderr)
         return EXIT_EXISTS
