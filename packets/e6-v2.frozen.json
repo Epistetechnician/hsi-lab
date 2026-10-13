@@ -1,0 +1,74 @@
+{
+  "packet": {
+    "arms": [
+      "d1_replay",
+      "d1_no_replay",
+      "d2_replay",
+      "d2_no_replay",
+      "d3_replay",
+      "d3_no_replay"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), training each generation on the previous generation's own hypotheses collapses held-out success at depth 3 unless original labeled data is replayed: d3 with replay beats d3 without.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d3 with replay does not beat d3 without replay by the threshold.",
+    "params": {
+      "adapt_batch": 8,
+      "adapt_lr": 0.0001,
+      "adapt_steps": 200,
+      "backbone": "llm",
+      "baselines": [
+        "d3_no_replay"
+      ],
+      "diversity_floor_frac": 0.5,
+      "families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "gen_max_tokens": 20,
+      "generations": 3,
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "max_n": 100,
+      "min_n": 30,
+      "n_adapt": 50,
+      "n_demos": 2,
+      "n_replay": 50,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 15,
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "rank": 8,
+      "support": 8,
+      "treatment": "d3_replay",
+      "tune_offset": 500000
+    },
+    "primary_metric": "success_diff_d3_replay_minus_d3_no_replay",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 2
+  },
+  "packet_digest": "8131068afea0fdc7bfb902a49039ff6c286036e44373d49819aec2f1041619b8"
+}

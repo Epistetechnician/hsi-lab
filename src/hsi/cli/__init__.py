@@ -147,6 +147,20 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                        "compositional transfer over the frozen model without regressing fit "
                        "families beyond 2 points.",
             params=p)
+    if exp == "E6" and variant == "llm":
+        p = dict(t["params"])  # type: ignore[call-overload]
+        for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
+            p.pop(k, None)
+        p.update(backbone="llm", n_adapt=50, n_replay=50, rank=8, lora_layers=8, lora_scale=20.0,
+                 adapt_steps=200, adapt_lr=1e-4, adapt_batch=8, gen_max_tokens=20, n_demos=2, pilot_tasks=15,
+                 min_n=30, max_n=100)
+        t.update(
+            version=2,
+            hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), training "
+                       "each generation on the previous generation's own hypotheses collapses "
+                       "held-out success at depth 3 unless original labeled data is replayed: "
+                       "d3 with replay beats d3 without.",
+            params=p)
     if exp in ("E4", "E6"):
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 0}

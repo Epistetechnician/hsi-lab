@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,13 @@ def render_prompt(pairs: Sequence[tuple[Sequence[int], Sequence[int]]]) -> str:
     return PREAMBLE + "\n".join(lines) + "\nThe rule is:"
 
 
+def few_shot_prompt(pairs: Sequence[tuple[Sequence[int], Sequence[int]]],
+                    demos: Sequence[tuple[Sequence[tuple[Sequence[int], Sequence[int]]], str]]) -> str:
+    """Generation prompt: solved demonstrations first, then the query (same format)."""
+    shots = [f"{render_prompt(dp)} {txt}\n\n" for dp, txt in demos]
+    return "".join(shots) + render_prompt(pairs)
+
+
 def model_path(home: Path = MODEL_HOME) -> Path:
     p = home / "models--mlx-community--Qwen2.5-1.5B-Instruct-4bit" / "snapshots" / MODEL_REVISION
     if not (p / "model.safetensors").exists():
@@ -63,6 +71,36 @@ def weights_digest(path: Path) -> str:
             h.update(blk)
     cache.write_text(json.dumps({"sha256": h.hexdigest(), "revision": path.name}))
     return h.hexdigest()
+
+
+_OP = re.compile(r"\b(add|swap|copy|mix)\s+(\d)\s+(\d)\b")
+
+
+def parse_hypothesis(text: str) -> tuple[Prim, ...] | None:
+    """Canonical hypothesis for a generated description, or None if it is not a valid one."""
+    parts = [x.strip() for x in text.split(";")]
+    if not 1 <= len(parts) <= 2:
+        return None
+    out: list[Prim] = []
+    for part in parts:
+        m = _OP.fullmatch(part)
+        if not m:
+            return None
+        kind, a, b = m[1], int(m[2]), int(m[3])
+        if kind == "add":
+            if a > 4 or not 1 <= b <= 6:
+                return None
+            out.append(("add", a, 0, b))
+            continue
+        if a > 4 or b > 4 or a == b:
+            return None
+        out.append(("swap", min(a, b), max(a, b), 0) if kind == "swap" else (kind, a, b, 0))
+    return tuple(out)
+
+
+def text_signature(text: str) -> str:
+    h = parse_hypothesis(text)
+    return "invalid" if h is None else ">".join(p[0] for p in h)
 
 
 class LLM:
@@ -144,6 +182,13 @@ class LLM:
             mx.eval(total)
             out += [float(v) for v in total.tolist()]
         return out
+
+    def generate(self, prompt: str, max_tokens: int = 20) -> str:
+        """Greedy free-text continuation (first line only). Unconstrained: no validity filter."""
+        from mlx_lm import generate
+
+        out = generate(self.model, self.tok, prompt=prompt, max_tokens=max_tokens)
+        return str(out).strip().split("\n")[0].strip()
 
     # -- LoRA -----------------------------------------------------------------
     def attach_lora(self, rank: int, layers: int, seed: int, scale: float = 20.0) -> None:
