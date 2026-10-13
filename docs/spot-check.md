@@ -157,3 +157,16 @@ d3_no_replay → d3_replay (receipt: diff -0.0150, CI [-0.0791, 0.0491])
 Guardrails: {'diversity_d3_no_replay': -0.0, 'diversity_d3_replay': -0.0, 'diversity_floor': 0.08675854327372498, 'min_replay_diversity': -0.0, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.425, 'rate_d3_replay': 0.46, 'validity_d3_no_replay': 0.0, 'validity_d3_replay': 0.0}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-llmgen (v4) — receipt `43dc7a01776f`, threshold 0.05, decision NO_CANDIDATE
+
+d3_no_replay → d3_replay (receipt: diff -0.0600, CI [-0.1093, -0.0107])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 100 | 3 | 4 | 9 | 84 |
+| compositional_transfer | 100 | 2 | 3 | 10 | 85 |
+
+Guardrails: {'diversity_d3_no_replay': 0.2643844043993107, 'diversity_d3_replay': 0.2852077682752576, 'diversity_floor': 0.0, 'min_replay_diversity': 0.18070647482209062, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.09, 'rate_d3_replay': 0.06, 'validity_d3_no_replay': 0.04285714285714286, 'validity_d3_replay': 0.11428571428571428}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)

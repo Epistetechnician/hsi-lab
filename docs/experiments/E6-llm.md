@@ -48,3 +48,10 @@ support "that degradation reaches evaluation success when evaluation is evidence
 Next-packet ideas: score by free generation instead of constrained selection (so generator
 quality reaches the metric), a stronger generator (7B Apache model, already licensed), or a
 verified-synthetic arm to connect back to E2.
+
+---
+**Correction (added after E6 v4):** the depth-3 generator collapse reported above (0% validity,
+0.0 diversity, repetitive strings) was largely caused by training targets that lacked an
+end-of-hypothesis marker, so run-on generation compounded across generations. With terminated
+targets the collapse does not appear (see `E6-llmgen.md`). The receipt and the null result on
+constrained-selection task success are unchanged; the collapse interpretation is confounded.

@@ -306,3 +306,10 @@ E6 on the MLX backbone (packet e6-v2): NO_CANDIDATE; the unconstrained generator
 success stayed flat (0.43-0.50) because evaluation selects among evidence-consistent hypotheses.
 Receipt `docs/experiments/E6-llm-receipt.json`, reproduced (A3) in a fresh environment including
 generation and adapter training. See docs/experiments/E6-llm.md.
+
+E6 free-generation evaluation (packets e6-v3, e6-v4): v3 was invalid (adapters never learned to
+stop; see docs/experiments/E6-llmgen-v3.md). v4: NO_CANDIDATE, replay -0.060 [-0.109, -0.011] vs no
+replay, non-collapse guardrail fails; the 1.5B generator is consistent with the evidence only ~5% of
+the time, so confident wrong hypotheses dominate the metric. v4 also shows the earlier LLM E6
+"collapse" was confounded by missing terminators (correction appended to E6-llm.md). Receipt
+`docs/experiments/E6-llmgen-receipt.json`, reproduced (A3). See docs/experiments/E6-llmgen.md.
