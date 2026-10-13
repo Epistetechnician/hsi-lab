@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E4, E6, E7)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E4, E6, E7)."""
 from __future__ import annotations
 
 import argparse
@@ -188,6 +188,18 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("-n", type=int, default=50)
     for cmd in ("pilot", "lock", "run", "eval", "verify-receipt"):
         sub.add_parser(cmd).add_argument("path", type=Path)
+    rp = sub.add_parser("reproduce")
+    rp.add_argument("path", type=Path)
+    rp.add_argument("--orig-run", type=Path, required=True)
+    rp.add_argument("--orig-custody", type=Path, required=True)
+    rp.add_argument("--out", type=Path)
+    rp.add_argument("--fetch", action="store_true",
+                    help="allow network for the hash-pinned dependency install only")
+    bd = sub.add_parser("bundle")
+    bd.add_argument("path", type=Path)
+    bd.add_argument("out", type=Path)
+    asr = sub.add_parser("assurance")
+    asr.add_argument("--write", type=Path)
     dc = sub.add_parser("decide")
     dc.add_argument("path", type=Path)
     dc.add_argument("outcome")
@@ -195,6 +207,27 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if a.cmd == "baselines":
             print(baselines(a.out, a.n))
+            return 0
+        if a.cmd == "reproduce":
+            from hsi.assurance import reproduce
+
+            rep = reproduce(a.path, a.orig_run, a.orig_custody, a.out, a.fetch)
+            print(f"{rep['experiment']}: matched {rep['aggregates_matched']}/"
+                  f"{rep['aggregates_compared']} aggregates; validator "
+                  f"{'ok' if rep['rerun_validator_ok'] else 'FAILED'}")
+            return 0 if rep["match"] and rep["rerun_validator_ok"] else 10
+        if a.cmd == "bundle":
+            from hsi.assurance import bundle
+
+            print(bundle(a.path, a.out))
+            return 0
+        if a.cmd == "assurance":
+            from hsi.assurance import assess, render
+
+            text = render(assess())
+            if a.write:
+                a.write.write_text(text, "utf-8")
+            print(text)
             return 0
         if a.cmd != "packet":
             fn = {"pilot": pipeline.pilot, "lock": pipeline.lock, "run": pipeline.run,
