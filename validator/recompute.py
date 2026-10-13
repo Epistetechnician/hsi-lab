@@ -53,6 +53,13 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
             errs.append("floor differs from packet")
         return (min(ds) >= -floor and g["example_count_equal_fraction"] == 1.0
                 and g["lineage_fraction"] == 1.0)
+    if exp == "E3":
+        if g["message_byte_cap"] != pk["budget"]["max_message_bytes"]:
+            errs.append("message cap differs from packet")
+        return g["max_message_bytes_used"] <= g["message_byte_cap"] \
+            and g["compute_matched_fraction"] == 1.0
+    if exp == "E7":
+        return g["duplicate_strength_updates"] == 0 and g["compute_matched_fraction"] == 1.0
     errs.append(f"no validator rule for {exp}")
     return False
 

@@ -1,0 +1,50 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E3",
+  "version": 1,
+  "hypothesis": "A fixed-graph collective of two agents with complementary action rights discovers more than one agent or two non-communicating agents at matched exploration and a message-byte cap.",
+  "null_hypothesis": "Fixed-graph success exceeds neither baseline by the threshold.",
+  "arms": [
+    "single",
+    "independent",
+    "centralized",
+    "fixed_graph"
+  ],
+  "primary_metric": "collective_discovery_success_diff_fixed_graph_minus_baseline",
+  "threshold": 0.05,
+  "guardrails": [
+    "message bytes within cap",
+    "exploration calls matched"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 24
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "families": [
+      "collective_discovery"
+    ],
+    "explore_total": 12,
+    "pilot_tasks": 30,
+    "min_n": 30,
+    "max_n": 400,
+    "treatment": "fixed_graph",
+    "baselines": [
+      "single",
+      "independent"
+    ]
+  }
+}

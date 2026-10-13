@@ -138,6 +138,7 @@ def run(packet_file: Path) -> Path:
         raise ExistsError("run already exists")
     led, exl, qled = (Ledger(rd / f"{x}.jsonl") for x in ("episodes", "examples", "quarantine"))
     dlog = DecisionLog(rd / "decisions.jsonl")
+    mlog, rlog = DecisionLog(rd / "messages.jsonl"), DecisionLog(rd / "relation_events.jsonl")
     try:
         for arm in packet.arms:
             for fam in fams:
@@ -156,6 +157,12 @@ def run(packet_file: Path) -> Path:
                         qled.append(ep)
                     for rec in r.decisions:
                         dlog.append(rec)
+                    for m in r.messages:
+                        mlog.append(m.model_dump(mode="json"))
+                    for ev in r.relation_events:
+                        rlog.append({**ev.model_dump(mode="json"), "task": r.family + str(r.seed),
+                                     "arm": r.arm})
+                    meter.bytes += int(r.stats.get("message_bytes", 0))
     except BudgetExceeded as e:
         raise BudgetError(str(e)) from e
     manifest = {"packet_digest": digest, "lock_digest": lk["lock_digest"],

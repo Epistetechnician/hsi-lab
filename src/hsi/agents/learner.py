@@ -52,6 +52,19 @@ class Model:
             prev = s
         return cls(out)
 
+    @classmethod
+    def with_hyps(cls, base: Model, hyps: dict[int, tuple[Prim, ...]]) -> Model:
+        m = cls([])
+        m.hyp = {**hyps, **base.hyp}
+        m.table = dict(base.table)
+        return m
+
+    def predict(self, s: State, a: int) -> State | None:
+        """Prediction if the model knows this action (hypothesis or exact table hit), else None."""
+        if a in self.hyp:
+            return _run(self.hyp[a], s)
+        return self.table.get((s, a))
+
     def next(self, s: State, a: int) -> State:
         if a in self.hyp:
             return _run(self.hyp[a], s)
@@ -77,3 +90,11 @@ class Model:
                     prev[n], depth[n] = (c, a), depth[c] + 1
                     q.append(n)
         return None
+
+
+def transitions_of(trace: Trace) -> list[Transition]:
+    out, prev = [], trace.initial
+    for a, s in trace.steps:
+        out.append((prev, a, s))
+        prev = s
+    return out

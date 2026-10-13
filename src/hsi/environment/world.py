@@ -71,26 +71,27 @@ class Task:
 class RuleWorld:
     """Gymnasium-style environment. Deterministic given (task_family, split, seed)."""
 
-    def __init__(self, family: str, split: Split, seed: int) -> None:
+    def __init__(self, family: str, split: Split, seed: int, variant: int = 0) -> None:
         if family not in TASK_FAMILIES:
             raise ValueError(f"unknown family {family}")
         if seed_split(seed) != split:
             raise ValueError(f"seed {seed} not in {split.value} seed family")
-        self.task = self._build(family, split, seed)
+        self.task = self._build(family, split, seed, variant)
         self._s: list[int] = list(self.task.start)
         self._t = 0
 
     # -- construction -------------------------------------------------------
     @staticmethod
-    def _build(family: str, split: Split, seed: int) -> Task:
+    def _build(family: str, split: Split, seed: int, variant: int = 0) -> Task:
         for attempt in range(100):  # resample degenerate worlds (no reachable unmet goal)
-            task = RuleWorld._try_build(family, split, seed, attempt)
+            task = RuleWorld._try_build(family, split, seed, attempt, variant)
             if task is not None:
                 return task
         raise RuntimeError("no non-degenerate world found")
 
     @staticmethod
-    def _try_build(family: str, split: Split, seed: int, attempt: int) -> Task | None:
+    def _try_build(family: str, split: Split, seed: int, attempt: int,
+                   variant: int = 0) -> Task | None:
         rng = random.Random(f"{ENV_VERSION}/{family}/{seed}/{attempt}")
         pool = _COMPOSITE[split] if family == "compositional_transfer" else _SINGLE[split]
         rf = rng.choice(pool)
@@ -103,7 +104,9 @@ class RuleWorld:
         guard = (rng.randrange(N_ACTIONS), rng.randrange(N_CELLS)) if family == "counterevidence" else None
         visible = (0, 1, 2) if family == "partial_observation" else tuple(range(N_CELLS))
         n_agents = 2 if family == "collective_discovery" else 1
-        start = tuple(rng.randrange(MOD) for _ in range(N_CELLS))
+        # variant>0: same hidden rules, fresh start/goal (used for 'return' tasks)
+        sr = rng if variant == 0 else random.Random(f"{ENV_VERSION}/{family}/{seed}/{attempt}/v{variant}")
+        start = tuple(sr.randrange(MOD) for _ in range(N_CELLS))
         probe = RuleWorld.__new__(RuleWorld)
         probe.task = Task(family, rf, split, seed, actions, guard, visible, start, start, 0, n_agents)
         # pick a goal reachable in 3..5 steps (guarantees solvability)
@@ -114,7 +117,7 @@ class RuleWorld:
             cands = sorted(unmet)
         if not cands:
             return None
-        goal = rng.choice(cands)
+        goal = sr.choice(cands)
         h = min((d for t, d in dist.items() if all(t[i] == goal[i] for i in visible)), default=0)
         task = Task(family, rf, split, seed, actions, guard, visible, start, goal, 3 * h + 4, n_agents)
         return task

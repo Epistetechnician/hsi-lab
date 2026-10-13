@@ -234,7 +234,8 @@ Open questions:
 | M1 Environment + ledger | done (pending owner review) | F1–F5, F19; `hsi baselines`; oracle 100%, random/greedy well below |
 | M2 Codecs (E1) | done (pending owner review) | F6, F16–F18 for E1; full `pilot→lock→run→eval→verify-receipt→decide` loop; see docs/experiments/E1.md |
 | M3 Verified synthesis (E2) | done (pending owner review) | F8–F9; quarantine → oracle verifier → eligible/rejected; E2 result is NO_CANDIDATE, see docs/experiments/E2.md |
-| M4–M6 | not started | |
+| M4 Collective + relations (E3, E7) | done (pending owner review) | F10, F12–F13; E3 PROMOTE, E7 INCONCLUSIVE; see docs/experiments/E3.md, E7.md |
+| M5–M6 | not started | |
 
 Schema deviations from the PRD text: `Episode` adds `rule_family` (split is defined on it) and
 `governance` (F5). `Receipt` carries `family_results` (successes/n per family and arm) so the
@@ -254,3 +255,11 @@ proposals are one-step trajectories from generator-chosen start states, with the
 produced by the generator's own induced model. The verifier re-executes via the environment
 oracle. If verification cannot fill the synthetic quota within `max_proposals`, the arm is topped up
 with real data so example counts stay equal (reported as `topped_up`).
+
+M4 deviations: (1) E3 uses two agents with complementary action rights; with N=2 the centralized
+and fixed-graph topologies coincide, so those arms differ in message payload (raw typed log vs
+learned-rule summary), not topology; true topology comparisons need N>=3 (E5). (2) `centralized`
+runs but is exploratory: the decision compares fixed_graph with single and independent only.
+(3) E7 relations are context->stored-transitions with a capacity of 2 active relations; "return"
+tasks reuse hidden rules with a fresh start/goal (`RuleWorld(..., variant=1)`). (4) Pilot sample
+sizes hit `max_n=400` (flagged `underpowered` in pilot.json) for E3 and E7.

@@ -13,10 +13,10 @@ from hsi.environment import RuleWorld
 from hsi.evaluation.base import TaskResult
 
 
-def teacher_trace(env: RuleWorld, length: int) -> Trace:
+def teacher_trace(env: RuleWorld, length: int, tag: str = "") -> Trace:
     """Random exploration of the same world, recorded as full-state transitions."""
     t = env.task
-    rng = random.Random(f"teacher/{t.family}/{t.seed}")
+    rng = random.Random(f"teacher/{t.family}/{t.seed}{tag}")
     obs, _ = env.reset()
     init = tuple(obs)
     steps = []

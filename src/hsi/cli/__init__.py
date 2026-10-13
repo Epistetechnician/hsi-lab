@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1, E2)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1, E2, E3, E7)."""
 from __future__ import annotations
 
 import argparse
@@ -56,6 +56,35 @@ def template(exp: str) -> dict[str, object]:
                     "max_proposals": 60, "family_regression_floor": 0.02,
                     "treatment": "verified_synthetic",
                     "baselines": ["real_only", "unverified_synthetic"]})
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 0}
+    if exp == "E3":
+        t.update(
+            hypothesis="A fixed-graph collective of two agents with complementary action rights "
+                       "discovers more than one agent or two non-communicating agents at matched "
+                       "exploration and a message-byte cap.",
+            null_hypothesis="Fixed-graph success exceeds neither baseline by the threshold.",
+            arms=["single", "independent", "centralized", "fixed_graph"],
+            primary_metric="collective_discovery_success_diff_fixed_graph_minus_baseline",
+            guardrails=["message bytes within cap", "exploration calls matched"],
+            params={"families": ["collective_discovery"], "explore_total": 12, "pilot_tasks": 30,
+                    "min_n": 30, "max_n": 400, "treatment": "fixed_graph",
+                    "baselines": ["single", "independent"]})
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 24}
+    if exp == "E7":
+        t.update(
+            hypothesis="Adaptive relations (dormant-over-delete, reactivation, counterevidence "
+                       "retirement) improve success on relational return and counterevidence "
+                       "streams over no relations and static relations at matched exploration.",
+            null_hypothesis="Adaptive relations beat neither baseline by the threshold.",
+            arms=["no_relations", "static_relations", "adaptive_relations"],
+            primary_metric="relational_return_and_counterevidence_success_diff",
+            guardrails=["shared-source evidence counted once", "exploration calls matched"],
+            params={"families": ["relational_return", "counterevidence"], "explore_full": 12,
+                    "explore_final": 4, "relation_cap": 2, "probes": 2, "pilot_tasks": 30,
+                    "min_n": 30, "max_n": 400, "treatment": "adaptive_relations",
+                    "baselines": ["no_relations", "static_relations"]})
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 0}
     return t

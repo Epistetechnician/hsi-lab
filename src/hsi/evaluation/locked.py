@@ -55,7 +55,7 @@ def main(run_dir: Path) -> Path:
             res[(fam, arm)] = rs
             for r in rs:
                 meter.charge(calls=int(r.stats.get("calls", 0)),
-                             bytes=int(r.stats.get("payload_bytes", 0)))
+                             bytes=int(r.stats.get("payload_bytes", 0)) + int(r.stats.get("message_bytes", 0)))
                 meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
                 rows.append([fam, r.seed, arm, r.success])
     fr = [FamilyResult(family=fam, arm=arm, n=n, successes=sum(r.success for r in res[(fam, arm)]))

@@ -1,0 +1,56 @@
+{
+  "packet": {
+    "arms": [
+      "no_relations",
+      "static_relations",
+      "adaptive_relations"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E7",
+    "guardrails": [
+      "shared-source evidence counted once",
+      "exploration calls matched"
+    ],
+    "hypothesis": "Adaptive relations (dormant-over-delete, reactivation, counterevidence retirement) improve success on relational return and counterevidence streams over no relations and static relations at matched exploration.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "Adaptive relations beat neither baseline by the threshold.",
+    "params": {
+      "baselines": [
+        "no_relations",
+        "static_relations"
+      ],
+      "explore_final": 4,
+      "explore_full": 12,
+      "families": [
+        "relational_return",
+        "counterevidence"
+      ],
+      "max_n": 400,
+      "min_n": 30,
+      "pilot_tasks": 30,
+      "probes": 2,
+      "relation_cap": 2,
+      "treatment": "adaptive_relations"
+    },
+    "primary_metric": "relational_return_and_counterevidence_success_diff",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 1
+  },
+  "packet_digest": "9542d8401f2707ba9e05f7a2c257a297d18082f98590e7f98d3cc36fecf326ea"
+}

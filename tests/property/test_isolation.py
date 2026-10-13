@@ -28,3 +28,9 @@ def test_verifier_never_sees_generator() -> None:
 def test_only_evaluator_reads_custody() -> None:
     users = [p.name for p in SRC.rglob("*.py") if "custody_root" in p.read_text()]
     assert sorted(users) == ["locked.py", "paths.py", "pipeline.py"]
+
+
+def test_relations_and_collective_never_touch_evaluator_or_custody() -> None:
+    bad = ("hsi.evaluation", "hsi.pipeline", "hsi.paths", "hsi.verification", "hsi.synthesis")
+    for pkg in ("relations", "collective"):
+        assert not [i for i in imports(pkg) if i.startswith(bad)], pkg
