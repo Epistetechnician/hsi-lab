@@ -236,6 +236,7 @@ Open questions:
 | M3 Verified synthesis (E2) | done (pending owner review) | F8–F9; quarantine → oracle verifier → eligible/rejected; E2 result is NO_CANDIDATE, see docs/experiments/E2.md |
 | M4 Collective + relations (E3, E7) | done (pending owner review) | F10, F12–F13; E3 PROMOTE, E7 INCONCLUSIVE; see docs/experiments/E3.md, E7.md |
 | M5 Candidate update (E4, E6) | done (pending owner review) | F15–F17; E4 NO_CANDIDATE, E6 NO_CANDIDATE; see docs/experiments/E4.md, E6.md; MLX/LLM backbone not used |
+| E5 (adaptive graph, F11) | done (added after M6) | see docs/experiments/E5.md; advantage depends on the byte cap |
 | M6 Reproduction | done (pending owner review) | F18; `hsi reproduce|bundle|assurance`; E1–E4, E6, E7 reproduced 100% (A3); E5 not built; A4 pending; see docs/assurance.md |
 
 Schema deviations from the PRD text: `Episode` adds `rule_family` (split is defined on it) and
@@ -280,7 +281,6 @@ M6 notes: reproduction = fresh clone at the receipt's source commit, fresh venv 
 run root, the ORIGINAL held-out lock imported (otherwise each lock draws a new cohort), then every
 aggregate compared (wall time and peak memory excluded). Same machine only. The dependency install
 is the one step that may touch the network (`--fetch`; hash-pinned); all hsi commands run
-`--offline`. **E5 (adaptive graph, F11) was not built, so 6 of 7 experiments have receipts; the
-"7 of 7" success metric is not met.** Original run roots and custody locks were copied to
+`--offline`. E5 was built after M6 (see docs/experiments/E5.md); the earlier "6 of 7" statement is superseded. Original run roots and custody locks were copied to
 `~/hsi-runs` and `~/hsi-custody` (owner-only) because reproduction needs them; they are outside the
 repo.

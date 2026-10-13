@@ -6,7 +6,7 @@ import pytest
 from hsi.cli import main, template
 
 
-@pytest.mark.parametrize("exp", ["E3", "E7"])
+@pytest.mark.parametrize("exp", ["E3", "E5", "E7"])
 def test_pipeline(exp: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HSI_RUN_ROOT", str(tmp_path / "runs"))
     monkeypatch.setenv("HSI_CUSTODY_ROOT", str(tmp_path / "custody"))
@@ -22,9 +22,11 @@ def test_pipeline(exp: str, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> 
     rc = rd / "eval" / "receipt.json"
     assert main(["verify-receipt", str(rc)]) == 0
     r = json.loads(rc.read_text())
-    if exp == "E3":
+    if exp in ("E3", "E5"):
         assert (rd / "run/messages.jsonl").read_text().strip()
-        assert r["guardrail_values"]["max_message_bytes_used"] <= 24
+        assert r["guardrail_values"]["max_message_bytes_used"] <= (24 if exp == "E3" else 72)
+        if exp == "E5":
+            assert "link_open" in (rd / "run/decisions.jsonl").read_text()
     else:
         assert (rd / "run/relation_events.jsonl").read_text().strip()
         assert r["guardrail_values"]["duplicate_strength_updates"] == 0

@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E4, E6, E7)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E7)."""
 from __future__ import annotations
 
 import argparse
@@ -87,6 +87,22 @@ def template(exp: str) -> dict[str, object]:
                     "baselines": ["no_relations", "static_relations"]})
         t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
                        "max_message_bytes": 0}
+    if exp == "E5":
+        t.update(
+            hypothesis="With four agents that each own one action, an adaptive graph (links opened "
+                       "on demand, dropped after use) reaches more successes than a fixed path "
+                       "graph with delta-sync gossip under the same per-task byte cap.",
+            null_hypothesis="Adaptive-graph success does not exceed fixed-graph success by the "
+                            "threshold at the byte cap.",
+            arms=["fixed_graph", "adaptive_graph"],
+            primary_metric="success_within_byte_cap_diff_adaptive_minus_fixed",
+            guardrails=["success per KB of adaptive >= fixed", "message bytes within cap",
+                        "exploration matched", "link churn reported"],
+            params={"families": ["rule_induction", "compositional_transfer"],
+                    "explore_per_agent": 6, "rounds": 3, "pilot_tasks": 30, "min_n": 30,
+                    "max_n": 400, "treatment": "adaptive_graph", "baselines": ["fixed_graph"]})
+        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
+                       "max_message_bytes": 72}
     if exp in ("E4", "E6"):
         common = {"pretrain_families": ["rule_induction", "compositional_transfer"], "support": 8,
                   "n_pretrain": 80, "n_adapt": 60, "pretrain_steps": 300, "pretrain_lr": 0.1,

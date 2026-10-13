@@ -77,6 +77,19 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
         if g["non_collapse_floor"] != q["non_collapse_floor"]:
             errs.append("non_collapse_floor differs from packet")
         return g["min_replay_diversity"] >= g["diversity_floor"] and rg - r1 >= -g["non_collapse_floor"]
+    if exp == "E5":
+        if g["message_byte_cap"] != pk["budget"]["max_message_bytes"]:
+            errs.append("message cap differs from packet")
+        ok = {}
+        for r in receipt["family_results"]:
+            ok[r["arm"]] = ok.get(r["arm"], 0) + r["successes"]
+        spk = {a: ok[a] / (g[f"bytes_total_{a}"] / 1024) for a in ("fixed_graph", "adaptive_graph")}
+        for a, v in spk.items():
+            if not close(g[f"success_per_kb_{a}"], v):
+                errs.append(f"success_per_kb_{a}")
+        return (spk["adaptive_graph"] >= spk["fixed_graph"]
+                and g["max_message_bytes_used"] <= g["message_byte_cap"]
+                and g["compute_matched_fraction"] == 1.0)
     if exp == "E7":
         return g["duplicate_strength_updates"] == 0 and g["compute_matched_fraction"] == 1.0
     errs.append(f"no validator rule for {exp}")

@@ -1,0 +1,51 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E5",
+  "version": 1,
+  "hypothesis": "With four agents that each own one action, an adaptive graph (links opened on demand, dropped after use) reaches more successes than a fixed path graph with delta-sync gossip under the same per-task byte cap.",
+  "null_hypothesis": "Adaptive-graph success does not exceed fixed-graph success by the threshold at the byte cap.",
+  "arms": [
+    "fixed_graph",
+    "adaptive_graph"
+  ],
+  "primary_metric": "success_within_byte_cap_diff_adaptive_minus_fixed",
+  "threshold": 0.05,
+  "guardrails": [
+    "success per KB of adaptive >= fixed",
+    "message bytes within cap",
+    "exploration matched",
+    "link churn reported"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 72
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "explore_per_agent": 6,
+    "rounds": 3,
+    "pilot_tasks": 30,
+    "min_n": 30,
+    "max_n": 400,
+    "treatment": "adaptive_graph",
+    "baselines": [
+      "fixed_graph"
+    ]
+  }
+}
