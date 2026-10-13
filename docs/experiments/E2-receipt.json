@@ -1,159 +1,159 @@
 {
   "budget_used": {
     "bytes": 0.0,
-    "calls": 28480.0,
-    "failed_proposals": 31798.0,
-    "peak_mem_mb": 298.640625,
+    "calls": 27834.0,
+    "failed_proposals": 31420.0,
+    "peak_mem_mb": 297.34375,
     "retries": 0.0,
     "tokens": 0.0,
-    "wall_seconds": 11.217912124935538
+    "wall_seconds": 11.622207583975978
   },
   "comparisons": [
     {
       "baseline_arm": "real_only",
-      "ci_high": -0.19314437491005135,
-      "ci_low": -0.24793306616738972,
-      "paired_diff": -0.22053872053872053,
+      "ci_high": -0.16379086202310106,
+      "ci_low": -0.2166805184482794,
+      "paired_diff": -0.19023569023569023,
       "pairs": [
         {
-          "both": 137,
+          "both": 145,
           "family": "rule_induction",
           "n": 297,
-          "neither": 72,
-          "only_baseline": 82,
-          "only_treatment": 6
+          "neither": 78,
+          "only_baseline": 65,
+          "only_treatment": 9
         },
         {
-          "both": 46,
+          "both": 54,
           "family": "compositional_transfer",
           "n": 297,
-          "neither": 172,
-          "only_baseline": 71,
-          "only_treatment": 8
+          "neither": 176,
+          "only_baseline": 60,
+          "only_treatment": 7
         },
         {
           "both": 132,
           "family": "counterevidence",
           "n": 297,
-          "neither": 79,
-          "only_baseline": 73,
-          "only_treatment": 13
+          "neither": 86,
+          "only_baseline": 68,
+          "only_treatment": 11
         },
         {
-          "both": 149,
+          "both": 153,
           "family": "relational_return",
           "n": 297,
-          "neither": 67,
-          "only_baseline": 72,
-          "only_treatment": 9
+          "neither": 64,
+          "only_baseline": 70,
+          "only_treatment": 10
         }
       ],
       "treatment_arm": "verified_synthetic"
     },
     {
       "baseline_arm": "unverified_synthetic",
-      "ci_high": 0.02123697689609908,
-      "ci_low": -0.002718458377580564,
-      "paired_diff": 0.009259259259259259,
+      "ci_high": 0.03635367251248973,
+      "ci_low": 0.009100872942055728,
+      "paired_diff": 0.022727272727272728,
       "pairs": [
         {
-          "both": 130,
+          "both": 137,
           "family": "rule_induction",
+          "n": 297,
+          "neither": 138,
+          "only_baseline": 5,
+          "only_treatment": 17
+        },
+        {
+          "both": 55,
+          "family": "compositional_transfer",
+          "n": 297,
+          "neither": 232,
+          "only_baseline": 4,
+          "only_treatment": 6
+        },
+        {
+          "both": 133,
+          "family": "counterevidence",
           "n": 297,
           "neither": 150,
           "only_baseline": 4,
-          "only_treatment": 13
+          "only_treatment": 10
         },
         {
-          "both": 50,
-          "family": "compositional_transfer",
-          "n": 297,
-          "neither": 238,
-          "only_baseline": 5,
-          "only_treatment": 4
-        },
-        {
-          "both": 138,
-          "family": "counterevidence",
-          "n": 297,
-          "neither": 146,
-          "only_baseline": 6,
-          "only_treatment": 7
-        },
-        {
-          "both": 150,
+          "both": 148,
           "family": "relational_return",
           "n": 297,
-          "neither": 133,
-          "only_baseline": 6,
-          "only_treatment": 8
+          "neither": 126,
+          "only_baseline": 8,
+          "only_treatment": 15
         }
       ],
       "treatment_arm": "verified_synthetic"
     }
   ],
-  "data_digest": "b9239917d64fa57b94f56fb7809ac8f9b2af00bf126b1f3d650a1c18f07115c1",
+  "data_digest": "0358ff2b47845a6ff238a8e47ab7216b99fa8c52b97719e151a6f32b949d5e19",
   "decision": "NO_CANDIDATE",
   "family_results": [
     {
       "arm": "real_only",
       "family": "rule_induction",
       "n": 297,
-      "successes": 219
+      "successes": 210
     },
     {
       "arm": "unverified_synthetic",
       "family": "rule_induction",
       "n": 297,
-      "successes": 134
+      "successes": 142
     },
     {
       "arm": "verified_synthetic",
       "family": "rule_induction",
+      "n": 297,
+      "successes": 154
+    },
+    {
+      "arm": "real_only",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 114
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 59
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "compositional_transfer",
+      "n": 297,
+      "successes": 61
+    },
+    {
+      "arm": "real_only",
+      "family": "counterevidence",
+      "n": 297,
+      "successes": 200
+    },
+    {
+      "arm": "unverified_synthetic",
+      "family": "counterevidence",
+      "n": 297,
+      "successes": 137
+    },
+    {
+      "arm": "verified_synthetic",
+      "family": "counterevidence",
       "n": 297,
       "successes": 143
     },
     {
       "arm": "real_only",
-      "family": "compositional_transfer",
-      "n": 297,
-      "successes": 117
-    },
-    {
-      "arm": "unverified_synthetic",
-      "family": "compositional_transfer",
-      "n": 297,
-      "successes": 55
-    },
-    {
-      "arm": "verified_synthetic",
-      "family": "compositional_transfer",
-      "n": 297,
-      "successes": 54
-    },
-    {
-      "arm": "real_only",
-      "family": "counterevidence",
-      "n": 297,
-      "successes": 205
-    },
-    {
-      "arm": "unverified_synthetic",
-      "family": "counterevidence",
-      "n": 297,
-      "successes": 144
-    },
-    {
-      "arm": "verified_synthetic",
-      "family": "counterevidence",
-      "n": 297,
-      "successes": 145
-    },
-    {
-      "arm": "real_only",
       "family": "relational_return",
       "n": 297,
-      "successes": 221
+      "successes": 223
     },
     {
       "arm": "unverified_synthetic",
@@ -165,28 +165,28 @@
       "arm": "verified_synthetic",
       "family": "relational_return",
       "n": 297,
-      "successes": 158
+      "successes": 163
     }
   ],
   "guardrail_values": {
     "example_count_equal_fraction": 1.0,
     "family_regression_floor": 0.02,
     "lineage_fraction": 1.0,
-    "min_family_diff_vs_real_only": -0.2558922558922559
+    "min_family_diff_vs_real_only": -0.20202020202020202
   },
   "guardrails_held": false,
-  "lock_digest": "f403776e1d298d71e85a01e7540ca7cdd02417d61553e329c22758171437c9a8",
+  "lock_digest": "0a871bf87dd924ae85fd5e96787bdd79c4d5b45c6fe6f4bf7545f4eeee34a958",
   "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
   "nonclaims": [
     "no general intelligence claim",
     "not a proof"
   ],
   "packet_digest": "0a11093d5a9d6ccc4f4832ce4f64de29e7018caefb6c6f4245c8a9ed135813da",
-  "receipt_digest": "2dbc0096ca61594ab78f63140af136aabf40970b84ea3086973f4b6807e077ef",
+  "receipt_digest": "99adb201d45f52e40da5c10f92abed745a1c62819a956d500ef3d5a51d73f1df",
   "schema_version": "hsi-receipt-v1",
   "seeds": [
     0
   ],
-  "source_commit": "096f44b8ca0072f338d2477725731db4ddf1fade",
+  "source_commit": "f466b12360d139c8641cab0e830db68302b2b411",
   "threshold": 0.05
 }

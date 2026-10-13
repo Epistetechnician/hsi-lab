@@ -1,0 +1,122 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 26202.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 78.140625,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 11.415617165970616
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "no_relations",
+      "ci_high": 0.062305383540711023,
+      "ci_low": 0.015194616459288973,
+      "paired_diff": 0.03875,
+      "pairs": [
+        {
+          "both": 144,
+          "family": "relational_return",
+          "n": 400,
+          "neither": 190,
+          "only_baseline": 17,
+          "only_treatment": 49
+        },
+        {
+          "both": 135,
+          "family": "counterevidence",
+          "n": 400,
+          "neither": 236,
+          "only_baseline": 15,
+          "only_treatment": 14
+        }
+      ],
+      "treatment_arm": "adaptive_relations"
+    },
+    {
+      "baseline_arm": "static_relations",
+      "ci_high": 0.17477218268106454,
+      "ci_low": 0.11022781731893551,
+      "paired_diff": 0.14250000000000002,
+      "pairs": [
+        {
+          "both": 137,
+          "family": "relational_return",
+          "n": 400,
+          "neither": 201,
+          "only_baseline": 6,
+          "only_treatment": 56
+        },
+        {
+          "both": 53,
+          "family": "counterevidence",
+          "n": 400,
+          "neither": 219,
+          "only_baseline": 32,
+          "only_treatment": 96
+        }
+      ],
+      "treatment_arm": "adaptive_relations"
+    }
+  ],
+  "data_digest": "bedbab05b2e7cfdb4f68e5ee43be9dd86b06ca2ba5fe04dd140cf5ba545b5240",
+  "decision": "INCONCLUSIVE",
+  "family_results": [
+    {
+      "arm": "no_relations",
+      "family": "relational_return",
+      "n": 400,
+      "successes": 161
+    },
+    {
+      "arm": "static_relations",
+      "family": "relational_return",
+      "n": 400,
+      "successes": 143
+    },
+    {
+      "arm": "adaptive_relations",
+      "family": "relational_return",
+      "n": 400,
+      "successes": 193
+    },
+    {
+      "arm": "no_relations",
+      "family": "counterevidence",
+      "n": 400,
+      "successes": 150
+    },
+    {
+      "arm": "static_relations",
+      "family": "counterevidence",
+      "n": 400,
+      "successes": 85
+    },
+    {
+      "arm": "adaptive_relations",
+      "family": "counterevidence",
+      "n": 400,
+      "successes": 149
+    }
+  ],
+  "guardrail_values": {
+    "compute_matched_fraction": 1.0,
+    "duplicate_strength_updates": 0.0
+  },
+  "guardrails_held": true,
+  "lock_digest": "47627a150dcc37ca9d4ef455d3ed720bd6da4b61442c86df4d754eca22f96c34",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "9542d8401f2707ba9e05f7a2c257a297d18082f98590e7f98d3cc36fecf326ea",
+  "receipt_digest": "e6c50d23df7f8590871044742a47ff53e7d928ad74a38d723471000fdbfe7109",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "f466b12360d139c8641cab0e830db68302b2b411",
+  "threshold": 0.05
+}

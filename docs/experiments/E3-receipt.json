@@ -1,0 +1,95 @@
+{
+  "budget_used": {
+    "bytes": 14753.0,
+    "calls": 21582.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 63.078125,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 4.9887547079706565
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "single",
+      "ci_high": 0.4082174386974132,
+      "ci_low": 0.29678256130258673,
+      "paired_diff": 0.3525,
+      "pairs": [
+        {
+          "both": 103,
+          "family": "collective_discovery",
+          "n": 400,
+          "neither": 118,
+          "only_baseline": 19,
+          "only_treatment": 160
+        }
+      ],
+      "treatment_arm": "fixed_graph"
+    },
+    {
+      "baseline_arm": "independent",
+      "ci_high": 0.28611568034081186,
+      "ci_low": 0.18888431965918814,
+      "paired_diff": 0.2375,
+      "pairs": [
+        {
+          "both": 155,
+          "family": "collective_discovery",
+          "n": 400,
+          "neither": 124,
+          "only_baseline": 13,
+          "only_treatment": 108
+        }
+      ],
+      "treatment_arm": "fixed_graph"
+    }
+  ],
+  "data_digest": "f6bb38762a86353c303a174dd8446201643dae3358752ef64c8889e13c003ee2",
+  "decision": "PROMOTE",
+  "family_results": [
+    {
+      "arm": "single",
+      "family": "collective_discovery",
+      "n": 400,
+      "successes": 122
+    },
+    {
+      "arm": "independent",
+      "family": "collective_discovery",
+      "n": 400,
+      "successes": 168
+    },
+    {
+      "arm": "centralized",
+      "family": "collective_discovery",
+      "n": 400,
+      "successes": 249
+    },
+    {
+      "arm": "fixed_graph",
+      "family": "collective_discovery",
+      "n": 400,
+      "successes": 263
+    }
+  ],
+  "guardrail_values": {
+    "compute_matched_fraction": 1.0,
+    "max_message_bytes_used": 24.0,
+    "message_byte_cap": 24.0
+  },
+  "guardrails_held": true,
+  "lock_digest": "afc9569bcb389c355a4998ed9678c118da47e4f51f7731d6cb57f89e49cc6c5c",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "35ef25b1fd5b234ca53373535fa690d2b69edcc3844dee1382bc4e9c812c9e2d",
+  "receipt_digest": "fa447f30b6c84ef0a320f09a2c23417bd7f7cd519ad88f4c7aaebed10ff9bc50",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "f466b12360d139c8641cab0e830db68302b2b411",
+  "threshold": 0.05
+}
