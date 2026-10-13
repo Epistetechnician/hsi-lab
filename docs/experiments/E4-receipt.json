@@ -1,0 +1,74 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 11763.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 62.59375,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 26.173015334061347
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "frozen_base",
+      "ci_high": 0.0288319387729309,
+      "ci_low": -0.0438319387729309,
+      "paired_diff": -0.0075,
+      "pairs": [
+        {
+          "both": 89,
+          "family": "compositional_transfer",
+          "n": 400,
+          "neither": 256,
+          "only_baseline": 29,
+          "only_treatment": 26
+        }
+      ],
+      "treatment_arm": "lora_candidate"
+    }
+  ],
+  "data_digest": "6eaf82c60a2f23784b86d25c6306ae208bf268733fe65a955fb39ab687ae45dd",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "frozen_base",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 118
+    },
+    {
+      "arm": "lora_candidate",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 115
+    },
+    {
+      "arm": "memory_candidate",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 120
+    }
+  ],
+  "guardrail_values": {
+    "compute_matched_fraction": 1.0,
+    "fit_n": 200.0,
+    "fit_regression_floor": 0.02,
+    "fit_success_base": 158.0,
+    "fit_success_candidate": 139.0
+  },
+  "guardrails_held": false,
+  "lock_digest": "a324b97ee6ce80ab413b532af67894de25fd3b78342d56808b87b508950d383a",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "d8941f993220e4802735438d3516a889e43209a1f6c37390e4b605556607b77f",
+  "receipt_digest": "cd616fd7992f458c60f3f63d10efa98416279e68dc9b3c70ec132c33534d5d8d",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "401bf35263861c7bf94fb3ed3aee423a7657a786",
+  "threshold": 0.05
+}

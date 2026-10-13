@@ -1,0 +1,136 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 13800.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 63.046875,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 18.318006500019692
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d3_no_replay",
+      "ci_high": 0.008362228786809946,
+      "ci_low": -0.03913145955604072,
+      "paired_diff": -0.015384615384615385,
+      "pairs": [
+        {
+          "both": 70,
+          "family": "rule_induction",
+          "n": 130,
+          "neither": 57,
+          "only_baseline": 3,
+          "only_treatment": 0
+        },
+        {
+          "both": 25,
+          "family": "compositional_transfer",
+          "n": 130,
+          "neither": 98,
+          "only_baseline": 4,
+          "only_treatment": 3
+        }
+      ],
+      "treatment_arm": "d3_replay"
+    }
+  ],
+  "data_digest": "26c2f2e4cec9a94d57760548ebb6738ceda63949dcddd7b76119887d7b8ce421",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "d1_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 71
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 69
+    },
+    {
+      "arm": "d2_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 70
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 71
+    },
+    {
+      "arm": "d3_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 70
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "rule_induction",
+      "n": 130,
+      "successes": 73
+    },
+    {
+      "arm": "d1_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 28
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 29
+    },
+    {
+      "arm": "d2_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 31
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 29
+    },
+    {
+      "arm": "d3_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 28
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "compositional_transfer",
+      "n": 130,
+      "successes": 29
+    }
+  ],
+  "guardrail_values": {
+    "diversity_floor": 0.2684704263206556,
+    "min_replay_diversity": 0.35193747488317756,
+    "non_collapse_floor": 0.02,
+    "rate_d1_replay": 0.38076923076923075,
+    "rate_d3_replay": 0.3769230769230769
+  },
+  "guardrails_held": true,
+  "lock_digest": "8a005aafa2c436b47f1f40c85b3fc02275c32f81fb21dd609157ec7eb2830e50",
+  "model_digest": "1cbaf16a808f38ac70574a4f17b3e62e8b3852bf06eac091d0270e1741f6b740",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "3bd1af93282b0b5b48045e4abe552427845a2555063f88b140c55ce68859467f",
+  "receipt_digest": "7a7d1247e9beed45d0ae365832870a84b40f9c98c556d3b18928582ad09610b4",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "401bf35263861c7bf94fb3ed3aee423a7657a786",
+  "threshold": 0.05
+}

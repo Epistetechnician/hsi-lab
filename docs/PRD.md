@@ -235,7 +235,7 @@ Open questions:
 | M2 Codecs (E1) | done (pending owner review) | F6, F16–F18 for E1; full `pilot→lock→run→eval→verify-receipt→decide` loop; see docs/experiments/E1.md |
 | M3 Verified synthesis (E2) | done (pending owner review) | F8–F9; quarantine → oracle verifier → eligible/rejected; E2 result is NO_CANDIDATE, see docs/experiments/E2.md |
 | M4 Collective + relations (E3, E7) | done (pending owner review) | F10, F12–F13; E3 PROMOTE, E7 INCONCLUSIVE; see docs/experiments/E3.md, E7.md |
-| M5 Candidate update (E4, E6) | done (pending owner review) | F15–F17; E4 NO_CANDIDATE, E6 INCONCLUSIVE; see docs/experiments/E4.md, E6.md; MLX/LLM backbone not used |
+| M5 Candidate update (E4, E6) | done (pending owner review) | F15–F17; E4 NO_CANDIDATE, E6 NO_CANDIDATE; see docs/experiments/E4.md, E6.md; MLX/LLM backbone not used |
 | M6 | not started | |
 
 Schema deviations from the PRD text: `Episode` adds `rule_family` (split is defined on it) and
