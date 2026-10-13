@@ -284,3 +284,14 @@ is the one step that may touch the network (`--fetch`; hash-pinned); all hsi com
 `--offline`. E5 was built after M6 (see docs/experiments/E5.md); the earlier "6 of 7" statement is superseded. Original run roots and custody locks were copied to
 `~/hsi-runs` and `~/hsi-custody` (owner-only) because reproduction needs them; they are outside the
 repo.
+
+MLX backend (post-M6): `hsi.learning.llm` adds the real-model backbone behind the chooser contract
+(optional extra `mlx`; core install and the default suite stay MLX-free). Checkpoint:
+`mlx-community/Qwen2.5-1.5B-Instruct-4bit` @ 8b40312, **Apache-2.0**, 0.84 GB, stored in
+`~/hsi-models` (outside the repo). The PRD's example Qwen2.5-3B is under the Qwen research
+license, so it was not used. A hypothesis is scored as log P(description | evidence prompt) with
+the prompt KV cache shared across candidates (~4 ms/candidate); LoRA via mlx-lm `LoRALinear`
+(rank/layers configurable), SFT on oracle-labelled non-held-out samples only, adapter-off switch is
+exact (tested), base weights digest-pinned. Zero-shot hypothesis-selection accuracy of the base
+model on unseen worlds: ~0.73 (fit-type), ~0.38 (tune-type). Not yet wired into an E4/E6 packet.
+LLM tests run with `HSI_LLM_TESTS=1 uv run --extra mlx pytest tests/integration/test_llm_backend.py`.

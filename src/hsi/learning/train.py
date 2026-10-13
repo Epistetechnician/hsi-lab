@@ -14,6 +14,7 @@ class Sample:
     key: str
     cands: tuple[int, ...]  # consistent hypothesis indices
     label: int
+    pairs: tuple[tuple[tuple[int, ...], tuple[int, ...]], ...] = ()  # (before, after) evidence
 
 
 def _batch_grads(samples, rng, cap, fwd, accum, vs) -> float:  # type: ignore[no-untyped-def]

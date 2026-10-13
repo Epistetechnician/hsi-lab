@@ -53,7 +53,10 @@ class Model:
             if pairs:
                 c = consistent(pairs, first_only=chooser is None)
                 if c:
-                    self.hyp[a] = HYPOTHESES[c[0] if chooser is None else chooser(c)]
+                    ctx = getattr(chooser, "with_context", None)  # LLM choosers see the evidence
+                    pick = c[0] if chooser is None else (
+                        ctx(c, pairs) if ctx is not None else chooser(c))
+                    self.hyp[a] = HYPOTHESES[pick]
 
     @classmethod
     def from_trace(cls, trace: Trace) -> Model:

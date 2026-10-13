@@ -38,7 +38,7 @@ def build_samples(families: list[str], split: Split, seeds: range, support: int,
                 if not cands or (labeled and lab not in cands):
                     continue
                 key = f"{fam}-{split.value}-{seed}/a{a}"
-                out.append(Sample(key, tuple(cands), -1 if lab is None else lab))
+                out.append(Sample(key, tuple(cands), -1 if lab is None else lab, tuple(pairs)))
                 log.append({"sample_id": key, "split": split.value,
                             "origin": "observed" if labeled else "unlabeled-world",
                             "eligibility": "eligible", "label_source": "oracle" if labeled else "none"})

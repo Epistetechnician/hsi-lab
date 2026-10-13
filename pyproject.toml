@@ -7,6 +7,11 @@ dependencies = ["pydantic>=2.7"]
 [project.scripts]
 hsi = "hsi.cli:main"
 
+[project.optional-dependencies]
+mlx = [
+    "mlx-lm>=0.20",
+]
+
 [dependency-groups]
 dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.5", "mypy>=1.10"]
 
