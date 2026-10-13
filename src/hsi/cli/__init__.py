@@ -147,24 +147,27 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                        "compositional transfer over the frozen model without regressing fit "
                        "families beyond 2 points.",
             params=p)
-    if exp == "E6" and variant in ("llm", "llm-gen"):
+    if exp == "E6" and variant in ("llm", "llm-gen", "llm-gen2"):
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
             p.pop(k, None)
         p.update(backbone="llm", n_adapt=50, n_replay=50, rank=8, lora_layers=8, lora_scale=20.0,
                  adapt_steps=200, adapt_lr=1e-4, adapt_batch=8, gen_max_tokens=20, n_demos=2, pilot_tasks=15,
                  min_n=30, max_n=100)
-        if variant == "llm-gen":
+        if variant in ("llm-gen", "llm-gen2"):
             p.update(eval_mode="generate", extra_arms=True, diversity_floor_frac=0.0)
+        if variant == "llm-gen2":  # v4: v3 never terminated generations; add a stop marker
+            p.update(target_terminator="\n", adapt_steps=300)
+        if variant in ("llm-gen", "llm-gen2"):
             t["arms"] = [*t["arms"], "real_only", "frozen_base"]  # type: ignore[misc]
         t.update(
-            version=3 if variant == "llm-gen" else 2,
+            version={"llm": 2, "llm-gen": 3, "llm-gen2": 4}[variant],
             hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), training "
                        "each generation on the previous generation's own hypotheses collapses "
                        "held-out success at depth 3 unless original labeled data is replayed: "
                        "d3 with replay beats d3 without.",
             params=p)
-        if variant == "llm-gen":
+        if variant in ("llm-gen", "llm-gen2"):
             t["hypothesis"] = (
                 "When held-out success is measured by the model's own free-text hypotheses (no "
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
@@ -233,7 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     n = pk.add_parser("new")
     n.add_argument("experiment", choices=sorted(EXPERIMENTS))
     n.add_argument("out", type=Path)
-    n.add_argument("--variant", default="", choices=["", "llm", "llm-gen"])
+    n.add_argument("--variant", default="", choices=["", "llm", "llm-gen", "llm-gen2"])
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)
     b = sub.add_parser("baselines")

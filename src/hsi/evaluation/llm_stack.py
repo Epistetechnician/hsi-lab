@@ -175,6 +175,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     rng = random.Random(f"e6llm/{seed}")
     cands: dict[str, Any] = {}
     demos = _demos(packet)
+    term = str(q.get("target_terminator", ""))  # end-of-hypothesis marker so generation stops
     for mode in ("no_replay", "replay"):
         llm.set_adapter(False)  # generation 1 is produced by the frozen base
         for g in range(1, int(q["generations"]) + 1):
@@ -185,9 +186,9 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
             valid = [
                 (h := parse_hypothesis(t)) is not None and (i := true_index(h)) is not None
                 and i in s.cands for t, s in zip(texts, take, strict=True)]
-            data = [(render_prompt(s.pairs), t) for s, t in zip(take, texts, strict=True)]
+            data = [(render_prompt(s.pairs), t + term) for s, t in zip(take, texts, strict=True)]
             real = [] if mode == "no_replay" else rng.sample(real_pool, n - len(take))
-            data += [(render_prompt(s.pairs), describe(HYPOTHESES[s.label])) for s in real]
+            data += [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term) for s in real]
             arm = f"d{g}_{mode}"
             for s, t in zip(take, texts, strict=True):
                 log.append({"sample_id": s.key, "arm": arm, "gen": g, "origin": "generated",
@@ -205,7 +206,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
                           "n_synthetic": len(take), "n_real": len(real)}
             # live weights now equal adapter g: the next loop iteration generates with it
     if q.get("extra_arms"):  # reference: SFT on original labelled data only (no synthetic)
-        real_only = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]))
+        real_only = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term)
                      for s in rng.sample(real_pool, min(n, len(real_pool)))]
         llm.reset_lora(seed)
         loss = llm.train_lora(real_only, int(q["adapt_steps"]), float(q["adapt_lr"]), seed,
