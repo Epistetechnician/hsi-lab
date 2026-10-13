@@ -1,4 +1,4 @@
-"""`hsi` command line. M0 implements `packet new`, `packet freeze`, and `packet check`."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`."""
 from __future__ import annotations
 
 import argparse
@@ -65,6 +65,35 @@ def check(path: Path) -> str:
     return str(data["packet_digest"])
 
 
+def baselines(out: Path, n: int) -> Path:
+    import random
+
+    from hsi.accounting import Meter
+    from hsi.agents import POLICIES, rollout
+    from hsi.contracts.records import Split
+    from hsi.environment import SEED_BASE, TASK_FAMILIES, RuleWorld
+    from hsi.experience import Ledger
+    from hsi.paths import refuse_in_repo
+
+    out = refuse_in_repo(out)
+    led, meter, table = Ledger(out / "baselines.ledger.jsonl"), Meter(), {}
+    for name, pol in POLICIES.items():
+        for fam in TASK_FAMILIES:
+            for split in (Split.FIT, Split.TUNE):  # held-out is never touched before lock
+                wins = 0
+                for i in range(n):
+                    w = RuleWorld(fam, split, SEED_BASE[split] + i)
+                    ep = rollout(w, pol(w, random.Random(i)))
+                    led.append(ep.model_copy(update={"episode_id": f"{name}-{ep.episode_id}"}))
+                    meter.charge(calls=len(ep.steps))
+                    wins += ep.outcome.success
+                table[f"{name}/{fam}/{split.value}"] = wins / n
+    dst = out / "baselines.json"
+    dst.write_text(json.dumps({"success": table, "resources": meter.snapshot(),
+                               "ledger_head": led.head}, indent=2, sort_keys=True) + "\n", "utf-8")
+    return dst
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="hsi")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -74,10 +103,16 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument("out", type=Path)
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)
+    b = sub.add_parser("baselines")
+    b.add_argument("out", type=Path)
+    b.add_argument("-n", type=int, default=50)
     for cmd in ("pilot", "lock", "run", "eval", "verify-receipt", "decide"):
         sub.add_parser(cmd).add_argument("args", nargs="*")
     a = p.parse_args(argv)
     try:
+        if a.cmd == "baselines":
+            print(baselines(a.out, a.n))
+            return 0
         if a.cmd != "packet":
             print(f"hsi {a.cmd}: not implemented until a later milestone", file=sys.stderr)
             return EXIT_UNIMPLEMENTED

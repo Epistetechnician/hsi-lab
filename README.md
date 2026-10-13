@@ -5,10 +5,10 @@ small agent collectives, and an adaptive relationship layer improve held-out ada
 at matched cost. Every experiment (E1–E7) is a frozen packet with an independently
 recomputed receipt; negative results are first-class.
 
-PRD: https://claude.ai/code/artifact/024e91dd-72c3-4436-9ca7-93a4776afc01
+PRD: docs/PRD.md
 
-## M0 status
-Scaffold, packet schema, and `hsi packet new|freeze|check`. Other commands exit 5
+## Status (M0–M1)
+Packet CLI, rule-world environment, digest-chained ledger, scripted baselines (`hsi baselines`). Other commands exit 5
 (not implemented).
 
 ```
