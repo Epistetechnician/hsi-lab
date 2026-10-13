@@ -8,6 +8,7 @@ generated-task diversity above the pilot floor at every depth, and d3_replay not
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Any
 
 from hsi.accounting import BudgetExceeded
 from hsi.contracts.packet import Packet
@@ -19,7 +20,7 @@ from hsi.evaluation.learned import Stack, load_stack, prepare_e6, prior_for, run
 class E6Spec:
     stack: Stack | None = None
 
-    manifest: dict | None = None
+    manifest: dict[str, Any] | None = None
     run_dir: Path | None = None
 
     @staticmethod
@@ -73,7 +74,7 @@ class E6Spec:
             rs = [r for r in results if r.arm == arm]
             return sum(r.success for r in rs) / len(rs)
 
-        floor = float(man["diversity_floor"])  # type: ignore[arg-type]
+        floor = float(man["diversity_floor"])
         gv = {"min_replay_diversity": min_div, "diversity_floor": floor,
               "rate_d1_replay": rate("d1_replay"), f"rate_d{gens}_replay": rate(f"d{gens}_replay"),
               "non_collapse_floor": float(packet.params["non_collapse_floor"])}

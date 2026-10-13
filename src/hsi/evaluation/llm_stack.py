@@ -154,6 +154,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
         MODEL_REVISION,
         RUNTIME,
         describe,
+        few_shot_prompt,
         parse_hypothesis,
         render_prompt,
         weights_digest,
