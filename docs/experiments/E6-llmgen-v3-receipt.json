@@ -1,0 +1,180 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 24286.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 1132.234375,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 1023.8722641249187
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d3_no_replay",
+      "ci_high": 0.0800924620896831,
+      "ci_low": -0.040092462089683104,
+      "paired_diff": 0.019999999999999997,
+      "pairs": [
+        {
+          "both": 6,
+          "family": "rule_induction",
+          "n": 100,
+          "neither": 74,
+          "only_baseline": 7,
+          "only_treatment": 13
+        },
+        {
+          "both": 6,
+          "family": "compositional_transfer",
+          "n": 100,
+          "neither": 76,
+          "only_baseline": 10,
+          "only_treatment": 8
+        }
+      ],
+      "treatment_arm": "d3_replay"
+    }
+  ],
+  "data_digest": "0b3b96fc66ac9ae90063e3de45a7f46c9907e1be57df3ee7ddb8c3296f53eb13",
+  "decision": "INCONCLUSIVE",
+  "family_results": [
+    {
+      "arm": "d1_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 14
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 16
+    },
+    {
+      "arm": "d2_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 16
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 17
+    },
+    {
+      "arm": "d3_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 19
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 13
+    },
+    {
+      "arm": "real_only",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 15
+    },
+    {
+      "arm": "frozen_base",
+      "family": "rule_induction",
+      "n": 100,
+      "successes": 11
+    },
+    {
+      "arm": "d1_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 10
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 18
+    },
+    {
+      "arm": "d2_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 11
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 12
+    },
+    {
+      "arm": "d3_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 14
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 16
+    },
+    {
+      "arm": "real_only",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 11
+    },
+    {
+      "arm": "frozen_base",
+      "family": "compositional_transfer",
+      "n": 100,
+      "successes": 15
+    }
+  ],
+  "guardrail_values": {
+    "diversity_d3_no_replay": -0.0,
+    "diversity_d3_replay": -0.0,
+    "diversity_floor": 0.0,
+    "eval_consistent_d1_no_replay": 0.0,
+    "eval_consistent_d1_replay": 0.0,
+    "eval_consistent_d2_no_replay": 0.0,
+    "eval_consistent_d2_replay": 0.0,
+    "eval_consistent_d3_no_replay": 0.0,
+    "eval_consistent_d3_replay": 0.0,
+    "eval_consistent_frozen_base": 0.0,
+    "eval_consistent_real_only": 0.0,
+    "eval_valid_d1_no_replay": 0.0,
+    "eval_valid_d1_replay": 0.0,
+    "eval_valid_d2_no_replay": 0.0,
+    "eval_valid_d2_replay": 0.0,
+    "eval_valid_d3_no_replay": 0.0,
+    "eval_valid_d3_replay": 0.0,
+    "eval_valid_frozen_base": 0.0,
+    "eval_valid_real_only": 0.0,
+    "min_replay_diversity": -0.0,
+    "non_collapse_floor": 0.02,
+    "rate_d1_replay": 0.12,
+    "rate_d3_replay": 0.165,
+    "validity_d3_no_replay": 0.0,
+    "validity_d3_replay": 0.0
+  },
+  "guardrails_held": true,
+  "lock_digest": "c81f0d6c842d876a2e47553563ae1de2c96811c9e4ee3c11fa7a75d91cab7ae4",
+  "model_digest": "0580aae2a057d831c7aab412a26799948f042a23b337ed9a9d0dffa9a72e058e",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "72c178f5d51119dfabe03430a5b528724152d788e4dbe6afb4d33d67ae734971",
+  "receipt_digest": "bacc5e99b752581b2f8918c148972d3df76be9e1f92655af7fb3944999dc685b",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "0368ecf38e4f4d8ae2a87aa8d3b288b64fd04fcc",
+  "threshold": 0.05
+}
