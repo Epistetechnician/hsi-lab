@@ -1,4 +1,4 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E7)."""
+"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. `watch`: terminal run viewer. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E7)."""
 from __future__ import annotations
 
 import argparse
@@ -256,6 +256,13 @@ def main(argv: list[str] | None = None) -> int:
     bd = sub.add_parser("bundle")
     bd.add_argument("path", type=Path)
     bd.add_argument("out", type=Path)
+    wt = sub.add_parser("watch", help="live read-only terminal view of a run (or list runs)")
+    wt.add_argument("path", type=Path, nargs="?")
+    wt.add_argument("--once", action="store_true", help="print a text snapshot and exit")
+    wt.add_argument("--tab", default="all", choices=["all", "overview", "mechanism", "data",
+                                                    "receipt", "events"])
+    wt.add_argument("--width", type=int, default=100)
+    wt.add_argument("--log", type=Path, help="also tail this log file in the events tab")
     asr = sub.add_parser("assurance")
     asr.add_argument("--write", type=Path)
     dc = sub.add_parser("decide")
@@ -266,6 +273,11 @@ def main(argv: list[str] | None = None) -> int:
         if a.cmd == "baselines":
             print(baselines(a.out, a.n))
             return 0
+        if a.cmd == "watch":
+            from hsi.paths import run_root
+            from hsi.watch import watch
+
+            return watch((a.path or run_root()).expanduser().resolve(), a.once, a.tab, a.width, a.log)
         if a.cmd == "reproduce":
             from hsi.assurance import reproduce
 

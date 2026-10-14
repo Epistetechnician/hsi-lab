@@ -29,6 +29,7 @@ from hsi.evaluation.base import arms_of
 from hsi.evaluation.registry import SPECS
 from hsi.experience import Ledger
 from hsi.paths import REPO, custody_root, run_root
+from hsi.progress import Progress
 from hsi.verification import DecisionLog
 
 OUTCOMES = {"PROMOTE", "NO_CANDIDATE", "INCONCLUSIVE"}
@@ -65,6 +66,8 @@ def pilot(packet_file: Path) -> Path:
         spec.bind(packet, d)
     off = int(packet.params.get("tune_offset", 0))
     treat, bases = arms_of(packet)
+    prog = Progress(d, "pilot:variance")
+    total, done = len(bases) * len(fams) * 2 * npilot, 0
     per_family: dict[str, float] = {}
     sigma = 0.0
     for base in bases:
@@ -77,6 +80,8 @@ def pilot(packet_file: Path) -> Path:
                     b = spec.run_task(base, fam, split, seed, packet)
                     t = spec.run_task(treat, fam, split, seed, packet)
                     fd.append(float(t.success) - float(b.success))
+                    done += 1
+                    prog.update(done, total, f"{base} vs {treat} · {fam} · {split.value}")
             mean = sum(fd) / len(fd)
             per_family[f"{base}/{fam}"] = mean
             sq += [(x - mean) ** 2 for x in fd]
@@ -87,6 +92,7 @@ def pilot(packet_file: Path) -> Path:
            "required_n": need, "n_per_family": n, "underpowered": need > hi,
            "pilot_tasks_per_family_per_split": npilot}
     write_json(d / "pilot.json", out)
+    prog.finish()
     return d / "pilot.json"
 
 
@@ -141,6 +147,8 @@ def run(packet_file: Path) -> Path:
     if hasattr(spec, "bind"):
         spec.bind(packet, d)
     meter = Meter()
+    prog = Progress(d, "run")
+    total, done = len(packet.arms) * len(fams) * n, 0
     rd = d / "run"
     if (rd / "episodes.jsonl").exists():
         raise ExistsError("run already exists")
@@ -157,6 +165,8 @@ def run(packet_file: Path) -> Path:
                                  limits={"calls": packet.budget.max_calls})
                     meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
                     spec.check_budget(r, packet)
+                    done += 1
+                    prog.update(done, total, f"{arm} · {fam}")
                     for ep in r.episodes:
                         led.append(ep)
                     for ep in r.examples:
@@ -178,6 +188,7 @@ def run(packet_file: Path) -> Path:
                 "ledger_head": led.head, "decision_log_head": dlog.head, "resources": meter.snapshot()}
     manifest["run_digest"] = canonical_digest({k: v for k, v in manifest.items() if k != "resources"})
     write_json(d / "run" / "manifest.json", manifest)
+    prog.finish()
     return d
 
 

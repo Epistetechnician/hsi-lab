@@ -13,6 +13,7 @@ from hsi.errors import DigestError
 from hsi.evaluation.base import TaskResult
 from hsi.evaluation.learned import _save, run_prior_task
 from hsi.learning.data import build_samples
+from hsi.progress import Progress
 from hsi.verification import DecisionLog
 
 _STATE: dict[str, Any] = {}
@@ -178,12 +179,16 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     n, seed = len(syn), int(packet.seeds[0])
     rng = random.Random(f"e6llm/{seed}")
     cands: dict[str, Any] = {}
+    n_adapters = 2 * int(q["generations"]) + (1 if q.get("extra_arms") else 0)
+    prog = Progress(run_dir, "pilot:prepare")
+    prog.update(0, n_adapters, "starting")
     demos = _demos(packet)
     term = str(q.get("target_terminator", ""))  # end-of-hypothesis marker so generation stops
     for mode in ("no_replay", "replay"):
         llm.set_adapter(False)  # generation 1 is produced by the frozen base
         for g in range(1, int(q["generations"]) + 1):
             take = syn if mode == "no_replay" else syn[: n // 2]
+            prog.update(len(cands), n_adapters, f"d{g}_{mode}: generating {len(take)} texts")
             texts = [llm.generate(few_shot_prompt(s.pairs, demos), int(q["gen_max_tokens"]))
                      or "unknown"
                      for s in take]
@@ -202,8 +207,11 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
                 log.append({"sample_id": s.key, "arm": arm, "gen": g, "origin": "observed",
                             "eligibility": "eligible", "label_source": "oracle"})
             llm.reset_lora(seed + g)
-            loss = llm.train_lora(data, int(q["adapt_steps"]), float(q["adapt_lr"]), seed + g,
-                                  int(q["adapt_batch"]))
+            steps = int(q["adapt_steps"])
+            loss = llm.train_lora(
+                data, steps, float(q["adapt_lr"]), seed + g, int(q["adapt_batch"]),
+                on_step=lambda i, ls, a=arm, st=steps: prog.update(
+                    len(cands), n_adapters, f"{a}: step {i}/{st} loss {ls:.2f}"))
             digest = llm.save_adapter(ld / f"{arm}.safetensors")
             cands[arm] = {"generation": g, "loss": loss, "digest": digest,
                           "diversity": _text_entropy(texts), "validity": sum(valid) / len(valid),
@@ -213,11 +221,15 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
         real_only = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term)
                      for s in rng.sample(real_pool, min(n, len(real_pool)))]
         llm.reset_lora(seed)
-        loss = llm.train_lora(real_only, int(q["adapt_steps"]), float(q["adapt_lr"]), seed,
-                              int(q["adapt_batch"]))
+        steps = int(q["adapt_steps"])
+        loss = llm.train_lora(
+            real_only, steps, float(q["adapt_lr"]), seed, int(q["adapt_batch"]),
+            on_step=lambda i, ls: prog.update(len(cands), n_adapters,
+                                              f"real_only: step {i}/{steps} loss {ls:.2f}"))
         cands["real_only"] = {"generation": 0, "loss": loss, "n_synthetic": 0,
                               "n_real": len(real_only),
                               "digest": llm.save_adapter(ld / "real_only.safetensors")}
+    prog.finish()
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
         "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",

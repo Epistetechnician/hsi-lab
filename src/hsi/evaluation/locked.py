@@ -16,6 +16,7 @@ from hsi.evaluation.base import TaskResult, arms_of
 from hsi.evaluation.registry import SPECS
 from hsi.evaluation.stats import decide, overall
 from hsi.paths import REPO, custody_root
+from hsi.progress import Progress
 
 
 def _commit() -> str:
@@ -50,10 +51,16 @@ def main(run_dir: Path) -> Path:
     treat, bases = arms_of(packet)
     meter, rows = Meter(), []
     res: dict[tuple[str, str], list[TaskResult]] = {}
+    prog = Progress(run_dir, "eval")
+    total, done = len(fams) * len(packet.arms) * len(offs), 0
     for fam in fams:
         for arm in packet.arms:
-            rs = [spec.run_task(arm, fam, Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o, packet)
-                  for o in offs]
+            rs = []
+            for o in offs:
+                rs.append(spec.run_task(arm, fam, Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o, packet))
+                done += 1
+                if done % 5 == 0 or done == total:
+                    prog.update(done, total, f"{arm} · {fam}")  # counts only, no scores
             res[(fam, arm)] = rs
             for r in rs:
                 meter.charge(calls=int(r.stats.get("calls", 0)),
@@ -91,6 +98,7 @@ def main(run_dir: Path) -> Path:
     d["receipt_digest"] = canonical_digest(d)
     out = run_dir / "eval" / "receipt.json"
     write_json(out, d)
+    prog.finish()
     return out
 
 

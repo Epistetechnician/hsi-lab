@@ -13,7 +13,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -257,7 +257,7 @@ class LLM:
         self.model.load_weights(str(path), strict=False)
 
     def train_lora(self, samples: list[tuple[str, str]], steps: int, lr: float, seed: int,
-                   batch: int = 8) -> float:
+                   batch: int = 8, on_step: Callable[[int, float], None] | None = None) -> float:
         """Supervised fine-tuning of the adapter only: maximise log P(target | prompt)."""
         import random
 
@@ -273,7 +273,7 @@ class LLM:
 
         vg = nn.value_and_grad(self.model, loss_fn)  # type: ignore[attr-defined]
         last = 0.0
-        for _ in range(steps):
+        for step in range(steps):
             mb = rng.sample(samples, min(batch, len(samples)))
             ps = [self.tok.encode(p) for p, _ in mb]
             cs = [self.tok.encode(" " + t) for _, t in mb]
@@ -281,6 +281,8 @@ class LLM:
             opt.update(self.model, grads)
             mx.eval(self.model.parameters(), opt.state, loss)
             last = float(loss.item())
+            if on_step is not None:
+                on_step(step + 1, last)
         return last
 
 

@@ -17,6 +17,11 @@ uv run pytest
 uv run hsi packet new E1 packets/e1-v1.json
 ```
 
+## Watching a run
+
+`hsi watch` opens a read-only terminal view of any run (pipeline stages, mechanism per
+experiment, data lineage, receipt with interval charts, live events). See docs/watch.md.
+
 ## Non-claims
 No general-intelligence, understanding, novelty, or production claims. Run roots and
 custody roots live outside this repo.
