@@ -170,3 +170,29 @@ d3_no_replay → d3_replay (receipt: diff -0.0600, CI [-0.1093, -0.0107])
 Guardrails: {'diversity_d3_no_replay': 0.2643844043993107, 'diversity_d3_replay': 0.2852077682752576, 'diversity_floor': 0.0, 'min_replay_diversity': 0.18070647482209062, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.09, 'rate_d3_replay': 0.06, 'validity_d3_no_replay': 0.04285714285714286, 'validity_d3_replay': 0.11428571428571428}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-llm7b — receipt `dfbcbc239dfd`, threshold 0.05, decision INCONCLUSIVE
+
+d3_no_replay → d3_replay (receipt: diff 0.0000, CI [-0.0571, 0.0571])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 100 | 6 | 12 | 12 | 70 |
+| compositional_transfer | 100 | 1 | 5 | 5 | 89 |
+
+Guardrails: {'diversity_floor': 0.0, 'min_replay_diversity': 0.26678812266154167, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.11, 'rate_d3_replay': 0.12}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-ground — receipt `da550f69c90a`, threshold 0.05, decision NO_CANDIDATE
+
+d3_no_replay → d3_replay (receipt: diff 0.0141, CI [-0.0106, 0.0388])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 354 | 21 | 31 | 31 | 271 |
+| compositional_transfer | 354 | 4 | 14 | 4 | 332 |
+
+Guardrails: {'diversity_floor': 0.15602001205706564, 'min_replay_diversity': 0.39310467378251435, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.1652542372881356, 'rate_d3_replay': 0.09887005649717515}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)

@@ -319,3 +319,10 @@ Qwen2.5-7B-Instruct 4-bit (Apache-2.0) is a clearly better generator but held-ou
 remain out of distribution, so success sits at the fallback floor for all arms. Generator-level
 diversity falls with depth, less with replay. Receipt `docs/experiments/E6-llm7b-receipt.json`;
 see docs/experiments/E6-llm7b.md. Clean-environment reproduction pending.
+
+E6 at the generator (packet e6-v6): NO_CANDIDATE (d3 replay - d3 no replay = +0.014 [-0.011, +0.039];
+non-collapse guardrail fails, d3 replay 0.099 vs d1 replay 0.165). First measurable collapse signal:
+without replay, grounded generation halves by depth 2 and output diversity falls 0.31 -> 0.14; replay
+holds diversity and delays the quality decline. Exact match is 0 for all arms (held-out rule types are
+out of vocabulary). Adapters reused from the 7B run via digest pinning (fail-closed). Receipt
+`docs/experiments/E6-ground-receipt.json`; see docs/experiments/E6-ground.md.

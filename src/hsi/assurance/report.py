@@ -35,6 +35,7 @@ ALL = [
     "E6-llm",
     "E6-llmgen",
     "E6-llm7b",
+    "E6-ground",
     "E7",
 ]  # *-llm: MLX-backbone variants
 
