@@ -1,4 +1,5 @@
 """Locked evaluator: its own process; the only reader of the custody root."""
+
 from __future__ import annotations
 
 import hashlib
@@ -21,8 +22,9 @@ from hsi.progress import Progress
 
 def _commit() -> str:
     def g(*a: str) -> str:
-        return subprocess.run(["git", *a], cwd=REPO, capture_output=True, text=True,
-                              check=False).stdout.strip()
+        return subprocess.run(
+            ["git", *a], cwd=REPO, capture_output=True, text=True, check=False
+        ).stdout.strip()
 
     return g("rev-parse", "HEAD") + ("+dirty" if g("status", "--porcelain") else "")
 
@@ -57,18 +59,26 @@ def main(run_dir: Path) -> Path:
         for arm in packet.arms:
             rs = []
             for o in offs:
-                rs.append(spec.run_task(arm, fam, Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o, packet))
+                rs.append(
+                    spec.run_task(arm, fam, Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o, packet)
+                )
                 done += 1
                 if done % 5 == 0 or done == total:
                     prog.update(done, total, f"{arm} · {fam}")  # counts only, no scores
             res[(fam, arm)] = rs
             for r in rs:
-                meter.charge(calls=int(r.stats.get("calls", 0)),
-                             bytes=int(r.stats.get("payload_bytes", 0)) + int(r.stats.get("message_bytes", 0)))
+                meter.charge(
+                    calls=int(r.stats.get("calls", 0)),
+                    bytes=int(r.stats.get("payload_bytes", 0))
+                    + int(r.stats.get("message_bytes", 0)),
+                )
                 meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
                 rows.append([fam, r.seed, arm, r.success])
-    fr = [FamilyResult(family=fam, arm=arm, n=n, successes=sum(r.success for r in res[(fam, arm)]))
-          for fam in fams for arm in packet.arms]
+    fr = [
+        FamilyResult(family=fam, arm=arm, n=n, successes=sum(r.success for r in res[(fam, arm)]))
+        for fam in fams
+        for arm in packet.arms
+    ]
     comps = []
     for base in bases:
         pairs = []
@@ -77,22 +87,49 @@ def main(run_dir: Path) -> Path:
             both = sum(x.success and y.success for x, y in zip(b, t, strict=True))
             ot = sum(y.success and not x.success for x, y in zip(b, t, strict=True))
             ob = sum(x.success and not y.success for x, y in zip(b, t, strict=True))
-            pairs.append(PairedFamily(family=fam, n=n, both=both, only_treatment=ot,
-                                      only_baseline=ob, neither=n - both - ot - ob))
+            pairs.append(
+                PairedFamily(
+                    family=fam,
+                    n=n,
+                    both=both,
+                    only_treatment=ot,
+                    only_baseline=ob,
+                    neither=n - both - ot - ob,
+                )
+            )
         mean, lo, hi = overall(pairs)
-        comps.append(Comparison(baseline_arm=base, treatment_arm=treat, pairs=pairs,
-                                paired_diff=mean, ci_low=lo, ci_high=hi))
+        comps.append(
+            Comparison(
+                baseline_arm=base,
+                treatment_arm=treat,
+                pairs=pairs,
+                paired_diff=mean,
+                ci_low=lo,
+                ci_high=hi,
+            )
+        )
     allr = [r for rs in res.values() for r in rs]
     gv, held = spec.guardrails(allr, comps, packet)
     body = Receipt(
-        packet_digest=digest, source_commit=_commit(), lock_digest=ld,
-        model_digest=(getattr(spec, "model_digest", lambda: None)()
-                      or hashlib.sha256(b"scripted:learner-v1:codecs-v1").hexdigest()),
-        data_digest=canonical_digest(rows), seeds=packet.seeds, budget_used=meter.snapshot(),
-        family_results=fr, comparisons=comps, guardrail_values=gv, threshold=packet.threshold,
+        packet_digest=digest,
+        source_commit=_commit(),
+        lock_digest=ld,
+        model_digest=(
+            getattr(spec, "model_digest", lambda: None)()
+            or hashlib.sha256(b"scripted:learner-v1:codecs-v1").hexdigest()
+        ),
+        data_digest=canonical_digest(rows),
+        seeds=packet.seeds,
+        budget_used=meter.snapshot(),
+        family_results=fr,
+        comparisons=comps,
+        guardrail_values=gv,
+        threshold=packet.threshold,
         guardrails_held=held,
         decision=decide([(c.ci_low, c.ci_high) for c in comps], packet.threshold, held),
-        nonclaims=packet.nonclaims, receipt_digest="")
+        nonclaims=packet.nonclaims,
+        receipt_digest="",
+    )
     d = body.model_dump(mode="json")
     d.pop("receipt_digest")
     d["receipt_digest"] = canonical_digest(d)

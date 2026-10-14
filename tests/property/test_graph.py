@@ -12,8 +12,10 @@ def know(owned: set[int]) -> list[dict]:  # type: ignore[type-arg]
 
 @given(st.sets(st.integers(0, 3)), st.integers(0, 150))
 def test_cap_never_exceeded_and_bytes_match_messages(owned: set[int], cap: int) -> None:
-    for res in (fixed_gossip(know(owned), PATH, 3, cap, "k"),
-                adaptive(know(owned), 0, 3, cap, "k", lambda kn: False)):
+    for res in (
+        fixed_gossip(know(owned), PATH, 3, cap, "k"),
+        adaptive(know(owned), 0, 3, cap, "k", lambda kn: False),
+    ):
         assert res.used <= cap and res.used == sum(m.bytes for m in res.messages)
 
 

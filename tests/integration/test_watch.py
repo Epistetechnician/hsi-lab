@@ -25,8 +25,13 @@ def run_dir(tmp_path_factory: pytest.TempPathFactory) -> Path:
     os.environ["HSI_RUN_ROOT"] = str(tmp / "runs")
     os.environ["HSI_CUSTODY_ROOT"] = str(tmp / "custody")
     t = template("E1")
-    t["params"] = {"families": ["rule_induction"], "trace_len": 40, "pilot_tasks": 4, "min_n": 8,
-                   "max_n": 8}
+    t["params"] = {
+        "families": ["rule_induction"],
+        "trace_len": 40,
+        "pilot_tasks": 4,
+        "min_n": 8,
+        "max_n": 8,
+    }
     (tmp / "p.json").write_text(json.dumps(t))
     assert main(["packet", "freeze", str(tmp / "p.json")]) == 0
     f = str(tmp / "p.frozen.json")
@@ -50,18 +55,21 @@ def test_load_and_all_panels_render(run_dir: Path) -> None:
     assert [s.state for s in v.stages] == ["done"] * 6 + ["pending"]
     assert v.experiment == "E1" and v.verified and v.receipt is not None
     text = render_text(v, TABS, 100)
-    assert "unavailable" not in text and "RECEIPT · " in text and "independent recompute: OK" in text
+    assert (
+        "unavailable" not in text and "RECEIPT · " in text and "independent recompute: OK" in text
+    )
     assert all(len(line) <= 100 for line in text.splitlines())
     assert "text" in text and "typed_event" in text
 
 
 def test_tolerates_partial_and_corrupt_artifacts(run_dir: Path, tmp_path: Path) -> None:
     import shutil
+
     d = tmp_path / "copy"
     shutil.copytree(run_dir, d)
-    (d / "pilot.json").write_text('{"n_per_fam')                          # half-written json
+    (d / "pilot.json").write_text('{"n_per_fam')  # half-written json
     (d / "run" / "episodes.jsonl").write_text('{"episode_id": "x"\n{bad\n')  # garbage lines
-    (d / "eval" / "receipt.json").write_text("[]")                         # wrong shape
+    (d / "eval" / "receipt.json").write_text("[]")  # wrong shape
     (d / "progress" / "run.json").write_text("nope")
     v = load(d)
     assert v.pilot is None and v.receipt is None
@@ -71,8 +79,13 @@ def test_tolerates_partial_and_corrupt_artifacts(run_dir: Path, tmp_path: Path) 
 
 def test_discover_and_list(run_dir: Path) -> None:
     assert discover(run_dir.parent) == [run_dir]
-    r = subprocess.run([sys.executable, "-c", CLI, "watch", str(run_dir.parent), "--once"],
-                       capture_output=True, text=True, check=False, cwd=REPO)
+    r = subprocess.run(
+        [sys.executable, "-c", CLI, "watch", str(run_dir.parent), "--once"],
+        capture_output=True,
+        text=True,
+        check=False,
+        cwd=REPO,
+    )
     assert r.returncode == 0 and run_dir.name in r.stdout and "E1 v1" in r.stdout
 
 

@@ -1,4 +1,5 @@
 """E4 with the MLX backbone: prepare (train the LoRA candidate), bind (verify + load), run."""
+
 from __future__ import annotations
 
 import random
@@ -22,7 +23,11 @@ _STATE: dict[str, Any] = {}
 def get_llm(packet: Packet | None = None) -> Any:
     from hsi.learning.llm import DEFAULT_MODEL, LLM
 
-    name = str(packet.params.get("model", DEFAULT_MODEL)) if packet else _STATE.get("name", DEFAULT_MODEL)
+    name = (
+        str(packet.params.get("model", DEFAULT_MODEL))
+        if packet
+        else _STATE.get("name", DEFAULT_MODEL)
+    )
     if _STATE.get("name") != name or "llm" not in _STATE:
         _STATE.pop("llm", None)
         _STATE["llm"], _STATE["name"], _STATE["arm"] = LLM(name=name), name, None
@@ -71,20 +76,40 @@ def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
         if r["sample_id"] in keep:
             log.append({**r, "used_by": "lora_candidate", "role": "fit-replay"})
     data = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label])) for s in [*tune, *fit]]
-    loss = llm.train_lora(data, int(q["adapt_steps"]), float(q["adapt_lr"]), int(packet.seeds[0]),
-                          int(q["adapt_batch"]))
+    loss = llm.train_lora(
+        data,
+        int(q["adapt_steps"]),
+        float(q["adapt_lr"]),
+        int(packet.seeds[0]),
+        int(q["adapt_batch"]),
+    )
     adapter_digest = llm.save_adapter(ld / "lora_candidate.safetensors")
     man: dict[str, object] = {
-        "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
-        "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",
-        "model_repo": MODELS[llm.name][0], "model_revision": MODELS[llm.name][1],
-        "model_license": MODELS[llm.name][2], "model_name": llm.name,
-        "weights_digest": weights_digest(llm.path), "adapter_digest": adapter_digest,
-        "adapter": {"rank": int(q["rank"]), "layers": int(q["lora_layers"]),
-                    "scale": float(q["lora_scale"])},
-        "train": {"samples_tune": len(tune), "samples_fit_replay": len(fit), "final_loss": loss,
-                  "steps": int(q["adapt_steps"]), "lr": float(q["adapt_lr"])},
-        "training_log_head": log.head}
+        "packet_digest": canonical_digest(packet.model_dump(mode="json")),
+        "runtime": RUNTIME,
+        "python": sys.version.split()[0],
+        "seeds": packet.seeds,
+        "backbone": "llm",
+        "model_repo": MODELS[llm.name][0],
+        "model_revision": MODELS[llm.name][1],
+        "model_license": MODELS[llm.name][2],
+        "model_name": llm.name,
+        "weights_digest": weights_digest(llm.path),
+        "adapter_digest": adapter_digest,
+        "adapter": {
+            "rank": int(q["rank"]),
+            "layers": int(q["lora_layers"]),
+            "scale": float(q["lora_scale"]),
+        },
+        "train": {
+            "samples_tune": len(tune),
+            "samples_fit_replay": len(fit),
+            "final_loss": loss,
+            "steps": int(q["adapt_steps"]),
+            "lr": float(q["adapt_lr"]),
+        },
+        "training_log_head": log.head,
+    }
     man["manifest_digest"] = canonical_digest(man)
     _save(ld / "manifest.json", man)
 
@@ -96,8 +121,10 @@ def bind_e4_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
     if not (ld / "manifest.json").exists():
         raise DigestError("no learning manifest; run `hsi pilot` first")
     man = load_json(ld / "manifest.json")
-    if canonical_digest({k: v for k, v in man.items() if k != "manifest_digest"}) \
-            != man["manifest_digest"]:
+    if (
+        canonical_digest({k: v for k, v in man.items() if k != "manifest_digest"})
+        != man["manifest_digest"]
+    ):
         raise DigestError("learning manifest digest mismatch")
     if man["packet_digest"] != canonical_digest(packet.model_dump(mode="json")):
         raise DigestError("candidate not bound to this packet")
@@ -112,8 +139,13 @@ def bind_e4_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
 
 def model_digest(run_dir: Path) -> str:
     man = load_json(run_dir / "learning" / "manifest.json")
-    return canonical_digest({"weights": man["weights_digest"], "adapter": man["adapter_digest"],
-                             "runtime": man["runtime"]})
+    return canonical_digest(
+        {
+            "weights": man["weights_digest"],
+            "adapter": man["adapter_digest"],
+            "runtime": man["runtime"],
+        }
+    )
 
 
 def run_llm_task(arm: str, family: str, split: Split, seed: int, packet: Packet) -> TaskResult:
@@ -142,8 +174,9 @@ def _demos(packet: Packet) -> list[tuple[Any, str]]:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import describe
 
-    s, _ = build_samples(["rule_induction"], Split.FIT, range(700_000, 700_040),
-                         int(packet.params["support"]), True)
+    s, _ = build_samples(
+        ["rule_induction"], Split.FIT, range(700_000, 700_040), int(packet.params["support"]), True
+    )
     picked = [x for x in s if len(x.pairs) >= 2][: int(packet.params.get("n_demos", 2))]
     return [(x.pairs, describe(HYPOTHESES[x.label])) for x in picked]
 
@@ -170,11 +203,17 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     syn, slog = build_samples(fams, Split.TUNE, range(int(q["n_adapt"])), int(q["support"]), False)
     for r in slog:
         log.append({**r, "eligibility": "unverified", "used_by": "synthesis-pool"})
-    real_pool, _ = build_samples(fams, Split.FIT, range(int(q["n_replay"])), int(q["support"]), True)
+    real_pool, _ = build_samples(
+        fams, Split.FIT, range(int(q["n_replay"])), int(q["support"]), True
+    )
     n_rt = int(q.get("n_replay_tune", 0))
-    if n_rt:  # original labelled data also covers tune-type worlds (disjoint from the synthetic pool)
+    if (
+        n_rt
+    ):  # original labelled data also covers tune-type worlds (disjoint from the synthetic pool)
         base = int(q["n_adapt"]) + 50
-        extra, _ = build_samples(fams, Split.TUNE, range(base, base + n_rt), int(q["support"]), True)
+        extra, _ = build_samples(
+            fams, Split.TUNE, range(base, base + n_rt), int(q["support"]), True
+        )
         real_pool = real_pool + extra
     n, seed = len(syn), int(packet.seeds[0])
     rng = random.Random(f"e6llm/{seed}")
@@ -189,55 +228,106 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
         for g in range(1, int(q["generations"]) + 1):
             take = syn if mode == "no_replay" else syn[: n // 2]
             prog.update(len(cands), n_adapters, f"d{g}_{mode}: generating {len(take)} texts")
-            texts = [llm.generate(few_shot_prompt(s.pairs, demos), int(q["gen_max_tokens"]))
-                     or "unknown"
-                     for s in take]
+            texts = [
+                llm.generate(few_shot_prompt(s.pairs, demos), int(q["gen_max_tokens"])) or "unknown"
+                for s in take
+            ]
             valid = [
-                (h := parse_hypothesis(t)) is not None and (i := true_index(h)) is not None
-                and i in s.cands for t, s in zip(texts, take, strict=True)]
+                (h := parse_hypothesis(t)) is not None
+                and (i := true_index(h)) is not None
+                and i in s.cands
+                for t, s in zip(texts, take, strict=True)
+            ]
             data = [(render_prompt(s.pairs), t + term) for s, t in zip(take, texts, strict=True)]
             real = [] if mode == "no_replay" else rng.sample(real_pool, n - len(take))
             data += [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term) for s in real]
             arm = f"d{g}_{mode}"
             for s, t in zip(take, texts, strict=True):
-                log.append({"sample_id": s.key, "arm": arm, "gen": g, "origin": "generated",
-                            "eligibility": "unverified", "label_source": "llm-free-text",
-                            "text": t})
+                log.append(
+                    {
+                        "sample_id": s.key,
+                        "arm": arm,
+                        "gen": g,
+                        "origin": "generated",
+                        "eligibility": "unverified",
+                        "label_source": "llm-free-text",
+                        "text": t,
+                    }
+                )
             for s in real:
-                log.append({"sample_id": s.key, "arm": arm, "gen": g, "origin": "observed",
-                            "eligibility": "eligible", "label_source": "oracle"})
+                log.append(
+                    {
+                        "sample_id": s.key,
+                        "arm": arm,
+                        "gen": g,
+                        "origin": "observed",
+                        "eligibility": "eligible",
+                        "label_source": "oracle",
+                    }
+                )
             llm.reset_lora(seed + g)
             steps = int(q["adapt_steps"])
             loss = llm.train_lora(
-                data, steps, float(q["adapt_lr"]), seed + g, int(q["adapt_batch"]),
+                data,
+                steps,
+                float(q["adapt_lr"]),
+                seed + g,
+                int(q["adapt_batch"]),
                 on_step=lambda i, ls, a=arm, st=steps: prog.update(
-                    len(cands), n_adapters, f"{a}: step {i}/{st} loss {ls:.2f}"))
+                    len(cands), n_adapters, f"{a}: step {i}/{st} loss {ls:.2f}"
+                ),
+            )
             digest = llm.save_adapter(ld / f"{arm}.safetensors")
-            cands[arm] = {"generation": g, "loss": loss, "digest": digest,
-                          "diversity": _text_entropy(texts), "validity": sum(valid) / len(valid),
-                          "n_synthetic": len(take), "n_real": len(real)}
+            cands[arm] = {
+                "generation": g,
+                "loss": loss,
+                "digest": digest,
+                "diversity": _text_entropy(texts),
+                "validity": sum(valid) / len(valid),
+                "n_synthetic": len(take),
+                "n_real": len(real),
+            }
             # live weights now equal adapter g: the next loop iteration generates with it
     if q.get("extra_arms"):  # reference: SFT on original labelled data only (no synthetic)
-        real_only = [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term)
-                     for s in rng.sample(real_pool, min(n, len(real_pool)))]
+        real_only = [
+            (render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term)
+            for s in rng.sample(real_pool, min(n, len(real_pool)))
+        ]
         llm.reset_lora(seed)
         steps = int(q["adapt_steps"])
         loss = llm.train_lora(
-            real_only, steps, float(q["adapt_lr"]), seed, int(q["adapt_batch"]),
-            on_step=lambda i, ls: prog.update(len(cands), n_adapters,
-                                              f"real_only: step {i}/{steps} loss {ls:.2f}"))
-        cands["real_only"] = {"generation": 0, "loss": loss, "n_synthetic": 0,
-                              "n_real": len(real_only),
-                              "digest": llm.save_adapter(ld / "real_only.safetensors")}
+            real_only,
+            steps,
+            float(q["adapt_lr"]),
+            seed,
+            int(q["adapt_batch"]),
+            on_step=lambda i, ls: prog.update(
+                len(cands), n_adapters, f"real_only: step {i}/{steps} loss {ls:.2f}"
+            ),
+        )
+        cands["real_only"] = {
+            "generation": 0,
+            "loss": loss,
+            "n_synthetic": 0,
+            "n_real": len(real_only),
+            "digest": llm.save_adapter(ld / "real_only.safetensors"),
+        }
     prog.finish()
     man: dict[str, object] = {
-        "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
-        "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",
-        "model_repo": MODELS[llm.name][0], "model_revision": MODELS[llm.name][1],
-        "model_license": MODELS[llm.name][2], "model_name": llm.name,
-        "weights_digest": weights_digest(llm.path), "candidates": cands,
+        "packet_digest": canonical_digest(packet.model_dump(mode="json")),
+        "runtime": RUNTIME,
+        "python": sys.version.split()[0],
+        "seeds": packet.seeds,
+        "backbone": "llm",
+        "model_repo": MODELS[llm.name][0],
+        "model_revision": MODELS[llm.name][1],
+        "model_license": MODELS[llm.name][2],
+        "model_name": llm.name,
+        "weights_digest": weights_digest(llm.path),
+        "candidates": cands,
         "diversity_floor": float(q["diversity_floor_frac"]) * cands["d1_no_replay"]["diversity"],
-        "training_log_head": log.head}
+        "training_log_head": log.head,
+    }
     man["manifest_digest"] = canonical_digest(man)
     _save(ld / "manifest.json", man)
 
@@ -249,8 +339,10 @@ def bind_e6_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
     if not (ld / "manifest.json").exists():
         raise DigestError("no learning manifest; run `hsi pilot` first")
     man = load_json(ld / "manifest.json")
-    if canonical_digest({k: v for k, v in man.items() if k != "manifest_digest"}) \
-            != man["manifest_digest"]:
+    if (
+        canonical_digest({k: v for k, v in man.items() if k != "manifest_digest"})
+        != man["manifest_digest"]
+    ):
         raise DigestError("learning manifest digest mismatch")
     if man["packet_digest"] != canonical_digest(packet.model_dump(mode="json")):
         raise DigestError("candidates not bound to this packet")
@@ -268,8 +360,13 @@ def bind_e6_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
 def model_digest_e6(run_dir: Path) -> str:
     man = load_json(run_dir / "learning" / "manifest.json")
     cands = dict(man["candidates"])  # type: ignore[call-overload]
-    return canonical_digest({"weights": man["weights_digest"], "runtime": man["runtime"],
-                             "adapters": {a: i["digest"] for a, i in cands.items()}})
+    return canonical_digest(
+        {
+            "weights": man["weights_digest"],
+            "runtime": man["runtime"],
+            "adapters": {a: i["digest"] for a, i in cands.items()},
+        }
+    )
 
 
 def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Packet) -> TaskResult:
@@ -285,12 +382,14 @@ def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Pack
         _STATE["arm"] = arm
     if packet.params.get("eval_mode") == "generate":
         return run_generation_task(llm, arm, family, split, seed, packet)
-    return run_prior_task(LLMPrior(llm, adapter=True), arm, family, split, seed,
-                          int(packet.params["support"]))
+    return run_prior_task(
+        LLMPrior(llm, adapter=True), arm, family, split, seed, int(packet.params["support"])
+    )
 
 
-def run_generation_task(llm: Any, arm: str, family: str, split: Split, seed: int,
-                        packet: Packet) -> TaskResult:
+def run_generation_task(
+    llm: Any, arm: str, family: str, split: Split, seed: int, packet: Packet
+) -> TaskResult:
     """Free-generation evaluation: the model writes a hypothesis per action; valid ones are used
     as-is (no consistency filter). Records how often the model's text was valid / consistent."""
     from hsi.agents.learner import Model, consistent, transitions_of
@@ -319,10 +418,22 @@ def run_generation_task(llm: Any, arm: str, family: str, split: Split, seed: int
     obs, info = env.reset()
     goal = tuple(int(x) for x in info["goal"])  # type: ignore[attr-defined]
     plan = model.plan(tuple(obs), goal, env.task.horizon)
-    acts = [(0, a) for a in plan] if plan else random_policy(env, random.Random(f"act/{arm}/{seed}"))
+    acts = (
+        [(0, a) for a in plan] if plan else random_policy(env, random.Random(f"act/{arm}/{seed}"))
+    )
     ep = rollout(env, acts)
     ep = ep.model_copy(update={"episode_id": f"{arm}/{family}/{split.value}-{seed}"})
-    return TaskResult(arm, family, seed, ep.outcome.success, [ep],
-                      {"explore_calls": float(support), "calls": float(len(ep.steps)),
-                       "gen_seen": float(seen), "gen_valid": float(valid),
-                       "gen_consistent": float(consist)})
+    return TaskResult(
+        arm,
+        family,
+        seed,
+        ep.outcome.success,
+        [ep],
+        {
+            "explore_calls": float(support),
+            "calls": float(len(ep.steps)),
+            "gen_seen": float(seen),
+            "gen_valid": float(valid),
+            "gen_consistent": float(consist),
+        },
+    )

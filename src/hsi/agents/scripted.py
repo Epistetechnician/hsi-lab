@@ -1,4 +1,5 @@
 """Model-free scripted baseline policies (used for E1-E3)."""
+
 from __future__ import annotations
 
 import random
@@ -30,10 +31,16 @@ def greedy_policy(env: RuleWorld, rng: random.Random) -> list[tuple[int, int]]:
     return out
 
 
-POLICIES: dict[str, Policy] = {"random": random_policy, "greedy": greedy_policy, "oracle": oracle_policy}
+POLICIES: dict[str, Policy] = {
+    "random": random_policy,
+    "greedy": greedy_policy,
+    "oracle": oracle_policy,
+}
 
 
-def rollout(env: RuleWorld, plan: list[tuple[int, int]], origin: Origin = Origin.OBSERVED) -> Episode:
+def rollout(
+    env: RuleWorld, plan: list[tuple[int, int]], origin: Origin = Origin.OBSERVED
+) -> Episode:
     obs, _ = env.reset()
     start = list(obs)
     steps: list[Step] = []
@@ -47,8 +54,20 @@ def rollout(env: RuleWorld, plan: list[tuple[int, int]], origin: Origin = Origin
             break
     t = env.task
     return Episode(
-        episode_id=f"{t.family}-{t.split.value}-{t.seed}", env_version=ENV_VERSION,
-        family=t.family, rule_family=t.rule_family, split=t.split, seed=t.seed, start=start, steps=steps,
+        episode_id=f"{t.family}-{t.split.value}-{t.seed}",
+        env_version=ENV_VERSION,
+        family=t.family,
+        rule_family=t.rule_family,
+        split=t.split,
+        seed=t.seed,
+        start=start,
+        steps=steps,
         outcome=EpisodeOutcome(success=ok, steps=len(steps), oracle_steps=env.oracle_steps()),
-        origin=origin, parent_ids=[], generation_depth=0, governance="synthetic-local",
-        eligibility=Eligibility.ELIGIBLE, prev_digest="", digest="")
+        origin=origin,
+        parent_ids=[],
+        generation_depth=0,
+        governance="synthetic-local",
+        eligibility=Eligibility.ELIGIBLE,
+        prev_digest="",
+        digest="",
+    )

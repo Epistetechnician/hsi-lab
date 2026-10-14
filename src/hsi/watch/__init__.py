@@ -1,4 +1,5 @@
 """`hsi watch`: read-only terminal view of any run (stages, mechanism, data, receipt, events)."""
+
 from __future__ import annotations
 
 from pathlib import Path

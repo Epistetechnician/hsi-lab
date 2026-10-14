@@ -2,6 +2,7 @@
 
 Only reads the run root (never the custody root). Heavy files are cached by (mtime, size).
 """
+
 from __future__ import annotations
 
 import json
@@ -111,16 +112,25 @@ class RunView:
     @property
     def title(self) -> str:
         bb = self.params.get("backbone")
-        return f"{self.experiment} v{self.version}" + (f" ({self.params.get('model', 'llm')})"
-                                                      if bb == "llm" else "")
+        return f"{self.experiment} v{self.version}" + (
+            f" ({self.params.get('model', 'llm')})" if bb == "llm" else ""
+        )
 
 
 def _procs(v: RunView) -> list[str]:
-    names = {p.name for p in (REPO / "packets").glob("*.frozen.json")
-             if (read_json(p) or {}).get("packet_digest", "").startswith(v.digest16)}
+    names = {
+        p.name
+        for p in (REPO / "packets").glob("*.frozen.json")
+        if (read_json(p) or {}).get("packet_digest", "").startswith(v.digest16)
+    }
     try:
-        out = subprocess.run(["ps", "-axo", "pid=,etime=,command="], capture_output=True, text=True,
-                             check=False, timeout=3).stdout
+        out = subprocess.run(
+            ["ps", "-axo", "pid=,etime=,command="],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=3,
+        ).stdout
     except (OSError, subprocess.SubprocessError):
         return []
     rows = []
@@ -158,14 +168,28 @@ def _stages(v: RunView, now: float) -> list[Stage]:
     st: list[Stage] = [Stage("packet", "done", f"{v.title}")]
     pilot_ps = prog("pilot")
     if v.pilot:
-        st.append(Stage("pilot", "done", f"n={v.pilot.get('n_per_family')}"
-                        + (" underpowered" if v.pilot.get("underpowered") else "")))
+        st.append(
+            Stage(
+                "pilot",
+                "done",
+                f"n={v.pilot.get('n_per_family')}"
+                + (" underpowered" if v.pilot.get("underpowered") else ""),
+            )
+        )
     else:
         s, d = live(pilot_ps)
-        st.append(Stage("pilot", s if pilot_ps else ("running" if any("pilot" in p for p in v.procs)
-                                                   else "pending"), d))
-    st.append(Stage("lock", "done" if v.lock else "pending",
-                    f"n={v.lock['n_per_family']}" if v.lock else ""))
+        st.append(
+            Stage(
+                "pilot",
+                s if pilot_ps else ("running" if any("pilot" in p for p in v.procs) else "pending"),
+                d,
+            )
+        )
+    st.append(
+        Stage(
+            "lock", "done" if v.lock else "pending", f"n={v.lock['n_per_family']}" if v.lock else ""
+        )
+    )
     if v.manifest:
         st.append(Stage("run", "done", ""))
     else:
@@ -177,8 +201,13 @@ def _stages(v: RunView, now: float) -> list[Stage]:
         s, d = live(prog("eval"))
         st.append(Stage("eval", s, d))
     st.append(Stage("verify", "done" if v.verified else "pending", ""))
-    st.append(Stage("decide", "done" if v.owner_decisions else "pending",
-                    str(v.owner_decisions[-1].get("owner_decision", "")) if v.owner_decisions else ""))
+    st.append(
+        Stage(
+            "decide",
+            "done" if v.owner_decisions else "pending",
+            str(v.owner_decisions[-1].get("owner_decision", "")) if v.owner_decisions else "",
+        )
+    )
     # a stage is "running" only if it is the first unfinished one
     seen_open = False
     for stage in st:
@@ -223,7 +252,11 @@ def load(path: Path) -> RunView:
 
 
 def discover(root: Path) -> list[Path]:
-    runs = [p for p in sorted(root.iterdir()) if (p / "packet.frozen.json").exists()] \
-        if root.exists() else []
-    return sorted(runs, key=lambda p: max((x.stat().st_mtime for x in p.iterdir()), default=0),
-                  reverse=True)
+    runs = (
+        [p for p in sorted(root.iterdir()) if (p / "packet.frozen.json").exists()]
+        if root.exists()
+        else []
+    )
+    return sorted(
+        runs, key=lambda p: max((x.stat().st_mtime for x in p.iterdir()), default=0), reverse=True
+    )

@@ -5,9 +5,10 @@ Policies: NONE (no memory), STATIC (FIFO capacity, hard eviction, never updated)
 reactivate on return). Shared-source evidence is counted once. Every state change is logged as a
 RelationEvent with a justification and source event ids.
 """
+
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from hsi.agents.learner import Transition
 from hsi.contracts.records import Relation, RelationEvent, RelOp, RelState
@@ -15,7 +16,7 @@ from hsi.contracts.records import Relation, RelationEvent, RelOp, RelState
 STRENGTH0, STEP_UP, STEP_DOWN, RETIRE_BELOW = 0.6, 0.2, 0.5, 0.25
 
 
-class Policy(str, Enum):
+class Policy(StrEnum):
     NONE = "none"
     STATIC = "static"
     ADAPTIVE = "adaptive"
@@ -37,8 +38,15 @@ class RelationStore:
         return f"rel/{context}"
 
     def _emit(self, rid: str, op: RelOp, why: str, sources: list[str]) -> None:
-        self.events.append(RelationEvent(event_id=f"ev/{len(self.events)}", rel_id=rid, op=op,
-                                         justification=why, source_event_ids=sources))
+        self.events.append(
+            RelationEvent(
+                event_id=f"ev/{len(self.events)}",
+                rel_id=rid,
+                op=op,
+                justification=why,
+                source_event_ids=sources,
+            )
+        )
 
     def _set(self, rid: str, **kw: object) -> None:
         self.rels[rid] = self.rels[rid].model_copy(update=kw)
@@ -71,9 +79,18 @@ class RelationStore:
             return
         self._make_room(phase, src)
         self.rels[rid] = Relation(
-            rel_id=rid, type="context_rule", endpoints=[context, "rule-model"],
-            strength=STRENGTH0, context=context, evidence_refs=[src], uncertainty=0.4,
-            valid_from=phase, valid_to=None, state=RelState.ACTIVE, cost=float(len(transitions)))
+            rel_id=rid,
+            type="context_rule",
+            endpoints=[context, "rule-model"],
+            strength=STRENGTH0,
+            context=context,
+            evidence_refs=[src],
+            uncertainty=0.4,
+            valid_from=phase,
+            valid_to=None,
+            state=RelState.ACTIVE,
+            cost=float(len(transitions)),
+        )
         self.payload[rid] = list(transitions)
         self._used[rid] = phase
         self._emit(rid, RelOp.CREATE, "first encounter of context", [src])
@@ -101,8 +118,11 @@ class RelationStore:
         rid = self.rid(context)
         r = self.rels[rid]
         if supports:
-            self._set(rid, strength=min(1.0, r.strength + STEP_UP),
-                      evidence_refs=[*r.evidence_refs, evidence_id])
+            self._set(
+                rid,
+                strength=min(1.0, r.strength + STEP_UP),
+                evidence_refs=[*r.evidence_refs, evidence_id],
+            )
             self._emit(rid, RelOp.STRENGTHEN, "probe confirmed stored prediction", [evidence_id])
             return
         s = max(0.0, r.strength - STEP_DOWN)
@@ -110,7 +130,9 @@ class RelationStore:
         self._emit(rid, RelOp.DECOUPLE, "probe contradicted stored prediction", [evidence_id])
         if s < RETIRE_BELOW:
             self._set(rid, state=RelState.RETIRED, valid_to=self._used.get(rid, 0))
-            self._emit(rid, RelOp.RETIRE, "counterevidence drove strength below floor", [evidence_id])
+            self._emit(
+                rid, RelOp.RETIRE, "counterevidence drove strength below floor", [evidence_id]
+            )
 
     @property
     def cost(self) -> float:

@@ -52,6 +52,7 @@ def test_e3_over_cap_stops_run(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) 
 
     def fat(*a, **k):  # type: ignore[no-untyped-def]
         import dataclasses
+
         r = orig(*a, **k)
         return dataclasses.replace(r, stats={**r.stats, "message_bytes": 999.0})
 

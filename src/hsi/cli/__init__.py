@@ -1,4 +1,9 @@
-"""`hsi` command line. M0: `packet new|freeze|check`. M1: `baselines`. M6: `reproduce|bundle|assurance`. `watch`: terminal run viewer. M2/M3: `pilot|lock|run|eval|verify-receipt|decide` (E1–E7)."""
+"""`hsi` command line.
+
+M0: `packet new|freeze|check`. M1: `baselines`. M2/M3: `pilot|lock|run|eval|verify-receipt|decide`
+(E1-E7). M6: `reproduce|bundle|assurance`. `watch`: terminal run viewer.
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -16,144 +21,288 @@ from hsi.errors import HsiError
 EXIT_INVALID, EXIT_DIGEST, EXIT_EXISTS = 2, 3, 4
 
 
-E1_PARAMS = {"families": ["rule_induction", "compositional_transfer", "counterevidence",
-                          "relational_return"],
-             "trace_len": 40, "pilot_tasks": 30, "min_n": 30, "max_n": 400}
+E1_PARAMS = {
+    "families": [
+        "rule_induction",
+        "compositional_transfer",
+        "counterevidence",
+        "relational_return",
+    ],
+    "trace_len": 40,
+    "pilot_tasks": 30,
+    "min_n": 30,
+    "max_n": 400,
+}
 
 
 def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
-        "schema_version": SCHEMA_VERSION, "experiment": exp, "version": 1,
-        "hypothesis": "TODO", "null_hypothesis": "TODO", "arms": ["baseline", "treatment"],
-        "primary_metric": "held_out_success_rate", "threshold": 0.05,
+        "schema_version": SCHEMA_VERSION,
+        "experiment": exp,
+        "version": 1,
+        "hypothesis": "TODO",
+        "null_hypothesis": "TODO",
+        "arms": ["baseline", "treatment"],
+        "primary_metric": "held_out_success_rate",
+        "threshold": 0.05,
         "guardrails": ["TODO"],
-        "budget": {"max_tokens": 0, "max_calls": 0, "max_wall_seconds": 3600,
-                   "max_message_bytes": 0},
-        "seeds": [0], "stop_rules": ["any digest, schema, split, or budget mismatch"],
+        "budget": {
+            "max_tokens": 0,
+            "max_calls": 0,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 0,
+        },
+        "seeds": [0],
+        "stop_rules": ["any digest, schema, split, or budget mismatch"],
         "claim_ceiling": "LocalSyntheticExperimentOnly",
-        "nonclaims": ["no general intelligence claim", "not a proof"], "params": {},
+        "nonclaims": ["no general intelligence claim", "not a proof"],
+        "params": {},
     }
     if exp == "E1":
         t.update(
             hypothesis="The typed-event codec yields higher held-out success than the text codec "
-                       "at an equal byte budget.",
-            null_hypothesis="Held-out success difference (typed_event - text) is below the threshold.",
-            arms=["text", "typed_event"], primary_metric="heldout_success_diff_typed_minus_text",
+            "at an equal byte budget.",
+            null_hypothesis=(
+                "Held-out success difference (typed_event - text) is below the threshold."
+            ),
+            arms=["text", "typed_event"],
+            primary_metric="heldout_success_diff_typed_minus_text",
             guardrails=["lossless_roundtrip", "payload_within_byte_budget"],
-            params=E1_PARAMS)
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 200}
+            params=E1_PARAMS,
+        )
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 200,
+        }
     if exp == "E2":
         t.update(
             hypothesis="Oracle-verified synthetic examples give higher held-out success than "
-                       "unverified synthetic and real-only examples at equal example count.",
+            "unverified synthetic and real-only examples at equal example count.",
             null_hypothesis="Verified synthetic does not beat both baselines by the threshold.",
             arms=["real_only", "unverified_synthetic", "verified_synthetic"],
             primary_metric="heldout_success_diff_verified_minus_baseline",
-            guardrails=["no family regresses vs real_only beyond the floor",
-                        "equal example count", "full lineage"],
-            params={**E1_PARAMS, "trace_len": 12, "examples": 12, "real_seed": 6,
-                    "max_proposals": 60, "family_regression_floor": 0.02,
-                    "treatment": "verified_synthetic",
-                    "baselines": ["real_only", "unverified_synthetic"]})
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 0}
+            guardrails=[
+                "no family regresses vs real_only beyond the floor",
+                "equal example count",
+                "full lineage",
+            ],
+            params={
+                **E1_PARAMS,
+                "trace_len": 12,
+                "examples": 12,
+                "real_seed": 6,
+                "max_proposals": 60,
+                "family_regression_floor": 0.02,
+                "treatment": "verified_synthetic",
+                "baselines": ["real_only", "unverified_synthetic"],
+            },
+        )
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 0,
+        }
     if exp == "E3":
         t.update(
             hypothesis="A fixed-graph collective of two agents with complementary action rights "
-                       "discovers more than one agent or two non-communicating agents at matched "
-                       "exploration and a message-byte cap.",
+            "discovers more than one agent or two non-communicating agents at matched "
+            "exploration and a message-byte cap.",
             null_hypothesis="Fixed-graph success exceeds neither baseline by the threshold.",
             arms=["single", "independent", "centralized", "fixed_graph"],
             primary_metric="collective_discovery_success_diff_fixed_graph_minus_baseline",
             guardrails=["message bytes within cap", "exploration calls matched"],
-            params={"families": ["collective_discovery"], "explore_total": 12, "pilot_tasks": 30,
-                    "min_n": 30, "max_n": 400, "treatment": "fixed_graph",
-                    "baselines": ["single", "independent"]})
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 24}
+            params={
+                "families": ["collective_discovery"],
+                "explore_total": 12,
+                "pilot_tasks": 30,
+                "min_n": 30,
+                "max_n": 400,
+                "treatment": "fixed_graph",
+                "baselines": ["single", "independent"],
+            },
+        )
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 24,
+        }
     if exp == "E7":
         t.update(
             hypothesis="Adaptive relations (dormant-over-delete, reactivation, counterevidence "
-                       "retirement) improve success on relational return and counterevidence "
-                       "streams over no relations and static relations at matched exploration.",
+            "retirement) improve success on relational return and counterevidence "
+            "streams over no relations and static relations at matched exploration.",
             null_hypothesis="Adaptive relations beat neither baseline by the threshold.",
             arms=["no_relations", "static_relations", "adaptive_relations"],
             primary_metric="relational_return_and_counterevidence_success_diff",
             guardrails=["shared-source evidence counted once", "exploration calls matched"],
-            params={"families": ["relational_return", "counterevidence"], "explore_full": 12,
-                    "explore_final": 4, "relation_cap": 2, "probes": 2, "pilot_tasks": 30,
-                    "min_n": 30, "max_n": 400, "treatment": "adaptive_relations",
-                    "baselines": ["no_relations", "static_relations"]})
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 0}
+            params={
+                "families": ["relational_return", "counterevidence"],
+                "explore_full": 12,
+                "explore_final": 4,
+                "relation_cap": 2,
+                "probes": 2,
+                "pilot_tasks": 30,
+                "min_n": 30,
+                "max_n": 400,
+                "treatment": "adaptive_relations",
+                "baselines": ["no_relations", "static_relations"],
+            },
+        )
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 0,
+        }
     if exp == "E5":
         t.update(
             hypothesis="With four agents that each own one action, an adaptive graph (links opened "
-                       "on demand, dropped after use) reaches more successes than a fixed path "
-                       "graph with delta-sync gossip under the same per-task byte cap.",
+            "on demand, dropped after use) reaches more successes than a fixed path "
+            "graph with delta-sync gossip under the same per-task byte cap.",
             null_hypothesis="Adaptive-graph success does not exceed fixed-graph success by the "
-                            "threshold at the byte cap.",
+            "threshold at the byte cap.",
             arms=["fixed_graph", "adaptive_graph"],
             primary_metric="success_within_byte_cap_diff_adaptive_minus_fixed",
-            guardrails=["success per KB of adaptive >= fixed", "message bytes within cap",
-                        "exploration matched", "link churn reported"],
-            params={"families": ["rule_induction", "compositional_transfer"],
-                    "explore_per_agent": 6, "rounds": 3, "pilot_tasks": 30, "min_n": 30,
-                    "max_n": 400, "treatment": "adaptive_graph", "baselines": ["fixed_graph"]})
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 72}
+            guardrails=[
+                "success per KB of adaptive >= fixed",
+                "message bytes within cap",
+                "exploration matched",
+                "link churn reported",
+            ],
+            params={
+                "families": ["rule_induction", "compositional_transfer"],
+                "explore_per_agent": 6,
+                "rounds": 3,
+                "pilot_tasks": 30,
+                "min_n": 30,
+                "max_n": 400,
+                "treatment": "adaptive_graph",
+                "baselines": ["fixed_graph"],
+            },
+        )
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 72,
+        }
     if exp in ("E4", "E6"):
-        common = {"pretrain_families": ["rule_induction", "compositional_transfer"], "support": 8,
-                  "n_pretrain": 80, "n_adapt": 60, "pretrain_steps": 300, "pretrain_lr": 0.1,
-                  "adapt_steps": 200, "adapt_lr": 0.2, "rank": 2, "pilot_tasks": 30, "min_n": 30,
-                  "max_n": 400, "tune_offset": 500_000}
+        common = {
+            "pretrain_families": ["rule_induction", "compositional_transfer"],
+            "support": 8,
+            "n_pretrain": 80,
+            "n_adapt": 60,
+            "pretrain_steps": 300,
+            "pretrain_lr": 0.1,
+            "adapt_steps": 200,
+            "adapt_lr": 0.2,
+            "rank": 2,
+            "pilot_tasks": 30,
+            "min_n": 30,
+            "max_n": 400,
+            "tune_offset": 500_000,
+        }
     if exp == "E4":
         t.update(
             hypothesis="One reversible adapter update (LoRA) trained on tune-split worlds improves "
-                       "held-out compositional transfer over the frozen base without regressing "
-                       "fit families beyond 2 points.",
+            "held-out compositional transfer over the frozen base without regressing "
+            "fit families beyond 2 points.",
             null_hypothesis="The LoRA candidate does not beat the frozen base by the threshold.",
             arms=["frozen_base", "lora_candidate", "memory_candidate"],
             primary_metric="compositional_transfer_success_diff_lora_minus_base",
             guardrails=["fit-family regression within floor", "exploration calls matched"],
-            params={**common, "families": ["compositional_transfer"], "memory_alpha": 1.0,
-                    "fit_eval_n": 100, "fit_regression_floor": 0.02,
-                    "treatment": "lora_candidate", "baselines": ["frozen_base"]})
+            params={
+                **common,
+                "families": ["compositional_transfer"],
+                "memory_alpha": 1.0,
+                "fit_eval_n": 100,
+                "fit_regression_floor": 0.02,
+                "treatment": "lora_candidate",
+                "baselines": ["frozen_base"],
+            },
+        )
     if exp == "E6":
         t.update(
             hypothesis="Original replay keeps recursive self-training from collapsing: at depth 3, "
-                       "training with replay beats training on synthetic data alone.",
+            "training with replay beats training on synthetic data alone.",
             null_hypothesis="d3 with replay does not beat d3 without replay by the threshold.",
-            arms=["d1_replay", "d1_no_replay", "d2_replay", "d2_no_replay", "d3_replay",
-                  "d3_no_replay"],
+            arms=[
+                "d1_replay",
+                "d1_no_replay",
+                "d2_replay",
+                "d2_no_replay",
+                "d3_replay",
+                "d3_no_replay",
+            ],
             primary_metric="success_diff_d3_replay_minus_d3_no_replay",
-            guardrails=["generated-task diversity above pilot floor at every depth",
-                        "d3_replay not below d1_replay beyond floor"],
-            params={**common, "families": ["rule_induction", "compositional_transfer"],
-                    "generations": 3, "diversity_floor_frac": 0.5, "non_collapse_floor": 0.02,
-                    "treatment": "d3_replay", "baselines": ["d3_no_replay"]})
+            guardrails=[
+                "generated-task diversity above pilot floor at every depth",
+                "d3_replay not below d1_replay beyond floor",
+            ],
+            params={
+                **common,
+                "families": ["rule_induction", "compositional_transfer"],
+                "generations": 3,
+                "diversity_floor_frac": 0.5,
+                "non_collapse_floor": 0.02,
+                "treatment": "d3_replay",
+                "baselines": ["d3_no_replay"],
+            },
+        )
     if exp == "E4" and variant == "llm":
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain", "memory_alpha"):
             p.pop(k, None)
-        p.update(backbone="llm", n_adapt=60, n_replay=60, replay_frac=0.5, rank=8, lora_layers=8,
-                 lora_scale=20.0, adapt_steps=300, adapt_lr=1e-4, adapt_batch=8, pilot_tasks=20,
-                 min_n=30, max_n=200, fit_eval_n=60)
+        p.update(
+            backbone="llm",
+            n_adapt=60,
+            n_replay=60,
+            replay_frac=0.5,
+            rank=8,
+            lora_layers=8,
+            lora_scale=20.0,
+            adapt_steps=300,
+            adapt_lr=1e-4,
+            adapt_batch=8,
+            pilot_tasks=20,
+            min_n=30,
+            max_n=200,
+            fit_eval_n=60,
+        )
         t.update(
-            version=2, arms=["frozen_base", "lora_candidate"],
-            hypothesis="A rank-8 LoRA adapter on a frozen Qwen2.5-1.5B-Instruct (4-bit), trained on "
-                       "tune-split worlds with 50% fit-world replay, improves held-out "
-                       "compositional transfer over the frozen model without regressing fit "
-                       "families beyond 2 points.",
-            params=p)
+            version=2,
+            arms=["frozen_base", "lora_candidate"],
+            hypothesis="A rank-8 LoRA adapter on a frozen Qwen2.5-1.5B-Instruct (4-bit), "
+            "trained on "
+            "tune-split worlds with 50% fit-world replay, improves held-out "
+            "compositional transfer over the frozen model without regressing fit "
+            "families beyond 2 points.",
+            params=p,
+        )
     if exp == "E6" and variant in ("llm", "llm-gen", "llm-gen2", "llm-gen3"):
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
             p.pop(k, None)
-        p.update(backbone="llm", n_adapt=50, n_replay=50, rank=8, lora_layers=8, lora_scale=20.0,
-                 adapt_steps=200, adapt_lr=1e-4, adapt_batch=8, gen_max_tokens=20, n_demos=2, pilot_tasks=15,
-                 min_n=30, max_n=100)
+        p.update(
+            backbone="llm",
+            n_adapt=50,
+            n_replay=50,
+            rank=8,
+            lora_layers=8,
+            lora_scale=20.0,
+            adapt_steps=200,
+            adapt_lr=1e-4,
+            adapt_batch=8,
+            gen_max_tokens=20,
+            n_demos=2,
+            pilot_tasks=15,
+            min_n=30,
+            max_n=100,
+        )
         if variant in ("llm-gen", "llm-gen2", "llm-gen3"):
             p.update(eval_mode="generate", extra_arms=True, diversity_floor_frac=0.0)
         if variant in ("llm-gen2", "llm-gen3"):  # v4+: stop marker (v3 never terminated)
@@ -164,19 +313,26 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             t["arms"] = [*t["arms"], "real_only", "frozen_base"]  # type: ignore[misc]
         t.update(
             version={"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5}[variant],
-            hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), training "
-                       "each generation on the previous generation's own hypotheses collapses "
-                       "held-out success at depth 3 unless original labeled data is replayed: "
-                       "d3 with replay beats d3 without.",
-            params=p)
+            hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), "
+            "training "
+            "each generation on the previous generation's own hypotheses collapses "
+            "held-out success at depth 3 unless original labeled data is replayed: "
+            "d3 with replay beats d3 without.",
+            params=p,
+        )
         if variant in ("llm-gen", "llm-gen2", "llm-gen3"):
             t["hypothesis"] = (
                 "When held-out success is measured by the model's own free-text hypotheses (no "
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
-                "original labeled data is replayed: d3 with replay beats d3 without.")
+                "original labeled data is replayed: d3 with replay beats d3 without."
+            )
     if exp in ("E4", "E6"):
-        t["budget"] = {"max_tokens": 0, "max_calls": 10_000_000, "max_wall_seconds": 3600,
-                       "max_message_bytes": 0}
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 0,
+        }
     return t
 
 
@@ -226,8 +382,15 @@ def baselines(out: Path, n: int) -> Path:
                     wins += ep.outcome.success
                 table[f"{name}/{fam}/{split.value}"] = wins / n
     dst = out / "baselines.json"
-    dst.write_text(json.dumps({"success": table, "resources": meter.snapshot(),
-                               "ledger_head": led.head}, indent=2, sort_keys=True) + "\n", "utf-8")
+    dst.write_text(
+        json.dumps(
+            {"success": table, "resources": meter.snapshot(), "ledger_head": led.head},
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        "utf-8",
+    )
     return dst
 
 
@@ -251,16 +414,22 @@ def main(argv: list[str] | None = None) -> int:
     rp.add_argument("--orig-run", type=Path, required=True)
     rp.add_argument("--orig-custody", type=Path, required=True)
     rp.add_argument("--out", type=Path)
-    rp.add_argument("--fetch", action="store_true",
-                    help="allow network for the hash-pinned dependency install only")
+    rp.add_argument(
+        "--fetch",
+        action="store_true",
+        help="allow network for the hash-pinned dependency install only",
+    )
     bd = sub.add_parser("bundle")
     bd.add_argument("path", type=Path)
     bd.add_argument("out", type=Path)
     wt = sub.add_parser("watch", help="live read-only terminal view of a run (or list runs)")
     wt.add_argument("path", type=Path, nargs="?")
     wt.add_argument("--once", action="store_true", help="print a text snapshot and exit")
-    wt.add_argument("--tab", default="all", choices=["all", "overview", "mechanism", "data",
-                                                    "receipt", "events"])
+    wt.add_argument(
+        "--tab",
+        default="all",
+        choices=["all", "overview", "mechanism", "data", "receipt", "events"],
+    )
     wt.add_argument("--width", type=int, default=100)
     wt.add_argument("--log", type=Path, help="also tail this log file in the events tab")
     asr = sub.add_parser("assurance")
@@ -277,14 +446,18 @@ def main(argv: list[str] | None = None) -> int:
             from hsi.paths import run_root
             from hsi.watch import watch
 
-            return watch((a.path or run_root()).expanduser().resolve(), a.once, a.tab, a.width, a.log)
+            return watch(
+                (a.path or run_root()).expanduser().resolve(), a.once, a.tab, a.width, a.log
+            )
         if a.cmd == "reproduce":
             from hsi.assurance import reproduce
 
             rep = reproduce(a.path, a.orig_run, a.orig_custody, a.out, a.fetch)
-            print(f"{rep['experiment']}: matched {rep['aggregates_matched']}/"
-                  f"{rep['aggregates_compared']} aggregates; validator "
-                  f"{'ok' if rep['rerun_validator_ok'] else 'FAILED'}")
+            print(
+                f"{rep['experiment']}: matched {rep['aggregates_matched']}/"
+                f"{rep['aggregates_compared']} aggregates; validator "
+                f"{'ok' if rep['rerun_validator_ok'] else 'FAILED'}"
+            )
             return 0 if rep["match"] and rep["rerun_validator_ok"] else 10
         if a.cmd == "bundle":
             from hsi.assurance import bundle
@@ -300,14 +473,21 @@ def main(argv: list[str] | None = None) -> int:
             print(text)
             return 0
         if a.cmd != "packet":
-            fn = {"pilot": pipeline.pilot, "lock": pipeline.lock, "run": pipeline.run,
-                  "eval": pipeline.evaluate, "verify-receipt": pipeline.verify_receipt}
+            fn = {
+                "pilot": pipeline.pilot,
+                "lock": pipeline.lock,
+                "run": pipeline.run,
+                "eval": pipeline.evaluate,
+                "verify-receipt": pipeline.verify_receipt,
+            }
             print(pipeline.decide(a.path, a.outcome) if a.cmd == "decide" else fn[a.cmd](a.path))
             return 0
         if a.action == "new":
             if a.out.exists():
                 raise FileExistsError(str(a.out))
-            a.out.write_text(json.dumps(template(a.experiment, a.variant), indent=2) + "\n", "utf-8")
+            a.out.write_text(
+                json.dumps(template(a.experiment, a.variant), indent=2) + "\n", "utf-8"
+            )
             print(a.out)
         elif a.action == "freeze":
             print(freeze(a.file))

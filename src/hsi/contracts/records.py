@@ -1,7 +1,8 @@
 """Episode, message, relation, relation-event, and receipt schemas (strict, versioned)."""
+
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import Field
 
@@ -11,19 +12,19 @@ EPISODE_V = "hsi-episode-v1"
 RECEIPT_V = "hsi-receipt-v1"
 
 
-class Origin(str, Enum):
+class Origin(StrEnum):
     OBSERVED = "observed"
     INFERRED = "inferred"
     GENERATED = "generated"
 
 
-class Eligibility(str, Enum):
+class Eligibility(StrEnum):
     QUARANTINED = "quarantined"
     ELIGIBLE = "eligible"
     REJECTED = "rejected"
 
 
-class Split(str, Enum):
+class Split(StrEnum):
     FIT = "fit"
     TUNE = "tune"
     HELDOUT = "heldout"
@@ -73,7 +74,7 @@ class Message(Strict):
     expires_at_step: int = Field(ge=0)
 
 
-class RelState(str, Enum):
+class RelState(StrEnum):
     ACTIVE = "active"
     DORMANT = "dormant"
     RETIRED = "retired"
@@ -93,7 +94,7 @@ class Relation(Strict):
     cost: float = Field(ge=0)
 
 
-class RelOp(str, Enum):
+class RelOp(StrEnum):
     STRENGTHEN = "strengthen"
     DECOUPLE = "decouple"
     DORMANT = "dormant"

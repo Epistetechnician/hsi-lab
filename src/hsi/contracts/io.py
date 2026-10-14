@@ -19,7 +19,7 @@ def _reject_duplicates(pairs: list[tuple[str, object]]) -> dict[str, object]:
 def load_json(path: Path) -> dict[str, object]:
     data = json.loads(path.read_text("utf-8"), object_pairs_hook=_reject_duplicates)
     if not isinstance(data, dict):
-        raise ValueError("top-level JSON must be an object")  # noqa: TRY004
+        raise ValueError("top-level JSON must be an object")
     return data
 
 

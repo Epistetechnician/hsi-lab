@@ -2,6 +2,7 @@
 
 usage: python -I validator/recompute.py <receipt.json> <packet.frozen.json>
 """
+
 import hashlib
 import json
 import math
@@ -51,13 +52,18 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
             errs.append("min_family_diff_vs_real_only")
         if g["family_regression_floor"] != floor:
             errs.append("floor differs from packet")
-        return (min(ds) >= -floor and g["example_count_equal_fraction"] == 1.0
-                and g["lineage_fraction"] == 1.0)
+        return (
+            min(ds) >= -floor
+            and g["example_count_equal_fraction"] == 1.0
+            and g["lineage_fraction"] == 1.0
+        )
     if exp == "E3":
         if g["message_byte_cap"] != pk["budget"]["max_message_bytes"]:
             errs.append("message cap differs from packet")
-        return g["max_message_bytes_used"] <= g["message_byte_cap"] \
+        return (
+            g["max_message_bytes_used"] <= g["message_byte_cap"]
             and g["compute_matched_fraction"] == 1.0
+        )
     if exp == "E4":
         q = pk["params"]
         if g["fit_regression_floor"] != q["fit_regression_floor"]:
@@ -76,7 +82,10 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
             errs.append("replay rates differ from family_results")
         if g["non_collapse_floor"] != q["non_collapse_floor"]:
             errs.append("non_collapse_floor differs from packet")
-        return g["min_replay_diversity"] >= g["diversity_floor"] and rg - r1 >= -g["non_collapse_floor"]
+        return (
+            g["min_replay_diversity"] >= g["diversity_floor"]
+            and rg - r1 >= -g["non_collapse_floor"]
+        )
     if exp == "E5":
         if g["message_byte_cap"] != pk["budget"]["max_message_bytes"]:
             errs.append("message cap differs from packet")
@@ -87,9 +96,11 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
         for a, v in spk.items():
             if not close(g[f"success_per_kb_{a}"], v):
                 errs.append(f"success_per_kb_{a}")
-        return (spk["adaptive_graph"] >= spk["fixed_graph"]
-                and g["max_message_bytes_used"] <= g["message_byte_cap"]
-                and g["compute_matched_fraction"] == 1.0)
+        return (
+            spk["adaptive_graph"] >= spk["fixed_graph"]
+            and g["max_message_bytes_used"] <= g["message_byte_cap"]
+            and g["compute_matched_fraction"] == 1.0
+        )
     if exp == "E7":
         return g["duplicate_strength_updates"] == 0 and g["compute_matched_fraction"] == 1.0
     errs.append(f"no validator rule for {exp}")
@@ -111,15 +122,19 @@ def check(receipt, frozen):
     treat = pk["params"].get("treatment", pk["arms"][1])
     bases = pk["params"].get("baselines", [pk["arms"][0]])
     if [(c["baseline_arm"], c["treatment_arm"]) for c in receipt["comparisons"]] != [
-            (b, treat) for b in bases]:
+        (b, treat) for b in bases
+    ]:
         errs.append("comparisons differ from packet")
     succ = {(r["family"], r["arm"]): r["successes"] for r in receipt["family_results"]}
     cis, comps_ds = [], {}
     for c in receipt["comparisons"]:
         ds, mean, lo, hi = stats(c["pairs"], errs, succ, c["baseline_arm"], c["treatment_arm"])
         comps_ds[(c["baseline_arm"], c["treatment_arm"])] = ds
-        for name, got, want in (("paired_diff", c["paired_diff"], mean), ("ci_low", c["ci_low"], lo),
-                                ("ci_high", c["ci_high"], hi)):
+        for name, got, want in (
+            ("paired_diff", c["paired_diff"], mean),
+            ("ci_low", c["ci_low"], lo),
+            ("ci_high", c["ci_high"], hi),
+        ):
             if not close(got, want):
                 errs.append(f"{c['baseline_arm']} {name}: receipt {got} != recomputed {want}")
         cis.append((lo, hi))

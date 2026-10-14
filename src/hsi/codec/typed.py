@@ -1,4 +1,5 @@
 """Typed-event codec: header + start state + per-step (action, changed-cell diffs)."""
+
 from __future__ import annotations
 
 import hashlib
@@ -28,12 +29,12 @@ class TypedEventCodec:
             raise ValueError("bad magic")
         prov = data[2:10].hex()
         n = 5
-        cur: State = tuple(data[10:10 + n])
+        cur: State = tuple(data[10 : 10 + n])
         init, pos, steps = cur, 10 + n, []
         while pos < len(data):
             a, k = data[pos] >> 4, data[pos] & 15
             lst = list(cur)
-            for b in data[pos + 1:pos + 1 + k]:
+            for b in data[pos + 1 : pos + 1 + k]:
                 lst[b >> 4] = b & 15
             cur = tuple(lst)
             steps.append((a, cur))

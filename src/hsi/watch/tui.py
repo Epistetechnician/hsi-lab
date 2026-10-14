@@ -1,6 +1,8 @@
 """Curses front end for `hsi watch`: run list -> run detail with tabs; auto-refreshes."""
+
 from __future__ import annotations
 
+import contextlib
 import curses
 import locale
 import os
@@ -16,24 +18,36 @@ REFRESH_S = 1.0
 def _colors() -> dict[str, int]:
     curses.start_color()
     curses.use_default_colors()
-    for i, c in enumerate([curses.COLOR_GREEN, curses.COLOR_YELLOW, curses.COLOR_RED,
-                           curses.COLOR_CYAN, curses.COLOR_MAGENTA], start=1):
+    for i, c in enumerate(
+        [
+            curses.COLOR_GREEN,
+            curses.COLOR_YELLOW,
+            curses.COLOR_RED,
+            curses.COLOR_CYAN,
+            curses.COLOR_MAGENTA,
+        ],
+        start=1,
+    ):
         curses.init_pair(i, c, -1)
-    return {"": 0, "ok": curses.color_pair(1), "warn": curses.color_pair(2),
-            "bad": curses.color_pair(3), "hdr": curses.color_pair(4) | curses.A_BOLD,
-            "acc": curses.color_pair(5) | curses.A_BOLD, "dim": curses.A_DIM}
+    return {
+        "": 0,
+        "ok": curses.color_pair(1),
+        "warn": curses.color_pair(2),
+        "bad": curses.color_pair(3),
+        "hdr": curses.color_pair(4) | curses.A_BOLD,
+        "acc": curses.color_pair(5) | curses.A_BOLD,
+        "dim": curses.A_DIM,
+    }
 
 
 def _put(win: curses.window, y: int, x: int, text: str, attr: int, w: int) -> None:
-    try:
+    with contextlib.suppress(curses.error):
         win.addnstr(y, x, text, max(0, w - x - 1), attr)
-    except curses.error:
-        pass
 
 
 def _draw(win: curses.window, lines: list[Line], top: int, col: dict[str, int], y0: int) -> int:
     h, w = win.getmaxyx()
-    for i, (text, st) in enumerate(lines[top: top + h - y0 - 1]):
+    for i, (text, st) in enumerate(lines[top : top + h - y0 - 1]):
         _put(win, y0 + i, 0, text, col.get(st, 0), w)
     return len(lines)
 
@@ -67,19 +81,30 @@ def _loop(stdscr: curses.window, root: Path, run: Path | None, log: Path | None)
                 _put(stdscr, 2 + i, 0, text, attr, w)
             _put(stdscr, h - 1, 0, "↑/↓ select · Enter open · r refresh · q quit", col["dim"], w)
         elif view is not None:
-            tabbar = "  ".join(f"[{i + 1}]{t}" if i == tab else f" {i + 1} {t}" for i, t in enumerate(TABS))
+            tabbar = "  ".join(
+                f"[{i + 1}]{t}" if i == tab else f" {i + 1} {t}" for i, t in enumerate(TABS)
+            )
             _put(stdscr, 0, 0, f"hsi watch · {view.title} · {view.digest16}", col["hdr"], w)
             _put(stdscr, 1, 0, tabbar, col["acc"], w)
             lines = PANELS[TABS[tab]](view, w)
             if log is not None and TABS[tab] == "events":
                 try:
                     tail = log.read_text("utf-8", errors="replace").splitlines()[-12:]
-                    lines = [*lines, ("", ""), (f"LOG {log.name}", "hdr"), *[(x, "dim") for x in tail]]
+                    lines = [
+                        *lines,
+                        ("", ""),
+                        (f"LOG {log.name}", "hdr"),
+                        *[(x, "dim") for x in tail],
+                    ]
                 except OSError:
                     pass
             n = _draw(stdscr, lines, top, col, 3)
             top = max(0, min(top, n - (h - 4)))
-            foot = "1-5/←→ tabs · j/k scroll · r refresh · " + ("b back · " if run is None else "") + "q quit"
+            foot = (
+                "1-5/←→ tabs · j/k scroll · r refresh · "
+                + ("b back · " if run is None else "")
+                + "q quit"
+            )
             _put(stdscr, h - 1, 0, foot, col["dim"], w)
         stdscr.refresh()
         k = stdscr.getch()

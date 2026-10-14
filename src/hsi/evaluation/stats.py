@@ -1,4 +1,5 @@
 """Paired family-level statistics. Duplicated independently in validator/recompute.py."""
+
 from __future__ import annotations
 
 import math
@@ -11,7 +12,9 @@ Z95 = 1.96
 
 def family_diff(p: PairedFamily) -> tuple[float, float]:
     d = (p.only_treatment - p.only_baseline) / p.n
-    var = (p.only_treatment + p.only_baseline - (p.only_treatment - p.only_baseline) ** 2 / p.n) / p.n**2
+    var = (
+        p.only_treatment + p.only_baseline - (p.only_treatment - p.only_baseline) ** 2 / p.n
+    ) / p.n**2
     return d, var
 
 

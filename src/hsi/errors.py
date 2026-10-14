@@ -1,4 +1,5 @@
 """Typed errors with stable exit codes. The CLI never degrades silently."""
+
 from __future__ import annotations
 
 

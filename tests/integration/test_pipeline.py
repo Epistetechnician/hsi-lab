@@ -15,8 +15,13 @@ def env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setenv("HSI_RUN_ROOT", str(tmp_path / "runs"))
     monkeypatch.setenv("HSI_CUSTODY_ROOT", str(tmp_path / "custody"))
     t = template("E1")
-    t["params"] = {"families": ["rule_induction", "compositional_transfer"], "trace_len": 40,
-                   "pilot_tasks": 6, "min_n": 12, "max_n": 12}
+    t["params"] = {
+        "families": ["rule_induction", "compositional_transfer"],
+        "trace_len": 40,
+        "pilot_tasks": 6,
+        "min_n": 12,
+        "max_n": 12,
+    }
     (tmp_path / "p.json").write_text(json.dumps(t))
     assert main(["packet", "freeze", str(tmp_path / "p.json")]) == 0
     return tmp_path
@@ -68,6 +73,7 @@ def test_tampered_receipt_with_fixed_digest_still_caught(env: Path) -> None:
     r["comparisons"][0]["pairs"][0]["neither"] -= 1
     body = {k: v for k, v in r.items() if k != "receipt_digest"}
     from hsi.contracts.packet import canonical_digest
+
     r["receipt_digest"] = canonical_digest(body)
     rc.write_text(json.dumps(r))
     assert main(["verify-receipt", str(rc)]) == 10
@@ -97,6 +103,7 @@ def test_over_budget_arm_stops_run(env: Path, monkeypatch: pytest.MonkeyPatch) -
     import dataclasses
 
     from hsi.evaluation import e1
+
     f = str(env / "p.frozen.json")
     main(["pilot", f])
     main(["lock", f])
@@ -112,12 +119,16 @@ def test_over_budget_arm_stops_run(env: Path, monkeypatch: pytest.MonkeyPatch) -
 
 def test_custody_is_owner_only_and_run_never_touches_it() -> None:
     src = (REPO / "src/hsi/pipeline.py").read_text()
-    run_body = src[src.index("def run("):src.index("def evaluate(")]
+    run_body = src[src.index("def run(") : src.index("def evaluate(")]
     assert "custody_root" not in run_body
 
 
 def test_validator_runs_isolated_without_args() -> None:
-    r = subprocess.run([sys.executable, "-I", str(REPO / "validator/recompute.py")],
-                       capture_output=True, text=True, check=False)
+    r = subprocess.run(
+        [sys.executable, "-I", str(REPO / "validator/recompute.py")],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     assert r.returncode != 0  # usage error, but imports resolve with no hsi on path
     assert "ModuleNotFoundError" not in r.stderr

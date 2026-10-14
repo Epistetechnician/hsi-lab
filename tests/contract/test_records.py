@@ -7,8 +7,16 @@ from hsi.paths import REPO, refuse_in_repo
 
 
 def test_message_rejects_unknown_and_missing() -> None:
-    good = {"msg_id": "m", "sender": 0, "receivers": [1], "payload_codec": "text",
-            "bytes": 3, "evidence_refs": [], "confidence": 0.5, "expires_at_step": 4}
+    good = {
+        "msg_id": "m",
+        "sender": 0,
+        "receivers": [1],
+        "payload_codec": "text",
+        "bytes": 3,
+        "evidence_refs": [],
+        "confidence": 0.5,
+        "expires_at_step": 4,
+    }
     Message.model_validate(good)
     with pytest.raises(ValidationError):
         Message.model_validate({**good, "x": 1})

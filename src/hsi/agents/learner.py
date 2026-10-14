@@ -1,4 +1,5 @@
 """Scripted inductive learner: infer per-action primitives from decoded transitions, then plan."""
+
 from __future__ import annotations
 
 from collections import deque
@@ -41,9 +42,12 @@ def consistent(pairs: list[tuple[State, State]], first_only: bool = False) -> li
 
 
 class Model:
-    def __init__(self, transitions: list[Transition], chooser: Chooser | None = None,
-                 proposer: Callable[[list[tuple[State, State]]], tuple[Prim, ...] | None] | None = None,
-                 ) -> None:
+    def __init__(
+        self,
+        transitions: list[Transition],
+        chooser: Chooser | None = None,
+        proposer: Callable[[list[tuple[State, State]]], tuple[Prim, ...] | None] | None = None,
+    ) -> None:
         obs: dict[int, list[tuple[State, State]]] = {a: [] for a in range(N_ACTIONS)}
         for s, a, s2 in transitions:
             obs[a].append((s, s2))
@@ -62,8 +66,11 @@ class Model:
                 c = consistent(pairs, first_only=chooser is None)
                 if c:
                     ctx = getattr(chooser, "with_context", None)  # LLM choosers see the evidence
-                    pick = c[0] if chooser is None else (
-                        ctx(c, pairs) if ctx is not None else chooser(c))
+                    pick = (
+                        c[0]
+                        if chooser is None
+                        else (ctx(c, pairs) if ctx is not None else chooser(c))
+                    )
                     self.hyp[a] = HYPOTHESES[pick]
 
     @classmethod
@@ -92,7 +99,9 @@ class Model:
             return _run(self.hyp[a], s)
         return self.table.get((s, a), s)
 
-    def plan(self, start: State, goal: State, limit: int, max_nodes: int = 50_000) -> list[int] | None:
+    def plan(
+        self, start: State, goal: State, limit: int, max_nodes: int = 50_000
+    ) -> list[int] | None:
         prev: dict[State, tuple[State, int] | None] = {start: None}
         depth = {start: 0}
         q = deque([start])

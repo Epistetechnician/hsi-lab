@@ -24,8 +24,9 @@ def test_adapter_is_reversible_and_base_frozen() -> None:
     assert base.state() == before and base.digest == d0  # base untouched
     cands = list(tune[0].cands)
     assert any(Prior(base, ad).score(i) != Prior(base).score(i) for i in cands)  # adapter acts
-    assert all(Prior(base, None).score(i) == Prior(Base(**{k: v for k, v in before.items()})).score(i)
-               for i in cands)  # dropping the adapter restores the base exactly
+    assert all(
+        Prior(base, None).score(i) == Prior(Base(**dict(before.items()))).score(i) for i in cands
+    )  # dropping the adapter restores the base exactly
 
 
 def test_lora_zero_init_is_identity() -> None:
@@ -49,8 +50,16 @@ def test_samples_labels_are_consistent() -> None:
 def tiny(exp: str) -> dict[str, object]:
     t = template(exp)
     p = dict(t["params"])  # type: ignore[call-overload]
-    p.update(n_pretrain=5, n_adapt=5, pretrain_steps=8, adapt_steps=8, pilot_tasks=3, min_n=6,
-             max_n=6, fit_eval_n=3)
+    p.update(
+        n_pretrain=5,
+        n_adapt=5,
+        pretrain_steps=8,
+        adapt_steps=8,
+        pilot_tasks=3,
+        min_n=6,
+        max_n=6,
+        fit_eval_n=3,
+    )
     t["params"] = p
     return t
 

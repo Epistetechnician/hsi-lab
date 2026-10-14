@@ -1,4 +1,5 @@
 """Run/custody roots live outside the repo; the CLI refuses repo-internal paths."""
+
 from __future__ import annotations
 
 import os

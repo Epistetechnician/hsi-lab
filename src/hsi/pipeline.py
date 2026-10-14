@@ -1,4 +1,5 @@
 """packet -> pilot -> lock -> run -> eval -> verify-receipt -> decide (E1)."""
+
 from __future__ import annotations
 
 import hashlib
@@ -88,9 +89,15 @@ def pilot(packet_file: Path) -> Path:
         sigma = max(sigma, math.sqrt(sum(sq) / max(1, len(sq) - len(fams))))
     need = math.ceil((1.96 * sigma / (packet.threshold / 2)) ** 2 / len(fams))
     n = min(hi, max(lo, need))
-    out = {"packet_digest": digest, "sigma": sigma, "per_family_mean_diff": per_family,
-           "required_n": need, "n_per_family": n, "underpowered": need > hi,
-           "pilot_tasks_per_family_per_split": npilot}
+    out = {
+        "packet_digest": digest,
+        "sigma": sigma,
+        "per_family_mean_diff": per_family,
+        "required_n": need,
+        "n_per_family": n,
+        "underpowered": need > hi,
+        "pilot_tasks_per_family_per_split": npilot,
+    }
     write_json(d / "pilot.json", out)
     prog.finish()
     return d / "pilot.json"
@@ -127,8 +134,10 @@ def lock(packet_file: Path) -> Path:
     secret.write_text(json.dumps({"packet_digest": digest, "salt": salt, "n_per_family": n}))
     secret.chmod(0o600)
     ld = _lock_digest(digest, n, com)
-    write_json(d / "lock.public.json", {"packet_digest": digest, "n_per_family": n,
-                                         "commitment": com, "lock_digest": ld})
+    write_json(
+        d / "lock.public.json",
+        {"packet_digest": digest, "n_per_family": n, "commitment": com, "lock_digest": ld},
+    )
     return d / "lock.public.json"
 
 
@@ -160,9 +169,11 @@ def run(packet_file: Path) -> Path:
             for fam in fams:
                 for i in range(n):
                     r = spec.run_task(arm, fam, Split.TUNE, SEED_BASE[Split.TUNE] + off + i, packet)
-                    meter.charge(calls=int(r.stats.get("calls", 0)),
-                                 bytes=int(r.stats.get("payload_bytes", 0)),
-                                 limits={"calls": packet.budget.max_calls})
+                    meter.charge(
+                        calls=int(r.stats.get("calls", 0)),
+                        bytes=int(r.stats.get("payload_bytes", 0)),
+                        limits={"calls": packet.budget.max_calls},
+                    )
                     meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
                     spec.check_budget(r, packet)
                     done += 1
@@ -178,15 +189,28 @@ def run(packet_file: Path) -> Path:
                     for m in r.messages:
                         mlog.append(m.model_dump(mode="json"))
                     for ev in r.relation_events:
-                        rlog.append({**ev.model_dump(mode="json"), "task": r.family + str(r.seed),
-                                     "arm": r.arm})
+                        rlog.append(
+                            {
+                                **ev.model_dump(mode="json"),
+                                "task": r.family + str(r.seed),
+                                "arm": r.arm,
+                            }
+                        )
                     meter.bytes += int(r.stats.get("message_bytes", 0))
     except BudgetExceeded as e:
         raise BudgetError(str(e)) from e
-    manifest = {"packet_digest": digest, "lock_digest": lk["lock_digest"],
-                "n_per_family": lk["n_per_family"], "arms": packet.arms,
-                "ledger_head": led.head, "decision_log_head": dlog.head, "resources": meter.snapshot()}
-    manifest["run_digest"] = canonical_digest({k: v for k, v in manifest.items() if k != "resources"})
+    manifest = {
+        "packet_digest": digest,
+        "lock_digest": lk["lock_digest"],
+        "n_per_family": lk["n_per_family"],
+        "arms": packet.arms,
+        "ledger_head": led.head,
+        "decision_log_head": dlog.head,
+        "resources": meter.snapshot(),
+    }
+    manifest["run_digest"] = canonical_digest(
+        {k: v for k, v in manifest.items() if k != "resources"}
+    )
     write_json(d / "run" / "manifest.json", manifest)
     prog.finish()
     return d
@@ -196,8 +220,13 @@ def evaluate(run_dir: Path) -> Path:
     """Spawn the locked evaluator in a separate process."""
     if not (run_dir / "run" / "manifest.json").exists():
         raise PreconditionError("no run manifest")
-    r = subprocess.run([sys.executable, "-m", "hsi.evaluation.locked", str(run_dir)],
-                       capture_output=True, text=True, cwd=REPO, check=False)
+    r = subprocess.run(
+        [sys.executable, "-m", "hsi.evaluation.locked", str(run_dir)],
+        capture_output=True,
+        text=True,
+        cwd=REPO,
+        check=False,
+    )
     if r.returncode != 0:
         msg = (r.stderr.strip().splitlines() or ["evaluator failed"])[-1]
         cls = {3: DigestError, 7: LockError, 9: PreconditionError}.get(r.returncode, InvalidError)
@@ -208,8 +237,12 @@ def evaluate(run_dir: Path) -> Path:
 def verify_receipt(receipt: Path) -> str:
     rd = receipt.parent.parent
     pf = rd / "packet.frozen.json"
-    r = subprocess.run([sys.executable, "-I", str(REPO / "validator" / "recompute.py"),
-                        str(receipt), str(pf)], capture_output=True, text=True, check=False)
+    r = subprocess.run(
+        [sys.executable, "-I", str(REPO / "validator" / "recompute.py"), str(receipt), str(pf)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
     if r.returncode != 0:
         raise RecomputeError((r.stdout + r.stderr).strip())
     digest = str(load_json(receipt)["receipt_digest"])

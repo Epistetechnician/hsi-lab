@@ -1,4 +1,5 @@
 """Append-only, digest-chained episode ledger (F5)."""
+
 from __future__ import annotations
 
 import json

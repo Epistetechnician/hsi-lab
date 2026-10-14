@@ -15,8 +15,13 @@ class TextCodec:
     name = "text"
 
     def encode(self, trace: Trace) -> bytes:
-        out = [f"hsi-text-v1 provenance={trace.provenance}\n", f"start cells {_cells(trace.initial)}\n"]
-        out += [f"step {i}: action {a} -> cells {_cells(s)}\n" for i, (a, s) in enumerate(trace.steps)]
+        out = [
+            f"hsi-text-v1 provenance={trace.provenance}\n",
+            f"start cells {_cells(trace.initial)}\n",
+        ]
+        out += [
+            f"step {i}: action {a} -> cells {_cells(s)}\n" for i, (a, s) in enumerate(trace.steps)
+        ]
         return "".join(out).encode("utf-8")
 
     def decode(self, data: bytes) -> Trace:

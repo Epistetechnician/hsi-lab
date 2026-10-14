@@ -1,4 +1,5 @@
 """Message formats for collectives (F10). Every message is byte-counted."""
+
 from __future__ import annotations
 
 from hsi.agents.learner import Transition
@@ -27,8 +28,10 @@ def decode_hyps(data: bytes) -> dict[int, tuple[Prim, ...]]:
     while data[:2] == b"H1" and i < len(data):
         a, n = data[i], data[i + 1]
         i += 2
-        out[a] = tuple((_NAME[data[i + 4 * t]], data[i + 4 * t + 1], data[i + 4 * t + 2],
-                        data[i + 4 * t + 3]) for t in range(n))
+        out[a] = tuple(
+            (_NAME[data[i + 4 * t]], data[i + 4 * t + 1], data[i + 4 * t + 2], data[i + 4 * t + 3])
+            for t in range(n)
+        )
         i += 4 * n
     return out
 
@@ -41,7 +44,22 @@ def encode_log(trans: list[Transition], cap: int) -> bytes:
     return fit_to_budget(CODECS["typed_event"], tr, cap)
 
 
-def message(msg_id: str, sender: int, receivers: list[int], codec: str, payload: bytes,
-            refs: list[str], expires: int) -> Message:
-    return Message(msg_id=msg_id, sender=sender, receivers=receivers, payload_codec=codec,
-                   bytes=len(payload), evidence_refs=refs, confidence=1.0, expires_at_step=expires)
+def message(
+    msg_id: str,
+    sender: int,
+    receivers: list[int],
+    codec: str,
+    payload: bytes,
+    refs: list[str],
+    expires: int,
+) -> Message:
+    return Message(
+        msg_id=msg_id,
+        sender=sender,
+        receivers=receivers,
+        payload_codec=codec,
+        bytes=len(payload),
+        evidence_refs=refs,
+        confidence=1.0,
+        expires_at_step=expires,
+    )

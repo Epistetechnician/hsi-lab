@@ -24,12 +24,15 @@ def test_refreeze_refused(tmp_path: Path) -> None:
     assert main(["packet", "freeze", str(p)]) == 4
 
 
-@pytest.mark.parametrize("mutate", [
-    lambda d: d.update(extra=1),
-    lambda d: d.pop("threshold"),
-    lambda d: d.update(experiment="E9"),
-    lambda d: d.update(arms=["a", "a"]),
-])
+@pytest.mark.parametrize(
+    "mutate",
+    [
+        lambda d: d.update(extra=1),
+        lambda d: d.pop("threshold"),
+        lambda d: d.update(experiment="E9"),
+        lambda d: d.update(arms=["a", "a"]),
+    ],
+)
 def test_invalid_rejected(tmp_path: Path, mutate) -> None:  # type: ignore[no-untyped-def]
     d = template("E2")
     mutate(d)

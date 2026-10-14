@@ -57,8 +57,11 @@ def test_ledger_chain_and_tamper(tmp_path: Path) -> None:
         led.append(rollout(w, POLICIES["random"](w, __import__("random").Random(i))))
     assert Ledger(tmp_path / "l.jsonl").head == led.head
     lines = (tmp_path / "l.jsonl").read_text().splitlines()
-    lines[2] = lines[2].replace('"success": false', '"success": true').replace(
-        '"success":false', '"success":true')
+    lines[2] = (
+        lines[2]
+        .replace('"success": false', '"success": true')
+        .replace('"success":false', '"success":true')
+    )
     if lines[2] == (tmp_path / "l.jsonl").read_text().splitlines()[2]:
         lines[2] = lines[2].replace('"seed": 2', '"seed": 9')
     (tmp_path / "l.jsonl").write_text("\n".join(lines) + "\n")

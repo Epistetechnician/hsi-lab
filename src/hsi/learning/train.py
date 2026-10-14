@@ -1,5 +1,6 @@
 """Training for the prior: base pretraining and LoRA adapters. Reads only the sample sets it is
 handed; the caller gates which splits those come from (never held-out)."""
+
 from __future__ import annotations
 
 import math
@@ -22,17 +23,26 @@ def _batch_grads(samples, rng, cap, fwd, accum, vs) -> float:  # type: ignore[no
     for smp in samples:
         c = list(smp.cands)
         if len(c) > cap:
-            c = rng.sample([x for x in c if x != smp.label], cap - 1) + [smp.label]
+            c = [*rng.sample([x for x in c if x != smp.label], cap - 1), smp.label]
         hs = fwd(c)
         scores = [sum(v * h for v, h in zip(vs, hi, strict=True)) for hi in hs]
         p = softmax(scores)
         loss -= math.log(max(p[c.index(smp.label)], 1e-12))
-        accum(c, hs, [(pi - (1.0 if ci == smp.label else 0.0)) for pi, ci in zip(p, c, strict=True)])
+        accum(
+            c, hs, [(pi - (1.0 if ci == smp.label else 0.0)) for pi, ci in zip(p, c, strict=True)]
+        )
     return loss / max(1, len(samples))
 
 
-def pretrain(base: Base, samples: list[Sample], steps: int, lr: float, seed: int,
-             batch: int = 16, cap: int = 48) -> float:
+def pretrain(
+    base: Base,
+    samples: list[Sample],
+    steps: int,
+    lr: float,
+    seed: int,
+    batch: int = 16,
+    cap: int = 48,
+) -> float:
     """Full update of W (and b) on labeled samples. v stays fixed."""
     rng = random.Random(f"pretrain/{seed}")
     last = 0.0
@@ -45,8 +55,12 @@ def pretrain(base: Base, samples: list[Sample], steps: int, lr: float, seed: int
             hs = []
             for i in c:
                 f = phi(i)
-                hs.append([math.tanh(sum(w * x for w, x in zip(row, f, strict=True)) + bi)
-                           for row, bi in zip(base.W, base.b, strict=True)])
+                hs.append(
+                    [
+                        math.tanh(sum(w * x for w, x in zip(row, f, strict=True)) + bi)
+                        for row, bi in zip(base.W, base.b, strict=True)
+                    ]
+                )
             return hs
 
         def accum(c: list[int], hs: list[list[float]], dp: list[float]) -> None:
@@ -68,8 +82,16 @@ def pretrain(base: Base, samples: list[Sample], steps: int, lr: float, seed: int
     return last
 
 
-def train_adapter(base: Base, adapter: Adapter, samples: list[Sample], steps: int, lr: float,
-                  seed: int, batch: int = 16, cap: int = 48) -> float:
+def train_adapter(
+    base: Base,
+    adapter: Adapter,
+    samples: list[Sample],
+    steps: int,
+    lr: float,
+    seed: int,
+    batch: int = 16,
+    cap: int = 48,
+) -> float:
     """Update only A and B. The base object is never mutated."""
     rng = random.Random(f"adapt/{seed}")
     r = len(adapter.A)

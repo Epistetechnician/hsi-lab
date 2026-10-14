@@ -60,13 +60,29 @@ def test_none_policy_stores_nothing() -> None:
 
 def test_variant_keeps_rules_changes_task() -> None:
     a, b = RuleWorld("rule_induction", Split.FIT, 5), RuleWorld("rule_induction", Split.FIT, 5, 1)
-    assert a.task.actions == b.task.actions and (a.task.start, a.task.goal) != (b.task.start, b.task.goal)
+    assert a.task.actions == b.task.actions and (a.task.start, a.task.goal) != (
+        b.task.start,
+        b.task.goal,
+    )
 
 
-@given(st.dictionaries(st.integers(0, 3), st.lists(
-    st.tuples(st.sampled_from(["add", "swap", "copy", "mix"]), st.integers(0, 4), st.integers(0, 4),
-              st.integers(0, 6)), min_size=1, max_size=2).map(tuple), max_size=4),
-    st.integers(2, 40))
+@given(
+    st.dictionaries(
+        st.integers(0, 3),
+        st.lists(
+            st.tuples(
+                st.sampled_from(["add", "swap", "copy", "mix"]),
+                st.integers(0, 4),
+                st.integers(0, 4),
+                st.integers(0, 6),
+            ),
+            min_size=1,
+            max_size=2,
+        ).map(tuple),
+        max_size=4,
+    ),
+    st.integers(2, 40),
+)
 def test_hyp_message_roundtrip_and_cap(h, cap) -> None:  # type: ignore[no-untyped-def]
     data = encode_hyps(h, cap)
     assert len(data) <= cap

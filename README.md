@@ -17,6 +17,16 @@ uv run pytest
 uv run hsi packet new E1 packets/e1-v1.json
 ```
 
+## Quality gates
+
+```
+uv run ruff check src tests validator       # rules are explicit in pyproject.toml
+uv run ruff format --check src tests validator
+uv run mypy src
+uv run pytest                               # model-free, ~25 s
+HSI_LLM_TESTS=1 uv run --extra mlx pytest tests/integration/test_llm_backend.py   # needs the checkpoint
+```
+
 ## Watching a run
 
 `hsi watch` opens a read-only terminal view of any run (pipeline stages, mechanism per

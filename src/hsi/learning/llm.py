@@ -8,6 +8,7 @@ frozen and never written; the adapter can be switched off exactly (scale -> 0) o
 
 mlx is imported lazily so the model-free suite and the core install stay MLX-free.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -21,10 +22,16 @@ from hsi.agents.learner import HYPOTHESES
 from hsi.environment.world import Prim
 
 MODELS: dict[str, tuple[str, str, str]] = {  # name -> (HF repo, pinned revision, license)
-    "qwen2.5-1.5b": ("mlx-community/Qwen2.5-1.5B-Instruct-4bit",
-                     "8b403126fc14f14cfc99bb4cfa72ecbc129ea677", "apache-2.0"),
-    "qwen2.5-7b": ("mlx-community/Qwen2.5-7B-Instruct-4bit",
-                   "c26a38f6a37d0a51b4e9a1eb3026530fa35d9fed", "apache-2.0"),
+    "qwen2.5-1.5b": (
+        "mlx-community/Qwen2.5-1.5B-Instruct-4bit",
+        "8b403126fc14f14cfc99bb4cfa72ecbc129ea677",
+        "apache-2.0",
+    ),
+    "qwen2.5-7b": (
+        "mlx-community/Qwen2.5-7B-Instruct-4bit",
+        "c26a38f6a37d0a51b4e9a1eb3026530fa35d9fed",
+        "apache-2.0",
+    ),
 }
 DEFAULT_MODEL = "qwen2.5-1.5b"
 MODEL_REPO, MODEL_REVISION, MODEL_LICENSE = MODELS[DEFAULT_MODEL]
@@ -51,8 +58,10 @@ def render_prompt(pairs: Sequence[tuple[Sequence[int], Sequence[int]]]) -> str:
     return PREAMBLE + "\n".join(lines) + "\nThe rule is:"
 
 
-def few_shot_prompt(pairs: Sequence[tuple[Sequence[int], Sequence[int]]],
-                    demos: Sequence[tuple[Sequence[tuple[Sequence[int], Sequence[int]]], str]]) -> str:
+def few_shot_prompt(
+    pairs: Sequence[tuple[Sequence[int], Sequence[int]]],
+    demos: Sequence[tuple[Sequence[tuple[Sequence[int], Sequence[int]]], str]],
+) -> str:
     """Generation prompt: solved demonstrations first, then the query (same format)."""
     shots = [f"{render_prompt(dp)} {txt}\n\n" for dp, txt in demos]
     return "".join(shots) + render_prompt(pairs)
@@ -150,8 +159,9 @@ class LLM:
             logits = self.model.model.embed_tokens.as_linear(hs)
         else:
             logits = self.model.lm_head(hs)
-        lp = logits.astype(mx.float32) - mx.logsumexp(logits.astype(mx.float32), axis=-1,
-                                                       keepdims=True)
+        lp = logits.astype(mx.float32) - mx.logsumexp(
+            logits.astype(mx.float32), axis=-1, keepdims=True
+        )
         tok_lp = mx.take_along_axis(lp, mx.array(targets)[:, :, None], axis=-1)[:, :, 0]
         return (tok_lp * mx.array(mask)).sum(axis=1).reshape(n)
 
@@ -169,11 +179,11 @@ class LLM:
         mx.eval(lp0, [c.state for c in pc])
         out: list[float] = []
         for i in range(0, len(texts), batch):
-            chunk = [self.tok.encode(" " + t) for t in texts[i:i + batch]]
+            chunk = [self.tok.encode(" " + t) for t in texts[i : i + batch]]
             n, l_max = len(chunk), max(len(c) for c in chunk)
             cache = make_prompt_cache(self.model)
             for dst, src in zip(cache, pc, strict=True):
-                k, v = src.keys[..., :src.offset, :], src.values[..., :src.offset, :]
+                k, v = src.keys[..., : src.offset, :], src.values[..., : src.offset, :]
                 dst.keys = mx.broadcast_to(k, (n, *k.shape[1:]))
                 dst.values = mx.broadcast_to(v, (n, *v.shape[1:]))
                 dst.offset = src.offset
@@ -256,8 +266,15 @@ class LLM:
     def load_adapter(self, path: Path) -> None:
         self.model.load_weights(str(path), strict=False)
 
-    def train_lora(self, samples: list[tuple[str, str]], steps: int, lr: float, seed: int,
-                   batch: int = 8, on_step: Callable[[int, float], None] | None = None) -> float:
+    def train_lora(
+        self,
+        samples: list[tuple[str, str]],
+        steps: int,
+        lr: float,
+        seed: int,
+        batch: int = 8,
+        on_step: Callable[[int, float], None] | None = None,
+    ) -> float:
         """Supervised fine-tuning of the adapter only: maximise log P(target | prompt)."""
         import random
 

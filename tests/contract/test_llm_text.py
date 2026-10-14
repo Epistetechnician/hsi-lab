@@ -16,9 +16,20 @@ def test_describe_parse_roundtrip(i: int) -> None:
     assert true_index(parse_hypothesis(describe(HYPOTHESES[i])) or ()) == i
 
 
-@pytest.mark.parametrize("bad", ["", "swap 1", "swap 2 2", "add 1 0", "add 9 1", "copy 1 7",
-                                 "swap 1 2 ; add 1 1 ; mix 0 1", "'add 0 4' -> 'swap 0 4' -> 'copy 0",
-                                 "hello"])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "",
+        "swap 1",
+        "swap 2 2",
+        "add 1 0",
+        "add 9 1",
+        "copy 1 7",
+        "swap 1 2 ; add 1 1 ; mix 0 1",
+        "'add 0 4' -> 'swap 0 4' -> 'copy 0",
+        "hello",
+    ],
+)
 def test_invalid_texts_rejected(bad: str) -> None:
     assert parse_hypothesis(bad) is None and text_signature(bad) == "invalid"
 

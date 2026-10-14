@@ -3,6 +3,7 @@
 State: N_CELLS ints mod MOD. Each of N_ACTIONS actions applies 1-2 hidden primitives drawn
 from the rule family. Gymnasium-style reset/step; exact transitions; BFS solvability oracle.
 """
+
 from __future__ import annotations
 
 import random
@@ -17,13 +18,23 @@ HIDDEN = -1
 
 # rule family -> split (split by rule family; seed ranges are partitioned per split too)
 RULE_FAMILIES: dict[str, Split] = {
-    "add": Split.FIT, "swap": Split.FIT, "add+swap": Split.FIT,
-    "copy": Split.TUNE, "add+copy": Split.TUNE,
-    "mix": Split.HELDOUT, "swap+copy": Split.HELDOUT,
+    "add": Split.FIT,
+    "swap": Split.FIT,
+    "add+swap": Split.FIT,
+    "copy": Split.TUNE,
+    "add+copy": Split.TUNE,
+    "mix": Split.HELDOUT,
+    "swap+copy": Split.HELDOUT,
 }
 SEED_BASE = {Split.FIT: 0, Split.TUNE: 1_000_000, Split.HELDOUT: 2_000_000}
-TASK_FAMILIES = ("rule_induction", "compositional_transfer", "counterevidence",
-                 "partial_observation", "collective_discovery", "relational_return")
+TASK_FAMILIES = (
+    "rule_induction",
+    "compositional_transfer",
+    "counterevidence",
+    "partial_observation",
+    "collective_discovery",
+    "relational_return",
+)
 # which rule families each task family draws from, per split
 _SINGLE = {Split.FIT: ["add", "swap"], Split.TUNE: ["copy"], Split.HELDOUT: ["mix"]}
 _COMPOSITE = {Split.FIT: ["add+swap"], Split.TUNE: ["add+copy"], Split.HELDOUT: ["swap+copy"]}
@@ -90,25 +101,38 @@ class RuleWorld:
         raise RuntimeError("no non-degenerate world found")
 
     @staticmethod
-    def _try_build(family: str, split: Split, seed: int, attempt: int,
-                   variant: int = 0) -> Task | None:
+    def _try_build(
+        family: str, split: Split, seed: int, attempt: int, variant: int = 0
+    ) -> Task | None:
         rng = random.Random(f"{ENV_VERSION}/{family}/{seed}/{attempt}")
         pool = _COMPOSITE[split] if family == "compositional_transfer" else _SINGLE[split]
         rf = rng.choice(pool)
         kinds = rf.split("+")
         actions = tuple(
-            tuple(_prim(kinds[i % len(kinds)] if len(kinds) > 1 else kinds[0], rng)
-                  for i in range(len(kinds)))
+            tuple(
+                _prim(kinds[i % len(kinds)] if len(kinds) > 1 else kinds[0], rng)
+                for i in range(len(kinds))
+            )
             for _ in range(N_ACTIONS)
         )
-        guard = (rng.randrange(N_ACTIONS), rng.randrange(N_CELLS)) if family == "counterevidence" else None
+        guard = (
+            (rng.randrange(N_ACTIONS), rng.randrange(N_CELLS))
+            if family == "counterevidence"
+            else None
+        )
         visible = (0, 1, 2) if family == "partial_observation" else tuple(range(N_CELLS))
         n_agents = 2 if family == "collective_discovery" else 1
         # variant>0: same hidden rules, fresh start/goal (used for 'return' tasks)
-        sr = rng if variant == 0 else random.Random(f"{ENV_VERSION}/{family}/{seed}/{attempt}/v{variant}")
+        sr = (
+            rng
+            if variant == 0
+            else random.Random(f"{ENV_VERSION}/{family}/{seed}/{attempt}/v{variant}")
+        )
         start = tuple(sr.randrange(MOD) for _ in range(N_CELLS))
         probe = RuleWorld.__new__(RuleWorld)
-        probe.task = Task(family, rf, split, seed, actions, guard, visible, start, start, 0, n_agents)
+        probe.task = Task(
+            family, rf, split, seed, actions, guard, visible, start, start, 0, n_agents
+        )
         # pick a goal reachable in 3..5 steps (guarantees solvability)
         dist = probe._bfs_all(start)
         unmet = [s for s in dist if any(s[i] != start[i] for i in visible)]
@@ -119,7 +143,9 @@ class RuleWorld:
             return None
         goal = sr.choice(cands)
         h = min((d for t, d in dist.items() if all(t[i] == goal[i] for i in visible)), default=0)
-        task = Task(family, rf, split, seed, actions, guard, visible, start, goal, 3 * h + 4, n_agents)
+        task = Task(
+            family, rf, split, seed, actions, guard, visible, start, goal, 3 * h + 4, n_agents
+        )
         return task
 
     # -- dynamics -----------------------------------------------------------
@@ -193,7 +219,9 @@ class RuleWorld:
         self._s, self._t = list(self.task.start), 0
         return self._obs(), {"goal": self.goal_obs(), "horizon": self.task.horizon}
 
-    def step(self, action: int, agent: int = 0) -> tuple[list[int], float, bool, bool, dict[str, object]]:
+    def step(
+        self, action: int, agent: int = 0
+    ) -> tuple[list[int], float, bool, bool, dict[str, object]]:
         if not 0 <= action < N_ACTIONS:
             raise ValueError("bad action")
         blocked = action not in self.allowed(agent)
@@ -201,8 +229,13 @@ class RuleWorld:
             self._s = list(self._next(tuple(self._s), action))
         self._t += 1
         done = self._reached(tuple(self._s))
-        return self._obs(), 1.0 if done else 0.0, done, (not done and self._t >= self.task.horizon), {
-            "blocked": blocked}
+        return (
+            self._obs(),
+            1.0 if done else 0.0,
+            done,
+            (not done and self._t >= self.task.horizon),
+            {"blocked": blocked},
+        )
 
 
 apply_prim = _apply

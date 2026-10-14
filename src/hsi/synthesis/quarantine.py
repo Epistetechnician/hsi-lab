@@ -1,4 +1,5 @@
 """Quarantine queue: the only place synthesis may write."""
+
 from __future__ import annotations
 
 from hsi.contracts.records import Eligibility, Episode, Origin

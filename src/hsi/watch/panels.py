@@ -1,5 +1,6 @@
 """Pure renderers: RunView -> list of (text, style) lines. No curses here, so they are testable
 and also drive `hsi watch --once`. Styles: '', ok, warn, bad, dim, hdr, acc."""
+
 from __future__ import annotations
 
 import subprocess
@@ -10,7 +11,7 @@ from collections.abc import Callable
 from typing import Any
 
 from hsi.paths import REPO
-from hsi.watch.model import RunView, read_json
+from hsi.watch.model import RunView
 
 Line = tuple[str, str]
 GLYPH = {"done": "✓", "running": "▶", "stalled": "!", "pending": "·"}
@@ -29,18 +30,26 @@ def spark(vals: list[float], lo: float = 0.0, hi: float = 1.0) -> str:
     return "".join(ticks[max(0, min(7, int((v - lo) / ((hi - lo) or 1) * 7.99)))] for v in vals)
 
 
-def eta(done: float, total: float, started: float, now: float | None = None,
-        rate: float = 0.0) -> str:
+def eta(
+    done: float, total: float, started: float, now: float | None = None, rate: float = 0.0
+) -> str:
     """ETA from the recent seconds-per-unit EMA if the producer reports it, else the average."""
     now = now or time.time()
     if done <= 0 or total <= 0 or done >= total:
         return ""
     s = (total - done) * (rate if rate > 0 else (now - started) / done)
-    return f"eta {int(s // 3600)}h{int(s % 3600 // 60):02d}m" if s >= 3600 else f"eta {int(s // 60)}m{int(s % 60):02d}s"
+    return (
+        f"eta {int(s // 3600)}h{int(s % 3600 // 60):02d}m"
+        if s >= 3600
+        else f"eta {int(s // 60)}m{int(s % 60):02d}s"
+    )
 
 
-def ci_bar(diff: float, lo: float, hi: float, thr: float, width: int = 41, span: float = 0.3) -> str:
+def ci_bar(
+    diff: float, lo: float, hi: float, thr: float, width: int = 41, span: float = 0.3
+) -> str:
     """Axis [-span, +span]: '|' zero, 'T' threshold, '[---o---]' the 95% interval."""
+
     def pos(x: float) -> int:
         return max(0, min(width - 1, round((x + span) / (2 * span) * (width - 1))))
 
@@ -88,8 +97,15 @@ def overview(v: RunView, width: int = 100) -> list[Line]:
     out.append((f"{v.title}   run {v.digest16}   packet {v.packet_digest[:12]}", "hdr"))
     if pk:
         out.append((f"H: {pk.get('hypothesis', '')}", ""))
-        out.append(((f"threshold +{pk.get('threshold')}   primary: {pk.get('primary_metric')}   "
-                    f"claim ceiling: {pk.get('claim_ceiling')}"), "dim"))
+        out.append(
+            (
+                (
+                    f"threshold +{pk.get('threshold')}   primary: {pk.get('primary_metric')}   "
+                    f"claim ceiling: {pk.get('claim_ceiling')}"
+                ),
+                "dim",
+            )
+        )
     out.append(("", ""))
     out.append(("PIPELINE", "hdr"))
     line = ""
@@ -107,8 +123,15 @@ def overview(v: RunView, width: int = 100) -> list[Line]:
         for p in sorted(live, key=lambda x: x.get("stage", "")):
             frac = p["done"] / p["total"] if p.get("total") else 0.0
             age = int(time.time() - p.get("updated", 0))
-            out.append(((f"  {p['stage']:<15} {bar(frac, 24)} {p['done']}/{p['total']} "
-                        f"{eta(p['done'], p['total'], p['started'], rate=p.get('rate', 0.0))}"), "acc"))
+            out.append(
+                (
+                    (
+                        f"  {p['stage']:<15} {bar(frac, 24)} {p['done']}/{p['total']} "
+                        f"{eta(p['done'], p['total'], p['started'], rate=p.get('rate', 0.0))}"
+                    ),
+                    "acc",
+                )
+            )
             if p.get("note"):
                 out.append((f"    {p['note']}  (updated {age}s ago)", "dim"))
     elif not v.receipt and v.stages[1].state == "running" and expected_adapters(v):
@@ -121,15 +144,29 @@ def overview(v: RunView, width: int = 100) -> list[Line]:
         out.append(("PROCESSES  none running for this packet", "dim"))
     for p in sorted(done, key=lambda x: x.get("started", 0)):
         dur = int(p["finished"] - p["started"])
-        out.append((f"  ✓ {p['stage']:<15} {p['total']} units in {dur // 60}m{dur % 60:02d}s", "dim"))
+        out.append(
+            (f"  ✓ {p['stage']:<15} {p['total']} units in {dur // 60}m{dur % 60:02d}s", "dim")
+        )
     if v.receipt:
         r = v.receipt
         out.append(("", ""))
-        sty = {"PROMOTE": "ok", "NO_CANDIDATE": "bad", "INCONCLUSIVE": "warn"}.get(r["decision"], "")
-        out.append((f"RESULT  {r['decision']}   guardrails {'held' if r['guardrails_held'] else 'FAILED'}"
-                    f"   verified {'yes' if v.verified else 'no'}"
-                    + (f"   reproduced {v.repro['aggregates_matched']}/{v.repro['aggregates_compared']}"
-                       if v.repro else ""), sty))
+        sty = {"PROMOTE": "ok", "NO_CANDIDATE": "bad", "INCONCLUSIVE": "warn"}.get(
+            r["decision"], ""
+        )
+        out.append(
+            (
+                f"RESULT  {r['decision']}   "
+                f"guardrails {'held' if r['guardrails_held'] else 'FAILED'}"
+                f"   verified {'yes' if v.verified else 'no'}"
+                + (
+                    f"   reproduced {v.repro['aggregates_matched']}/"
+                    f"{v.repro['aggregates_compared']}"
+                    if v.repro
+                    else ""
+                ),
+                sty,
+            )
+        )
     return out
 
 
@@ -150,8 +187,10 @@ def _dev_success(v: RunView) -> list[Line]:
         cells = [f"{ok[(a, f)] / n[(a, f)]:.2f}({n[(a, f)]})" if n[(a, f)] else "—" for f in fams]
         tot, hits = sum(n[(a, f)] for f in fams), sum(ok[(a, f)] for f in fams)
         rows.append([a, _role(v, a), *cells, f"{hits / tot:.2f}" if tot else "—"])
-    return [("DEV-SPLIT ROLLOUTS (tune seeds; held-out stays locked)", "hdr"),
-            *_table(rows, ["arm", "role", *fams, "all"])]
+    return [
+        ("DEV-SPLIT ROLLOUTS (tune seeds; held-out stays locked)", "hdr"),
+        *_table(rows, ["arm", "role", *fams, "all"]),
+    ]
 
 
 def expected_adapters(v: RunView) -> list[str]:
@@ -193,34 +232,65 @@ def _learning(v: RunView) -> list[Line]:
         return out
     out.append(("BACKBONE", "hdr"))
     if m.get("model_repo"):
-        out.append(((f"  {m['model_repo']} @ {str(m['model_revision'])[:8]} ({m.get('model_license')})"
-                    f"  weights {str(m['weights_digest'])[:12]}"), ""))
+        out.append(
+            (
+                (
+                    f"  {m['model_repo']} @ {str(m['model_revision'])[:8]} "
+                    f"({m.get('model_license')})"
+                    f"  weights {str(m['weights_digest'])[:12]}"
+                ),
+                "",
+            )
+        )
     else:
         out.append((f"  runtime {m.get('runtime')}  base {str(m.get('base_digest', ''))[:12]}", ""))
     cands = m.get("candidates", {})
     if m.get("adapter_digest"):
-        out.append((f"  adapter {str(m['adapter_digest'])[:12]}  {m.get('adapter')}  train {m.get('train')}", ""))
+        out.append(
+            (
+                (
+                    f"  adapter {str(m['adapter_digest'])[:12]}  {m.get('adapter')}  "
+                    f"train {m.get('train')}"
+                ),
+                "",
+            )
+        )
     if cands:
         out.append(("ADAPTERS / CANDIDATES", "hdr"))
         rows = []
         for a, i in cands.items():
-            rows.append([a, str(i.get("generation", "")), f"{i.get('loss', 0):.2f}",
-                         f"{i['diversity']:.2f}" if "diversity" in i else "—",
-                         f"{i['validity']:.2f}" if "validity" in i else "—",
-                         f"{i.get('n_synthetic', '')}/{i.get('n_real', '')}",
-                         str(i.get("digest", ""))[:10]])
+            rows.append(
+                [
+                    a,
+                    str(i.get("generation", "")),
+                    f"{i.get('loss', 0):.2f}",
+                    f"{i['diversity']:.2f}" if "diversity" in i else "—",
+                    f"{i['validity']:.2f}" if "validity" in i else "—",
+                    f"{i.get('n_synthetic', '')}/{i.get('n_real', '')}",
+                    str(i.get("digest", ""))[:10],
+                ]
+            )
         out += _table(rows, ["arm", "gen", "loss", "diversity", "validity", "syn/real", "digest"])
         chains = defaultdict(list)
         for a, i in cands.items():
             if a.startswith("d") and "_" in a and "diversity" in i:
-                chains[a.split("_", 1)[1]].append((i["generation"], i["diversity"], i.get("validity", 0.0)))
+                chains[a.split("_", 1)[1]].append(
+                    (i["generation"], i["diversity"], i.get("validity", 0.0))
+                )
         if chains:
             out.append(("GENERATOR HEALTH BY DEPTH (diversity ▁→█ | validity ▁→█)", "hdr"))
             for mode, xs in sorted(chains.items()):
                 xs.sort()
-                out.append(((f"  {mode:<10} diversity {spark([x[1] for x in xs], 0, 0.5)}  "
+                out.append(
+                    (
+                        (
+                            f"  {mode:<10} diversity {spark([x[1] for x in xs], 0, 0.5)}  "
                             f"validity {spark([x[2] for x in xs], 0, 0.3)}   "
-                            f"({' → '.join(f'{x[1]:.2f}/{x[2]:.2f}' for x in xs)})"), ""))
+                            f"({' → '.join(f'{x[1]:.2f}/{x[2]:.2f}' for x in xs)})"
+                        ),
+                        "",
+                    )
+                )
             if "diversity_floor" in m:
                 out.append((f"  diversity floor {m['diversity_floor']:.3f}", "dim"))
     return out
@@ -238,7 +308,15 @@ def _messages(v: RunView) -> list[Line]:
     trs = []
     for a, ms in sorted(by.items()):
         b = sum(m["bytes"] for m in ms)
-        trs.append([a, str(len(ms)), str(b), f"{b / len(ms):.1f}", ",".join(sorted({m['payload_codec'] for m in ms}))])
+        trs.append(
+            [
+                a,
+                str(len(ms)),
+                str(b),
+                f"{b / len(ms):.1f}",
+                ",".join(sorted({m["payload_codec"] for m in ms})),
+            ]
+        )
     out += _table(trs, ["arm", "msgs", "bytes", "B/msg", "codecs"])
     return out
 
@@ -250,9 +328,18 @@ def _links(v: RunView) -> list[Line]:
     c = Counter(e["event"] for e in ev)
     deliv = sum(1 for e in ev if e["event"] == "link_drop" and e.get("delivered"))
     tasks = len({e.get("task") for e in ev})
-    return [("LINK CHURN (adaptive graph)", "hdr"),
-            ((f"  opened {c['link_open']}  dropped {c['link_drop']}  delivered {deliv}/{c['link_drop']}"
-             f"  over {tasks} tasks  ({(c['link_open'] + c['link_drop']) / max(1, tasks):.1f} events/task)"), "")]
+    return [
+        ("LINK CHURN (adaptive graph)", "hdr"),
+        (
+            (
+                f"  opened {c['link_open']}  dropped {c['link_drop']}  "
+                f"delivered {deliv}/{c['link_drop']}"
+                f"  over {tasks} tasks  "
+                f"({(c['link_open'] + c['link_drop']) / max(1, tasks):.1f} events/task)"
+            ),
+            "",
+        ),
+    ]
 
 
 def _verification(v: RunView) -> list[Line]:
@@ -263,9 +350,21 @@ def _verification(v: RunView) -> list[Line]:
     tot = len(d)
     out: list[Line] = [("VERIFIER DECISIONS (quarantine → eligible / rejected)", "hdr")]
     for r, k in c.most_common():
-        out.append((f"  {r:<22} {bar(k / tot, 24)} {k:>5} {100 * k / tot:5.1f}%", "ok" if r == "ok" else "warn"))
-    out.append(((f"  quarantine queue {v.ledgers.get('quarantine', 0)} · eligible examples "
-                f"{v.ledgers.get('examples', 0)}"), "dim"))
+        out.append(
+            (
+                f"  {r:<22} {bar(k / tot, 24)} {k:>5} {100 * k / tot:5.1f}%",
+                "ok" if r == "ok" else "warn",
+            )
+        )
+    out.append(
+        (
+            (
+                f"  quarantine queue {v.ledgers.get('quarantine', 0)} · eligible examples "
+                f"{v.ledgers.get('examples', 0)}"
+            ),
+            "dim",
+        )
+    )
     return out
 
 
@@ -277,8 +376,10 @@ def _relations(v: RunView) -> list[Line]:
     for e in ev:
         by[str(e.get("arm", "?"))][str(e.get("op"))] += 1
     ops = ["create", "strengthen", "decouple", "dormant", "reactivate", "retire", "prune"]
-    return [("RELATION EVENTS BY ARM", "hdr"),
-            *_table([[a, *[str(c[o]) for o in ops]] for a, c in sorted(by.items())], ["arm", *ops])]
+    return [
+        ("RELATION EVENTS BY ARM", "hdr"),
+        *_table([[a, *[str(c[o]) for o in ops]] for a, c in sorted(by.items())], ["arm", *ops]),
+    ]
 
 
 def mechanism(v: RunView, width: int = 100) -> list[Line]:
@@ -290,10 +391,12 @@ def mechanism(v: RunView, width: int = 100) -> list[Line]:
     for fn in (_learning, _verification, _messages, _links, _relations, _dev_success):
         try:
             part = fn(v)
-        except Exception as e:  # noqa: BLE001  # one odd artifact must not take down the view
-            part = [(f"({fn.__name__.strip('_')} panel unavailable: {type(e).__name__}: {e})", "bad")]
+        except Exception as e:  # one odd artifact must not take down the view
+            part = [
+                (f"({fn.__name__.strip('_')} panel unavailable: {type(e).__name__}: {e})", "bad")
+            ]
         if part:
-            out += part + [("", "")]
+            out += [*part, ("", "")]
     return out
 
 
@@ -310,21 +413,33 @@ def data(v: RunView, width: int = 100) -> list[Line]:
         out.append(("TRAINING DATA COMPOSITION (origin / eligibility)", "hdr"))
         by: dict[str, Counter[str]] = defaultdict(Counter)
         for r in tr:
-            by[str(r.get("arm") or r.get("used_by") or "?")][f"{r.get('origin')}/{r.get('eligibility')}"] += 1
+            by[str(r.get("arm") or r.get("used_by") or "?")][
+                f"{r.get('origin')}/{r.get('eligibility')}"
+            ] += 1
         for a, c in sorted(by.items()):
             out.append((f"  {a:<22} " + "  ".join(f"{k}:{n}" for k, n in c.most_common(4)), ""))
         splits = Counter(str(r.get("split")) for r in tr if r.get("split"))
         if splits:
             ok = "heldout" not in splits
-            out.append((f"  splits touched: {dict(splits)}  held-out untouched: {'yes' if ok else 'NO'}",
-                        "ok" if ok else "bad"))
+            out.append(
+                (
+                    (
+                        f"  splits touched: {dict(splits)}  "
+                        f"held-out untouched: {'yes' if ok else 'NO'}"
+                    ),
+                    "ok" if ok else "bad",
+                )
+            )
     out.append(("", ""))
     out.append(("DIGESTS", "hdr"))
-    items = [("packet", v.packet_digest), ("lock", (v.lock or {}).get("lock_digest", "")),
-             ("run", (v.manifest or {}).get("run_digest", "")),
-             ("model", (v.receipt or {}).get("model_digest", "")),
-             ("data", (v.receipt or {}).get("data_digest", "")),
-             ("receipt", (v.receipt or {}).get("receipt_digest", ""))]
+    items = [
+        ("packet", v.packet_digest),
+        ("lock", (v.lock or {}).get("lock_digest", "")),
+        ("run", (v.manifest or {}).get("run_digest", "")),
+        ("model", (v.receipt or {}).get("model_digest", "")),
+        ("data", (v.receipt or {}).get("data_digest", "")),
+        ("receipt", (v.receipt or {}).get("receipt_digest", "")),
+    ]
     for k, d in items:
         out.append((f"  {k:<8} {d[:24] or '—'}", "" if d else "dim"))
     if v.receipt:
@@ -347,34 +462,69 @@ def validator_status(v: RunView) -> str:
     key = str(v.receipt.get("receipt_digest"))
     if key not in _VALIDATOR:
         pf = v.path / "packet.frozen.json"
-        r = subprocess.run([sys.executable, "-I", str(REPO / "validator" / "recompute.py"),
-                            str(v.path / "eval" / "receipt.json"), str(pf)],
-                           capture_output=True, text=True, check=False, timeout=30)
-        _VALIDATOR[key] = ("OK" if r.returncode == 0 else "MISMATCH: " + r.stdout.strip()[:80])
+        r = subprocess.run(
+            [
+                sys.executable,
+                "-I",
+                str(REPO / "validator" / "recompute.py"),
+                str(v.path / "eval" / "receipt.json"),
+                str(pf),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=30,
+        )
+        _VALIDATOR[key] = "OK" if r.returncode == 0 else "MISMATCH: " + r.stdout.strip()[:80]
     return _VALIDATOR[key]
 
 
 def receipt(v: RunView, width: int = 100) -> list[Line]:
     r = v.receipt
     if not r:
-        return [("RECEIPT", "hdr"), ("  not produced yet — the locked evaluator has not finished", "dim")]
+        return [
+            ("RECEIPT", "hdr"),
+            ("  not produced yet — the locked evaluator has not finished", "dim"),
+        ]
     sty = {"PROMOTE": "ok", "NO_CANDIDATE": "bad", "INCONCLUSIVE": "warn"}.get(r["decision"], "")
-    out: list[Line] = [((f"RECEIPT · {r['decision']}   threshold +{r['threshold']}   "
-                        f"guardrails {'HELD' if r['guardrails_held'] else 'FAILED'}"), sty)]
+    out: list[Line] = [
+        (
+            (
+                f"RECEIPT · {r['decision']}   threshold +{r['threshold']}   "
+                f"guardrails {'HELD' if r['guardrails_held'] else 'FAILED'}"
+            ),
+            sty,
+        )
+    ]
     vs = validator_status(v)
-    out.append((f"independent recompute: {vs}" + (f"   clean-env rerun: {v.repro['aggregates_matched']}/"
-                f"{v.repro['aggregates_compared']} aggregates" if v.repro else "   clean-env rerun: not done"),
-                "ok" if vs == "OK" else "bad"))
+    out.append(
+        (
+            f"independent recompute: {vs}"
+            + (
+                f"   clean-env rerun: {v.repro['aggregates_matched']}/"
+                f"{v.repro['aggregates_compared']} aggregates"
+                if v.repro
+                else "   clean-env rerun: not done"
+            ),
+            "ok" if vs == "OK" else "bad",
+        )
+    )
     out.append(("", ""))
-    out.append(("COMPARISONS   axis −0.30 … +0.30   | zero   T threshold   [─●─] 95% CI", "hdr"))
+    out.append(("COMPARISONS   axis -0.30 … +0.30   | zero   T threshold   [─●─] 95% CI", "hdr"))
     for c in r["comparisons"]:
         clear = c["ci_low"] >= r["threshold"]
         excl = c["ci_high"] < r["threshold"]
         out.append((f"  {c['baseline_arm']} → {c['treatment_arm']}", ""))
-        out.append(((f"  {ci_bar(c['paired_diff'], c['ci_low'], c['ci_high'], r['threshold'])}  "
+        out.append(
+            (
+                (
+                    f"  {ci_bar(c['paired_diff'], c['ci_low'], c['ci_high'], r['threshold'])}  "
                     f"{c['paired_diff']:+.3f} [{c['ci_low']:+.3f}, {c['ci_high']:+.3f}]  "
-                    f"{'clears' if clear else 'excludes' if excl else 'straddles'} threshold"),
-                    "ok" if clear else "bad" if excl else "warn"))
+                    f"{'clears' if clear else 'excludes' if excl else 'straddles'} threshold"
+                ),
+                "ok" if clear else "bad" if excl else "warn",
+            )
+        )
     out.append(("", ""))
     out.append(("GUARDRAILS", "hdr"))
     for k, val in r["guardrail_values"].items():
@@ -385,8 +535,16 @@ def receipt(v: RunView, width: int = 100) -> list[Line]:
     if gen:
         out.append(("EVAL-TIME GENERATION (valid | consistent with evidence)", "hdr"))
         for k, val in gen.items():
-            a = k[len("eval_valid_"):]
-            out.append((f"  {a:<14} {bar(val, 16)} {val:.2f} | {r['guardrail_values'].get('eval_consistent_' + a, 0):.2f}", ""))
+            a = k[len("eval_valid_") :]
+            out.append(
+                (
+                    (
+                        f"  {a:<14} {bar(val, 16)} {val:.2f} | "
+                        f"{r['guardrail_values'].get('eval_consistent_' + a, 0):.2f}"
+                    ),
+                    "",
+                )
+            )
     out.append(("", ""))
     out.append(("SUCCESS BY ARM (held-out)", "hdr"))
     n: Counter[str] = Counter()
@@ -396,12 +554,23 @@ def receipt(v: RunView, width: int = 100) -> list[Line]:
         ok[f["arm"]] += f["successes"]
     for a in v.arms or list(n):
         if n[a]:
-            out.append((f"  {a:<22} {bar(ok[a] / n[a], 28)} {ok[a] / n[a]:.3f}  [{_role(v, a)}]", ""))
+            out.append(
+                (f"  {a:<22} {bar(ok[a] / n[a], 28)} {ok[a] / n[a]:.3f}  [{_role(v, a)}]", "")
+            )
     bu = r.get("budget_used", {})
     out.append(("", ""))
-    out.append(((f"budget used: wall {bu.get('wall_seconds', 0):.0f}s · calls {bu.get('calls', 0):.0f} · "
-                f"bytes {bu.get('bytes', 0):.0f} · failed proposals {bu.get('failed_proposals', 0):.0f} · "
-                f"peak mem {bu.get('peak_mem_mb', 0):.0f} MB"), "dim"))
+    out.append(
+        (
+            (
+                f"budget used: wall {bu.get('wall_seconds', 0):.0f}s · "
+                f"calls {bu.get('calls', 0):.0f} · "
+                f"bytes {bu.get('bytes', 0):.0f} · "
+                f"failed proposals {bu.get('failed_proposals', 0):.0f} · "
+                f"peak mem {bu.get('peak_mem_mb', 0):.0f} MB"
+            ),
+            "dim",
+        )
+    )
     out.append((f"nonclaims: {'; '.join(r.get('nonclaims', []))}", "dim"))
     return out
 
@@ -410,15 +579,27 @@ def receipt(v: RunView, width: int = 100) -> list[Line]:
 def events(v: RunView, width: int = 100, limit: int = 40) -> list[Line]:
     """Newest records across this run's jsonl streams (by file mtime, then position)."""
     out: list[Line] = [("EVENT STREAM (newest last)", "hdr")]
-    files = sorted([*(v.path / "run").glob("*.jsonl"), *(v.path / "learning").glob("*.jsonl")],
-                   key=lambda p: p.stat().st_mtime)
+    files = sorted(
+        [*(v.path / "run").glob("*.jsonl"), *(v.path / "learning").glob("*.jsonl")],
+        key=lambda p: p.stat().st_mtime,
+    )
     recs: list[tuple[str, dict[str, Any]]] = []
     for f in files:
         for d in v.rows(str(f.relative_to(v.path)))[-limit:]:
             recs.append((f.stem, d))
     for name, d in recs[-limit:]:
-        keys = ("episode_id", "sample_id", "msg_id", "event", "op", "reason", "eligibility", "arm",
-                "bytes", "text")
+        keys = (
+            "episode_id",
+            "sample_id",
+            "msg_id",
+            "event",
+            "op",
+            "reason",
+            "eligibility",
+            "arm",
+            "bytes",
+            "text",
+        )
         body = " ".join(f"{k}={str(d[k])[:36]}" for k in keys if k in d)
         out.append((f"  {name[:14]:<14} {body}"[: width - 1], "dim"))
     if len(out) == 1:
@@ -430,29 +611,52 @@ def _safe(fn: Callable[[RunView, int], list[Line]]) -> Callable[[RunView, int], 
     def wrapped(v: RunView, width: int = 100) -> list[Line]:
         try:
             return fn(v, width)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             return [(f"{fn.__name__}: unavailable ({type(e).__name__}: {e})", "bad")]
 
     wrapped.__name__ = fn.__name__
     return wrapped
 
 
-PANELS = {k: _safe(f) for k, f in {"overview": overview, "mechanism": mechanism, "data": data,
-                                    "receipt": receipt, "events": events}.items()}
+PANELS = {
+    k: _safe(f)
+    for k, f in {
+        "overview": overview,
+        "mechanism": mechanism,
+        "data": data,
+        "receipt": receipt,
+        "events": events,
+    }.items()
+}
 
 
 def list_rows(views: list[RunView]) -> list[Line]:
-    out: list[Line] = [(f"{'run':<17}{'experiment':<22}{'stage':<18}{'result':<14}{'updated'}", "hdr")]
+    out: list[Line] = [
+        (f"{'run':<17}{'experiment':<22}{'stage':<18}{'result':<14}{'updated'}", "hdr")
+    ]
     for v in views:
         cur = next((s for s in v.stages if s.state in ("running", "stalled")), None)
-        stage = (f"{GLYPH[cur.state]} {cur.name} {cur.detail}" if cur else
-                 "✓ done" if v.receipt else "· idle")
+        stage = (
+            f"{GLYPH[cur.state]} {cur.name} {cur.detail}"
+            if cur
+            else "✓ done"
+            if v.receipt
+            else "· idle"
+        )
         res = (v.receipt or {}).get("decision", "—")
         sty = {"PROMOTE": "ok", "NO_CANDIDATE": "bad", "INCONCLUSIVE": "warn"}.get(res, "dim")
         age = int(time.time() - v.updated)
-        ago = f"{age // 3600}h{age % 3600 // 60:02d}m ago" if age >= 3600 else f"{age // 60}m ago" if age >= 60 else f"{age}s ago"
-        out.append((f"{v.digest16:<17}{v.title[:21]:<22}{stage[:17]:<18}{res:<14}{ago}", sty if not cur else "acc"))
+        ago = (
+            f"{age // 3600}h{age % 3600 // 60:02d}m ago"
+            if age >= 3600
+            else f"{age // 60}m ago"
+            if age >= 60
+            else f"{age}s ago"
+        )
+        out.append(
+            (
+                f"{v.digest16:<17}{v.title[:21]:<22}{stage[:17]:<18}{res:<14}{ago}",
+                sty if not cur else "acc",
+            )
+        )
     return out
-
-
-_ = read_json  # re-exported for tests

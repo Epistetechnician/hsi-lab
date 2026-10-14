@@ -1,9 +1,10 @@
 """Experiment packet schema. Frozen packets are immutable; changes require a new packet."""
+
 from __future__ import annotations
 
 import hashlib
 import json
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -16,7 +17,7 @@ class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
 
-class Outcome(str, Enum):
+class Outcome(StrEnum):
     PROMOTE = "PROMOTE"
     NO_CANDIDATE = "NO_CANDIDATE"
     INCONCLUSIVE = "INCONCLUSIVE"

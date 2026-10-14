@@ -1,4 +1,5 @@
 """Hand-off bundle for the independent validator: validator/ + receipt + frozen packet only."""
+
 from __future__ import annotations
 
 import shutil

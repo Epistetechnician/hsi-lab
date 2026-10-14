@@ -1,4 +1,5 @@
 """Codec interface (F6). Byte counts include schema header and provenance."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -25,7 +26,10 @@ class Codec(Protocol):
 
 
 def fit_to_budget(codec: Codec, trace: Trace, budget: int) -> bytes:
-    """Longest whole-step prefix whose encoding fits `budget` bytes; b'' if even the header doesn't."""
+    """Longest whole-step prefix whose encoding fits `budget` bytes.
+
+    Returns b'' if even the header does not fit.
+    """
     best = b""
     for k in range(len(trace.steps) + 1):
         data = codec.encode(trace.prefix(k))

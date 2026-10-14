@@ -21,7 +21,9 @@ def proposal(parents: list[str], tamper: bool = False):  # type: ignore[no-untyp
     p = Proposer([(s, 0, w.transition(s, 0))], ["r0"], "k")
     ep = p.propose("syn-0", "rule_induction", Split.FIT, 3)
     if tamper:
-        st = ep.steps[0].model_copy(update={"observation": [(x + 1) % 7 for x in ep.steps[0].observation]})
+        st = ep.steps[0].model_copy(
+            update={"observation": [(x + 1) % 7 for x in ep.steps[0].observation]}
+        )
         ep = ep.model_copy(update={"steps": [st]})
     return ep.model_copy(update={"parent_ids": parents})
 
@@ -35,7 +37,10 @@ def test_accepts_true_rejects_false_and_provenance_free() -> None:
     good = good.model_copy(update={"steps": [st]})
     assert v.verify(good).episode.eligibility is Eligibility.ELIGIBLE
     assert v.verify(good).reason == "ambiguous_duplicate"
-    assert Verifier(w).verify(good.model_copy(update={"parent_ids": []})).reason == "provenance_missing"
+    assert (
+        Verifier(w).verify(good.model_copy(update={"parent_ids": []})).reason
+        == "provenance_missing"
+    )
     bad = good.model_copy(update={"steps": [st.model_copy(update={"observation": [9] * 5})]})
     assert Verifier(w).verify(bad).reason == "outcome_mismatch"
 
@@ -54,8 +59,13 @@ def test_e2_pipeline_and_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     monkeypatch.setenv("HSI_RUN_ROOT", str(tmp_path / "runs"))
     monkeypatch.setenv("HSI_CUSTODY_ROOT", str(tmp_path / "custody"))
     t = template("E2")
-    t["params"] = {**t["params"], "families": ["rule_induction"], "pilot_tasks": 4, "min_n": 8,  # type: ignore[dict-item]
-                   "max_n": 8}
+    t["params"] = {
+        **t["params"],
+        "families": ["rule_induction"],
+        "pilot_tasks": 4,
+        "min_n": 8,  # type: ignore[dict-item]
+        "max_n": 8,
+    }
     (tmp_path / "p.json").write_text(json.dumps(t))
     assert main(["packet", "freeze", str(tmp_path / "p.json")]) == 0
     f = str(tmp_path / "p.frozen.json")
@@ -68,12 +78,20 @@ def test_e2_pipeline_and_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     r = json.loads(rc.read_text())
     assert r["guardrail_values"]["lineage_fraction"] == 1.0
     # every eligible example in the examples ledger traces to a decision and a quarantine record
-    dec = {json.loads(x)["episode_id"] for x in (rd / "run/decisions.jsonl").read_text().splitlines()}
-    quar = {json.loads(x)["episode_id"] for x in (rd / "run/quarantine.jsonl").read_text().splitlines()}
+    dec = {
+        json.loads(x)["episode_id"] for x in (rd / "run/decisions.jsonl").read_text().splitlines()
+    }
+    quar = {
+        json.loads(x)["episode_id"] for x in (rd / "run/quarantine.jsonl").read_text().splitlines()
+    }
     for line in (rd / "run/examples.jsonl").read_text().splitlines():
         e = json.loads(line)
         if e["origin"] == "generated" and e["episode_id"].startswith("verified"):
-            assert e["eligibility"] == "eligible" and e["episode_id"] in dec and e["episode_id"] in quar
+            assert (
+                e["eligibility"] == "eligible"
+                and e["episode_id"] in dec
+                and e["episode_id"] in quar
+            )
     # tampering with a verified receipt's guardrail is caught
     r["guardrail_values"]["lineage_fraction"] = 0.5
     rc.write_text(json.dumps(r))

@@ -3,6 +3,7 @@
 It must not import the verifier, the environment world, the evaluator, or any path/custody code
 (enforced by tests/property/test_isolation.py). Writes only to the quarantine queue.
 """
+
 from __future__ import annotations
 
 import random
@@ -29,9 +30,20 @@ class Proposer:
         self._k += 1
         claimed = self._model.next(start, a)
         return Episode(
-            episode_id=episode_id, env_version=SYN_ENV, family=family, rule_family="unknown",
-            split=split, seed=seed, start=list(start),
+            episode_id=episode_id,
+            env_version=SYN_ENV,
+            family=family,
+            rule_family="unknown",
+            split=split,
+            seed=seed,
+            start=list(start),
             steps=[Step(action=a, agent=0, observation=list(claimed), reward=0.0)],
-            outcome=EpisodeOutcome(success=False, steps=1, oracle_steps=0), origin=Origin.GENERATED,
-            parent_ids=list(self._parents), generation_depth=1, governance="synthetic-local",
-            eligibility=Eligibility.QUARANTINED, prev_digest="", digest="")
+            outcome=EpisodeOutcome(success=False, steps=1, oracle_steps=0),
+            origin=Origin.GENERATED,
+            parent_ids=list(self._parents),
+            generation_depth=1,
+            governance="synthetic-local",
+            eligibility=Eligibility.QUARANTINED,
+            prev_digest="",
+            digest="",
+        )

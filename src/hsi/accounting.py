@@ -1,4 +1,5 @@
 """Resource accounting (F19) and budget conservation."""
+
 from __future__ import annotations
 
 import resource
@@ -28,8 +29,14 @@ class Meter:
         d["peak_mem_mb"] = peak_mb
         return d
 
-    def charge(self, *, tokens: int = 0, calls: int = 0, bytes: int = 0,
-               limits: dict[str, int] | None = None) -> None:
+    def charge(
+        self,
+        *,
+        tokens: int = 0,
+        calls: int = 0,
+        bytes: int = 0,
+        limits: dict[str, int] | None = None,
+    ) -> None:
         self.tokens += tokens
         self.calls += calls
         self.bytes += bytes

@@ -2,6 +2,7 @@
 
 Never imports synthesis: it sees proposals as plain episodes, never generator state.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -20,9 +21,13 @@ class Decision:
 
     def record(self) -> dict[str, object]:
         ep = self.episode
-        return {"episode_id": ep.episode_id, "eligibility": ep.eligibility.value, "reason": self.reason,
-                "parent_ids": ep.parent_ids,
-                "content_digest": canonical_digest([ep.start, [s.model_dump() for s in ep.steps]])}
+        return {
+            "episode_id": ep.episode_id,
+            "eligibility": ep.eligibility.value,
+            "reason": self.reason,
+            "parent_ids": ep.parent_ids,
+            "content_digest": canonical_digest([ep.start, [s.model_dump() for s in ep.steps]]),
+        }
 
 
 class Verifier:
@@ -36,8 +41,11 @@ class Verifier:
 
         if not ep.parent_ids:
             return rej("provenance_missing")
-        if len(ep.steps) != 1 or not 0 <= ep.steps[0].action < N_ACTIONS \
-                or len(ep.start) != len(ep.steps[0].observation):
+        if (
+            len(ep.steps) != 1
+            or not 0 <= ep.steps[0].action < N_ACTIONS
+            or len(ep.start) != len(ep.steps[0].observation)
+        ):
             return rej("invalid")
         start, a = tuple(ep.start), ep.steps[0].action
         if (start, a) in self._seen:
