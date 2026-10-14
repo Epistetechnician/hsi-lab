@@ -546,8 +546,8 @@ def receipt(v: RunView, width: int = 100) -> list[Line]:
                 extra += f" | {gvals['eval_diversity_' + a]:.2f}"
             out.append(
                 (
-                    f"  {a:<14} {bar(val, 16)} {val:.2f} | {gvals.get('eval_consistent_' + a, 0):.2f}"
-                    + extra,
+                    f"  {a:<14} {bar(val, 16)} {val:.2f} | "
+                    f"{gvals.get('eval_consistent_' + a, 0):.2f}" + extra,
                     "",
                 )
             )
