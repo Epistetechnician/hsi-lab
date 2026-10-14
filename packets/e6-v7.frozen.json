@@ -1,0 +1,92 @@
+{
+  "packet": {
+    "arms": [
+      "d1_replay",
+      "d1_no_replay",
+      "d2_replay",
+      "d2_no_replay",
+      "d3_replay",
+      "d3_no_replay",
+      "real_only",
+      "frozen_base"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "Confirmatory (pre-registered after the exploratory depth-2 signal in E6 v6): on unseen worlds of trained rule families, at recursion depth 2 the generator trained with original-data replay produces more valid, evidence-consistent hypotheses than the one trained on its own outputs alone: d2 replay beats d2 no-replay.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d2 replay does not beat d2 no-replay by the threshold.",
+    "params": {
+      "adapt_batch": 8,
+      "adapt_lr": 0.0001,
+      "adapt_steps": 300,
+      "backbone": "llm",
+      "baselines": [
+        "d2_no_replay"
+      ],
+      "depth": 2,
+      "diversity_floor_frac": 0.5,
+      "eval_mode": "ground",
+      "extra_arms": true,
+      "families": [
+        "rule_induction@tune",
+        "compositional_transfer@tune"
+      ],
+      "gen_max_tokens": 20,
+      "generations": 3,
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "max_n": 400,
+      "min_n": 100,
+      "model": "qwen2.5-7b",
+      "n_adapt": 50,
+      "n_demos": 2,
+      "n_replay": 50,
+      "n_replay_tune": 50,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 30,
+      "pinned_adapters": {
+        "d1_no_replay": "350c253ef058b2389949f73f298f1b777340f437cf2e2d11e35668e8ee75ba15",
+        "d1_replay": "84ae1b1cd4bf10429ab3b261b67f36ee185b000935f6273e1deaa31e6e8058c2",
+        "d2_no_replay": "d6ac1d16f2313710dc412a4faa7378059f25787b4547ab7fb202d90872c49356",
+        "d2_replay": "ff761cc5675d4d22c06e3bc396534d75785df95ee08cf180a6d7bcd8a61063f8",
+        "d3_no_replay": "adc92408c7a56b25489c75286efc2612270908a5c84eac612baa1c60b4080ed7",
+        "d3_replay": "be1fe78c6d0b4e44bc6fbe63df25839ecba10776dc50d37f5a9e567010d3762b",
+        "real_only": "d636a25610d64bd29a040e3f3c3a7b93920ec8a20afbc11a41bc2f64e94d75e6"
+      },
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "rank": 8,
+      "reuse_from": "5ace07853340f87d",
+      "support": 8,
+      "target_terminator": "\n",
+      "treatment": "d2_replay",
+      "tune_offset": 500000
+    },
+    "primary_metric": "grounded_generation_rate_diff_d2_replay_minus_d2_no_replay",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 7
+  },
+  "packet_digest": "573cc437b361b586fe268cb6abc9ec9a711521b76be000c976cef7c7cc257fa4"
+}

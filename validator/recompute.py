@@ -72,7 +72,7 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
         return diff >= -g["fit_regression_floor"] and g["compute_matched_fraction"] == 1.0
     if exp == "E6":
         q = pk["params"]
-        gens = q["generations"]
+        gens = q.get("depth", q["generations"])
         tot, ok = {}, {}
         for r in receipt["family_results"]:
             tot[r["arm"]] = tot.get(r["arm"], 0) + r["n"]

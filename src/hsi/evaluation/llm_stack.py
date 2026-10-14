@@ -10,6 +10,7 @@ from typing import Any
 from hsi.contracts.io import load_json
 from hsi.contracts.packet import Packet, canonical_digest
 from hsi.contracts.records import Split
+from hsi.environment import SEED_BASE
 from hsi.errors import DigestError
 from hsi.evaluation.base import TaskResult
 from hsi.evaluation.learned import _save, run_prior_task
@@ -519,6 +520,40 @@ def run_generation_task(
     )
 
 
+IN_DIST = "@tune"  # family suffix: unseen worlds from a TRAINED rule family, drawn from the lock
+
+
+def _collides(o: int, packet: Packet) -> bool:
+    """True if offset o falls in a seed range used for training, replay, demos or pilot."""
+    q = packet.params
+    n_adapt, n_rt = int(q["n_adapt"]), int(q.get("n_replay_tune", 0))
+    off = int(q.get("tune_offset", 0))
+    return (
+        o < n_adapt + 50 + n_rt
+        or off <= o < off + 200
+        or 700_000 <= o < 700_100
+    )  # fmt: skip
+
+
+def resolve_world(family: str, split: Split, seed: int, packet: Packet) -> tuple[str, Split, int]:
+    """Map a packet family label to (rule-world family, split, seed).
+
+    "<fam>@tune" under the locked (held-out) cohort keeps the lock's random offset but builds the
+    world in the TUNE seed range, i.e. an unseen world of a rule family the model was trained on.
+    Offsets that collide with training/pilot seeds are shifted deterministically (identical
+    for every arm, so pairing is preserved).
+    """
+    if not family.endswith(IN_DIST):
+        return family, split, seed
+    base = family[: -len(IN_DIST)]
+    if split is not Split.HELDOUT:
+        return base, split, seed
+    o = seed - SEED_BASE[Split.HELDOUT]
+    while _collides(o, packet):
+        o = (o + 7_919) % 1_000_000
+    return base, Split.TUNE, SEED_BASE[Split.TUNE] + o
+
+
 def run_grounding_task(
     llm: Any, arm: str, family: str, split: Split, seed: int, packet: Packet
 ) -> TaskResult:
@@ -532,12 +567,13 @@ def run_grounding_task(
     from hsi.learning.prior import true_index
 
     support = int(packet.params["support"])
-    env = RuleWorld(family, split, seed)
-    trans = transitions_of(teacher_trace(RuleWorld(family, split, seed), support, tag="/support"))
+    fam0, split0, seed0 = resolve_world(family, split, seed, packet)
+    env = RuleWorld(fam0, split0, seed0)
+    trans = transitions_of(teacher_trace(RuleWorld(fam0, split0, seed0), support, tag="/support"))
     per: dict[int, list[tuple[Any, Any]]] = {}
     for st, a, st2 in trans:
         per.setdefault(a, []).append((st, st2))
-    a = random.Random(f"ground/{seed}").choice(sorted(per))
+    a = random.Random(f"ground/{seed0}").choice(sorted(per))
     pairs = per[a]
     text = llm.generate(render_prompt(pairs), int(packet.params["gen_max_tokens"]))
     h = parse_hypothesis(text)

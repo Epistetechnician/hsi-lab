@@ -86,7 +86,7 @@ class E6Spec:
         man = self.manifest
         cands = man["candidates"]
         assert isinstance(cands, dict)
-        gens = int(packet.params["generations"])
+        gens = int(packet.params.get("depth", packet.params["generations"]))
         ground = packet.params.get("eval_mode") == "ground"
         if ground:  # diversity of the model's own outputs on held-out prompts, per arm
             div = {

@@ -35,6 +35,12 @@ E1_PARAMS = {
 }
 
 
+GEN_VARIANTS = {"llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"}
+TERMINATED = {"llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"}
+SEVEN_B = {"llm-gen3", "llm-ground", "llm-confirm"}
+VERSIONS = {"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5, "llm-ground": 6, "llm-confirm": 7}
+
+
 def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION,
@@ -283,7 +289,14 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "families beyond 2 points.",
             params=p,
         )
-    if exp == "E6" and variant in ("llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
+    if exp == "E6" and variant in (
+        "llm",
+        "llm-gen",
+        "llm-gen2",
+        "llm-gen3",
+        "llm-ground",
+        "llm-confirm",
+    ):
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
             p.pop(k, None)
@@ -303,25 +316,16 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             min_n=30,
             max_n=100,
         )
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
+        if variant in GEN_VARIANTS:
             p.update(eval_mode="generate", extra_arms=True, diversity_floor_frac=0.0)
-        if variant in (
-            "llm-gen2",
-            "llm-gen3",
-            "llm-ground",
-        ):  # v4+: stop marker (v3 never terminated)
+        if variant in TERMINATED:  # v4+: stop marker (v3 never terminated)
             p.update(target_terminator="\n", adapt_steps=300)
-        if variant in (
-            "llm-gen3",
-            "llm-ground",
-        ):  # v5: 7B generator, original data includes tune-type worlds
+        if variant in SEVEN_B:  # v5+: 7B generator, original data includes tune-type worlds
             p.update(model="qwen2.5-7b", n_replay_tune=50)
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
+        if variant in GEN_VARIANTS:
             t["arms"] = [*t["arms"], "real_only", "frozen_base"]  # type: ignore[misc]
         t.update(
-            version={"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5, "llm-ground": 6}[
-                variant
-            ],
+            version=VERSIONS[variant],
             hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), "
             "training "
             "each generation on the previous generation's own hypotheses collapses "
@@ -329,13 +333,13 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "d3 with replay beats d3 without.",
             params=p,
         )
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
+        if variant in GEN_VARIANTS:
             t["hypothesis"] = (
                 "When held-out success is measured by the model's own free-text hypotheses (no "
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
                 "original labeled data is replayed: d3 with replay beats d3 without."
             )
-        if variant == "llm-ground":  # v6: generator-level metric; reuse the v5 adapters (pinned)
+        if variant in ("llm-ground", "llm-confirm"):  # v6/v7: generator-level metric, pinned reuse
             from hsi.paths import run_root
 
             src = "5ace07853340f87d"
@@ -352,6 +356,22 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "quality by depth 3 unless original labeled data is replayed: d3 with replay "
                 "beats d3 without."
             )
+        if (
+            variant == "llm-confirm"
+        ):  # v7: confirmatory depth-2 contrast on unseen in-distribution worlds
+            p.update(
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                depth=2, treatment="d2_replay", baselines=["d2_no_replay"],
+            )  # fmt: skip
+            t["primary_metric"] = "grounded_generation_rate_diff_d2_replay_minus_d2_no_replay"
+            t["hypothesis"] = (
+                "Confirmatory (pre-registered after the exploratory depth-2 signal in E6 v6): on "
+                "unseen worlds of trained rule families, at recursion depth 2 the generator "
+                "trained with original-data replay produces more valid, evidence-consistent "
+                "hypotheses than the one trained on its own outputs alone: d2 replay beats d2 "
+                "no-replay."
+            )
+            t["null_hypothesis"] = "d2 replay does not beat d2 no-replay by the threshold."
     if exp in ("E4", "E6"):
         t["budget"] = {
             "max_tokens": 0,
@@ -430,7 +450,7 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument(
         "--variant",
         default="",
-        choices=["", "llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground"],
+        choices=["", "llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"],
     )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)
