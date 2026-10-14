@@ -20,9 +20,14 @@ from typing import Any
 from hsi.agents.learner import HYPOTHESES
 from hsi.environment.world import Prim
 
-MODEL_REPO = "mlx-community/Qwen2.5-1.5B-Instruct-4bit"
-MODEL_REVISION = "8b403126fc14f14cfc99bb4cfa72ecbc129ea677"
-MODEL_LICENSE = "apache-2.0"
+MODELS: dict[str, tuple[str, str, str]] = {  # name -> (HF repo, pinned revision, license)
+    "qwen2.5-1.5b": ("mlx-community/Qwen2.5-1.5B-Instruct-4bit",
+                     "8b403126fc14f14cfc99bb4cfa72ecbc129ea677", "apache-2.0"),
+    "qwen2.5-7b": ("mlx-community/Qwen2.5-7B-Instruct-4bit",
+                   "c26a38f6a37d0a51b4e9a1eb3026530fa35d9fed", "apache-2.0"),
+}
+DEFAULT_MODEL = "qwen2.5-1.5b"
+MODEL_REPO, MODEL_REVISION, MODEL_LICENSE = MODELS[DEFAULT_MODEL]
 RUNTIME = "hsi-llm-v1/mlx"
 MODEL_HOME = Path("~/hsi-models").expanduser()
 
@@ -53,22 +58,24 @@ def few_shot_prompt(pairs: Sequence[tuple[Sequence[int], Sequence[int]]],
     return "".join(shots) + render_prompt(pairs)
 
 
-def model_path(home: Path = MODEL_HOME) -> Path:
-    p = home / "models--mlx-community--Qwen2.5-1.5B-Instruct-4bit" / "snapshots" / MODEL_REVISION
-    if not (p / "model.safetensors").exists():
+def model_path(name: str = DEFAULT_MODEL, home: Path = MODEL_HOME) -> Path:
+    repo, revision, _ = MODELS[name]
+    p = home / f"models--{repo.replace('/', '--')}" / "snapshots" / revision
+    if not list(p.glob("*.safetensors")):
         raise FileNotFoundError(f"checkpoint not found at {p}")
     return p
 
 
 def weights_digest(path: Path) -> str:
-    """sha256 of the checkpoint weights (cached next to the model, not inside it)."""
+    """sha256 over the checkpoint's safetensors files in name order (cached beside the model)."""
     cache = path.parent.parent.parent / f"{path.name}.sha256.json"
     if cache.exists():
         return str(json.loads(cache.read_text())["sha256"])
     h = hashlib.sha256()
-    with (path / "model.safetensors").open("rb") as f:
-        for blk in iter(lambda: f.read(1 << 24), b""):
-            h.update(blk)
+    for f in sorted(path.glob("*.safetensors")):
+        with f.open("rb") as fh:
+            for blk in iter(lambda: fh.read(1 << 24), b""):
+                h.update(blk)
     cache.write_text(json.dumps({"sha256": h.hexdigest(), "revision": path.name}))
     return h.hexdigest()
 
@@ -107,11 +114,12 @@ class LLM:
     """Loaded base model + tokenizer with scoring, LoRA attach/train/save/load, and an exact
     adapter off-switch."""
 
-    def __init__(self, path: Path | None = None) -> None:
+    def __init__(self, path: Path | None = None, name: str = DEFAULT_MODEL) -> None:
         import mlx.core as mx  # noqa: F401
         from mlx_lm.utils import load
 
-        self.path = path or model_path()
+        self.name = name
+        self.path = path or model_path(name)
         res = load(str(self.path))
         self.model, self.tok = res[0], res[1]
         self.model.freeze()

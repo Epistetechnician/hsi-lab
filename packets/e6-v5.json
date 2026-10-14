@@ -1,0 +1,78 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E6",
+  "version": 5,
+  "hypothesis": "When held-out success is measured by the model's own free-text hypotheses (no consistency filter), recursive self-training degrades success by depth 3 unless original labeled data is replayed: d3 with replay beats d3 without.",
+  "null_hypothesis": "d3 with replay does not beat d3 without replay by the threshold.",
+  "arms": [
+    "d1_replay",
+    "d1_no_replay",
+    "d2_replay",
+    "d2_no_replay",
+    "d3_replay",
+    "d3_no_replay",
+    "real_only",
+    "frozen_base"
+  ],
+  "primary_metric": "success_diff_d3_replay_minus_d3_no_replay",
+  "threshold": 0.05,
+  "guardrails": [
+    "generated-task diversity above pilot floor at every depth",
+    "d3_replay not below d1_replay beyond floor"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "pretrain_families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "support": 8,
+    "n_adapt": 50,
+    "adapt_steps": 300,
+    "adapt_lr": 0.0001,
+    "rank": 8,
+    "pilot_tasks": 15,
+    "min_n": 30,
+    "max_n": 100,
+    "tune_offset": 500000,
+    "families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "generations": 3,
+    "diversity_floor_frac": 0.0,
+    "non_collapse_floor": 0.02,
+    "treatment": "d3_replay",
+    "baselines": [
+      "d3_no_replay"
+    ],
+    "backbone": "llm",
+    "n_replay": 50,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "adapt_batch": 8,
+    "gen_max_tokens": 20,
+    "n_demos": 2,
+    "eval_mode": "generate",
+    "extra_arms": true,
+    "target_terminator": "\n",
+    "model": "qwen2.5-7b",
+    "n_replay_tune": 50
+  }
+}

@@ -18,11 +18,13 @@ from hsi.verification import DecisionLog
 _STATE: dict[str, Any] = {}
 
 
-def get_llm() -> Any:
-    from hsi.learning.llm import LLM
+def get_llm(packet: Packet | None = None) -> Any:
+    from hsi.learning.llm import DEFAULT_MODEL, LLM
 
-    if "llm" not in _STATE:
-        _STATE["llm"] = LLM()
+    name = str(packet.params.get("model", DEFAULT_MODEL)) if packet else _STATE.get("name", DEFAULT_MODEL)
+    if _STATE.get("name") != name or "llm" not in _STATE:
+        _STATE.pop("llm", None)
+        _STATE["llm"], _STATE["name"], _STATE["arm"] = LLM(name=name), name, None
     return _STATE["llm"]
 
 
@@ -32,7 +34,7 @@ def _lora_cfg(packet: Packet) -> tuple[int, int, float]:
 
 
 def _ensure_adapter(packet: Packet) -> Any:
-    llm = get_llm()
+    llm = get_llm(packet)
     if not llm._lora:
         r, layers, scale = _lora_cfg(packet)
         llm.attach_lora(r, layers, int(packet.seeds[0]), scale)
@@ -42,9 +44,7 @@ def _ensure_adapter(packet: Packet) -> Any:
 def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
-        MODEL_LICENSE,
-        MODEL_REPO,
-        MODEL_REVISION,
+        MODELS,
         RUNTIME,
         describe,
         render_prompt,
@@ -76,7 +76,8 @@ def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
         "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",
-        "model_repo": MODEL_REPO, "model_revision": MODEL_REVISION, "model_license": MODEL_LICENSE,
+        "model_repo": MODELS[llm.name][0], "model_revision": MODELS[llm.name][1],
+        "model_license": MODELS[llm.name][2], "model_name": llm.name,
         "weights_digest": weights_digest(llm.path), "adapter_digest": adapter_digest,
         "adapter": {"rank": int(q["rank"]), "layers": int(q["lora_layers"]),
                     "scale": float(q["lora_scale"])},
@@ -117,7 +118,7 @@ def model_digest(run_dir: Path) -> str:
 def run_llm_task(arm: str, family: str, split: Split, seed: int, packet: Packet) -> TaskResult:
     from hsi.learning.llm import LLMPrior
 
-    prior = LLMPrior(get_llm(), adapter=(arm == "lora_candidate"))
+    prior = LLMPrior(get_llm(packet), adapter=(arm == "lora_candidate"))
     return run_prior_task(prior, arm, family, split, seed, int(packet.params["support"]))
 
 
@@ -149,9 +150,7 @@ def _demos(packet: Packet) -> list[tuple[Any, str]]:
 def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
-        MODEL_LICENSE,
-        MODEL_REPO,
-        MODEL_REVISION,
+        MODELS,
         RUNTIME,
         describe,
         few_shot_prompt,
@@ -171,6 +170,11 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     for r in slog:
         log.append({**r, "eligibility": "unverified", "used_by": "synthesis-pool"})
     real_pool, _ = build_samples(fams, Split.FIT, range(int(q["n_replay"])), int(q["support"]), True)
+    n_rt = int(q.get("n_replay_tune", 0))
+    if n_rt:  # original labelled data also covers tune-type worlds (disjoint from the synthetic pool)
+        base = int(q["n_adapt"]) + 50
+        extra, _ = build_samples(fams, Split.TUNE, range(base, base + n_rt), int(q["support"]), True)
+        real_pool = real_pool + extra
     n, seed = len(syn), int(packet.seeds[0])
     rng = random.Random(f"e6llm/{seed}")
     cands: dict[str, Any] = {}
@@ -217,7 +221,8 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")), "runtime": RUNTIME,
         "python": sys.version.split()[0], "seeds": packet.seeds, "backbone": "llm",
-        "model_repo": MODEL_REPO, "model_revision": MODEL_REVISION, "model_license": MODEL_LICENSE,
+        "model_repo": MODELS[llm.name][0], "model_revision": MODELS[llm.name][1],
+        "model_license": MODELS[llm.name][2], "model_name": llm.name,
         "weights_digest": weights_digest(llm.path), "candidates": cands,
         "diversity_floor": float(q["diversity_floor_frac"]) * cands["d1_no_replay"]["diversity"],
         "training_log_head": log.head}
@@ -258,7 +263,7 @@ def model_digest_e6(run_dir: Path) -> str:
 def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Packet) -> TaskResult:
     from hsi.learning.llm import LLMPrior
 
-    llm = get_llm()
+    llm = get_llm(packet)
     if arm == "frozen_base":
         llm.set_adapter(False)
         _STATE["arm"] = None
