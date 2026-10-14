@@ -106,16 +106,21 @@ def render(rows: list[dict[str, object]]) -> str:
             f"| {r['experiment']} | {r.get('decision', '—')} | {r['level']} | "
             f"{r.get('commit', '—')} | {r['note']} |"
         )
-    base = [r for r in rows if not str(r["experiment"]).endswith("-llm")]
+    core = {f"E{i}" for i in range(1, 8)}
+    base = [r for r in rows if r["experiment"] in core]
+    var = [r for r in rows if r["experiment"] not in core]
     done = sum(1 for r in base if r["level"] in ("A2", "A3"))
     a3 = sum(1 for r in base if r["level"] == "A3")
+    vdone = sum(1 for r in var if r["level"] in ("A2", "A3"))
+    va3 = sum(1 for r in var if r["level"] == "A3")
     out += [
         "",
         (
-            f"Experiments with an independently recomputed receipt: {done} of 7. "
-            f"Clean-rerun reproduced (A3): {a3} of 7. A4 (independent party + human spot-check) "
-            "has not been performed for any experiment. "
-            "The -llm rows are the MLX-backbone variants of E4 and E6."
+            f"Base experiments E1-E7 with an independently recomputed receipt: {done} of 7. "
+            f"Clean-rerun reproduced (A3): {a3} of 7. "
+            f"Variants (MLX-backbone and follow-up packets: {', '.join(r['experiment'] for r in var)}): "
+            f"{vdone} of {len(var)} recomputed, {va3} of {len(var)} reproduced. "
+            "A4 (independent party + human spot-check) has not been performed for any experiment."
         ),
     ]
     return "\n".join(out) + "\n"
