@@ -313,3 +313,9 @@ replay, non-collapse guardrail fails; the 1.5B generator is consistent with the 
 the time, so confident wrong hypotheses dominate the metric. v4 also shows the earlier LLM E6
 "collapse" was confounded by missing terminators (correction appended to E6-llm.md). Receipt
 `docs/experiments/E6-llmgen-receipt.json`, reproduced (A3). See docs/experiments/E6-llmgen.md.
+
+E6 on the 7B backbone (packet e6-v5): INCONCLUSIVE, replay 0.000 [-0.057, +0.057] vs no replay.
+Qwen2.5-7B-Instruct 4-bit (Apache-2.0) is a clearly better generator but held-out rule types
+remain out of distribution, so success sits at the fallback floor for all arms. Generator-level
+diversity falls with depth, less with replay. Receipt `docs/experiments/E6-llm7b-receipt.json`;
+see docs/experiments/E6-llm7b.md. Clean-environment reproduction pending.

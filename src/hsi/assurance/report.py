@@ -18,7 +18,7 @@ LEVELS = [
            + " matches 100% of aggregates"),
     ("A4", "Rerun by an independent party/machine plus a human spot-check"),
 ]
-ALL = ["E1", "E2", "E3", "E4", "E4-llm", "E5", "E6", "E6-llm", "E6-llmgen", "E7"]  # *-llm: MLX-backbone variants
+ALL = ["E1", "E2", "E3", "E4", "E4-llm", "E5", "E6", "E6-llm", "E6-llmgen", "E6-llm7b", "E7"]  # *-llm: MLX-backbone variants
 
 
 def _packet_for(digest: str) -> Path | None:
