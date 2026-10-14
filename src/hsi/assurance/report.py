@@ -107,6 +107,7 @@ def render(rows: list[dict[str, object]]) -> str:
             f"{r.get('commit', '—')} | {r['note']} |"
         )
     core = {f"E{i}" for i in range(1, 8)}
+    names = ", ".join(str(r["experiment"]) for r in rows if r["experiment"] not in core)
     base = [r for r in rows if r["experiment"] in core]
     var = [r for r in rows if r["experiment"] not in core]
     done = sum(1 for r in base if r["level"] in ("A2", "A3"))
@@ -118,7 +119,7 @@ def render(rows: list[dict[str, object]]) -> str:
         (
             f"Base experiments E1-E7 with an independently recomputed receipt: {done} of 7. "
             f"Clean-rerun reproduced (A3): {a3} of 7. "
-            f"Variants (MLX-backbone and follow-up packets: {', '.join(r['experiment'] for r in var)}): "
+            f"Variants (MLX-backbone and follow-up packets: {names}): "
             f"{vdone} of {len(var)} recomputed, {va3} of {len(var)} reproduced. "
             "A4 (independent party + human spot-check) has not been performed for any experiment."
         ),
