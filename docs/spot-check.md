@@ -196,3 +196,16 @@ d3_no_replay → d3_replay (receipt: diff 0.0141, CI [-0.0106, 0.0388])
 Guardrails: {'diversity_floor': 0.15602001205706564, 'min_replay_diversity': 0.39310467378251435, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.1652542372881356, 'rate_d3_replay': 0.09887005649717515}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-confirm — receipt `8dd868227d8d`, threshold 0.05, decision NO_CANDIDATE
+
+d2_no_replay → d2_replay (receipt: diff -0.0015, CI [-0.0165, 0.0134])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction@tune | 328 | 8 | 9 | 9 | 302 |
+| compositional_transfer@tune | 328 | 3 | 3 | 4 | 318 |
+
+Guardrails: {'diversity_floor': 0.16225727465384066, 'min_replay_diversity': 0.37726109285765164, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.06707317073170732, 'rate_d2_replay': 0.0350609756097561}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)

@@ -326,3 +326,9 @@ without replay, grounded generation halves by depth 2 and output diversity falls
 holds diversity and delays the quality decline. Exact match is 0 for all arms (held-out rule types are
 out of vocabulary). Adapters reused from the 7B run via digest pinning (fail-closed). Receipt
 `docs/experiments/E6-ground-receipt.json`; see docs/experiments/E6-ground.md.
+
+E6 confirmatory (packet e6-v7): NO_CANDIDATE. Pre-registered depth-2 replay contrast on fresh
+in-distribution worlds: -0.002 [-0.016, +0.013]; the +0.08 exploratory signal from e6-v6 did not
+replicate. Training on the model's own mostly-invalid text hurts generation immediately (0.078 vs
+0.329 for the oracle-labelled reference); replay preserves output diversity but not quality.
+Receipt `docs/experiments/E6-confirm-receipt.json`; see docs/experiments/E6-confirm.md.
