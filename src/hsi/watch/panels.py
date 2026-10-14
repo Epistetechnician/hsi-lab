@@ -29,12 +29,13 @@ def spark(vals: list[float], lo: float = 0.0, hi: float = 1.0) -> str:
     return "".join(ticks[max(0, min(7, int((v - lo) / ((hi - lo) or 1) * 7.99)))] for v in vals)
 
 
-def eta(done: float, total: float, started: float, now: float | None = None) -> str:
+def eta(done: float, total: float, started: float, now: float | None = None,
+        rate: float = 0.0) -> str:
+    """ETA from the recent seconds-per-unit EMA if the producer reports it, else the average."""
     now = now or time.time()
     if done <= 0 or total <= 0 or done >= total:
         return ""
-    rate = done / max(1e-9, now - started)
-    s = (total - done) / rate
+    s = (total - done) * (rate if rate > 0 else (now - started) / done)
     return f"eta {int(s // 3600)}h{int(s % 3600 // 60):02d}m" if s >= 3600 else f"eta {int(s // 60)}m{int(s % 60):02d}s"
 
 
@@ -107,7 +108,7 @@ def overview(v: RunView, width: int = 100) -> list[Line]:
             frac = p["done"] / p["total"] if p.get("total") else 0.0
             age = int(time.time() - p.get("updated", 0))
             out.append((f"  {p['stage']:<15} {bar(frac, 24)} {p['done']}/{p['total']} "
-                        f"{eta(p['done'], p['total'], p['started'])}", "acc"))
+                        f"{eta(p['done'], p['total'], p['started'], rate=p.get('rate', 0.0))}", "acc"))
             if p.get("note"):
                 out.append((f"    {p['note']}  (updated {age}s ago)", "dim"))
     elif not v.receipt and v.stages[1].state == "running" and expected_adapters(v):

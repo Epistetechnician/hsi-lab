@@ -82,6 +82,7 @@ def test_helpers() -> None:
     b = ci_bar(0.1, 0.05, 0.15, 0.05, width=41)
     assert len(b) == 41 and b.index("●") > b.index("|") and "[" in b and "]" in b
     assert eta(50, 100, started=0, now=100) == "eta 1m40s" and eta(0, 10, 0, 5) == ""
+    assert eta(50, 100, started=0, now=100, rate=4.0) == "eta 3m20s"  # recent rate wins
 
 
 def test_watch_never_touches_custody() -> None:

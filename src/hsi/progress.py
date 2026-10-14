@@ -19,11 +19,18 @@ class Progress:
         self.started = time.time()
         self.done = 0
         self.total = 0
+        self._last_t, self._last_done, self.rate = self.started, 0, 0.0  # rate: EMA of s/unit
 
     def update(self, done: int, total: int, note: str = "") -> None:
+        now = time.time()
+        if done > self._last_done and now > self._last_t:
+            inst = (now - self._last_t) / (done - self._last_done)
+            self.rate = inst if self.rate == 0 else 0.8 * self.rate + 0.2 * inst
+            self._last_t, self._last_done = now, done
         self.done, self.total = done, total
         self._write({"stage": self.stage, "done": done, "total": total, "note": note,
-                     "started": self.started, "updated": time.time(), "finished": None})
+                     "started": self.started, "updated": now, "finished": None,
+                     "rate": self.rate})
 
     def finish(self, note: str = "") -> None:
         self._write({"stage": self.stage, "done": self.total, "total": self.total, "note": note,
