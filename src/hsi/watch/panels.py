@@ -533,15 +533,21 @@ def receipt(v: RunView, width: int = 100) -> list[Line]:
         out.append((f"  {k:<34} {val:.4g}", ""))
     gen = {k: val for k, val in r["guardrail_values"].items() if k.startswith("eval_valid_")}
     if gen:
-        out.append(("EVAL-TIME GENERATION (valid | consistent with evidence)", "hdr"))
+        out.append(
+            ("EVAL-TIME GENERATION  valid | consistent with evidence | exact | diversity", "hdr")
+        )
+        gvals = r["guardrail_values"]
         for k, val in gen.items():
             a = k[len("eval_valid_") :]
+            extra = ""
+            if "eval_exact_" + a in gvals:
+                extra += f" | {gvals['eval_exact_' + a]:.2f}"
+            if "eval_diversity_" + a in gvals:
+                extra += f" | {gvals['eval_diversity_' + a]:.2f}"
             out.append(
                 (
-                    (
-                        f"  {a:<14} {bar(val, 16)} {val:.2f} | "
-                        f"{r['guardrail_values'].get('eval_consistent_' + a, 0):.2f}"
-                    ),
+                    f"  {a:<14} {bar(val, 16)} {val:.2f} | {gvals.get('eval_consistent_' + a, 0):.2f}"
+                    + extra,
                     "",
                 )
             )

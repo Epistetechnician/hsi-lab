@@ -18,6 +18,17 @@ from hsi.evaluation.base import TaskResult
 from hsi.evaluation.learned import Stack, load_stack, prepare_e6, prior_for, run_prior_task
 
 
+def sig_entropy(sigs: list[str]) -> float:
+    """Normalized Shannon entropy of hypothesis signatures (21 classes: 20 shapes + invalid)."""
+    import math
+    from collections import Counter
+
+    n = len(sigs)
+    return (
+        -sum(c / n * math.log(c / n) for c in Counter(sigs).values()) / math.log(21) if n else 0.0
+    )
+
+
 class E6Spec:
     stack: Stack | None = None
 
@@ -76,13 +87,22 @@ class E6Spec:
         cands = man["candidates"]
         assert isinstance(cands, dict)
         gens = int(packet.params["generations"])
-        min_div = min(float(cands[f"d{g}_replay"]["diversity"]) for g in range(1, gens + 1))
+        ground = packet.params.get("eval_mode") == "ground"
+        if ground:  # diversity of the model's own outputs on held-out prompts, per arm
+            div = {
+                a: sig_entropy([str(d["sig"]) for r in results if r.arm == a for d in r.decisions])
+                for a in sorted({r.arm for r in results})
+            }
+            min_div = min(div[f"d{g}_replay"] for g in range(1, gens + 1))
+            floor = float(packet.params["diversity_floor_frac"]) * div["d1_no_replay"]
+        else:  # diversity of the texts used to train each generation (from the manifest)
+            min_div = min(float(cands[f"d{g}_replay"]["diversity"]) for g in range(1, gens + 1))
+            floor = float(man["diversity_floor"])
 
         def rate(arm: str) -> float:
             rs = [r for r in results if r.arm == arm]
             return sum(r.success for r in rs) / len(rs)
 
-        floor = float(man["diversity_floor"])
         gv = {
             "min_replay_diversity": min_div,
             "diversity_floor": floor,
@@ -100,6 +120,10 @@ class E6Spec:
                 tot = sum(r.stats["gen_seen"] for r in rs)
                 gv[f"eval_valid_{arm}"] = sum(r.stats["gen_valid"] for r in rs) / tot
                 gv[f"eval_consistent_{arm}"] = sum(r.stats["gen_consistent"] for r in rs) / tot
+                if "gen_exact" in rs[0].stats:
+                    gv[f"eval_exact_{arm}"] = sum(r.stats["gen_exact"] for r in rs) / tot
+                if ground:
+                    gv[f"eval_diversity_{arm}"] = div[arm]
         held = (
             min_div >= floor
             and gv[f"rate_d{gens}_replay"] - gv["rate_d1_replay"] >= -gv["non_collapse_floor"]

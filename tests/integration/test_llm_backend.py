@@ -63,3 +63,19 @@ def test_lora_identity_reversible_and_base_frozen(llm, tmp_path: Path) -> None: 
     d = llm.save_adapter(tmp_path / "a.safetensors")
     assert d == llm.adapter_digest() and weights_digest(llm.path) == before
     assert (tmp_path / "a.safetensors").exists()
+
+
+def test_grounding_probe_shape(llm) -> None:  # type: ignore[no-untyped-def]
+    from hsi.cli import template
+    from hsi.contracts.packet import Packet
+    from hsi.contracts.records import Split
+    from hsi.evaluation.llm_stack import run_grounding_task
+
+    t = template("E6", "llm-gen3")
+    pk = Packet.model_validate(
+        {**t, "params": {**t["params"], "eval_mode": "ground"}}, strict=False
+    )
+    r = run_grounding_task(llm, "frozen_base", "rule_induction", Split.TUNE, 1_500_000, pk)
+    assert r.episodes == [] and r.stats["gen_seen"] == 1.0
+    assert r.success == bool(r.stats["gen_consistent"]) <= bool(r.stats["gen_valid"])
+    assert r.decisions[0]["sig"]

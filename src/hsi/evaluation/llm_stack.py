@@ -181,6 +181,81 @@ def _demos(packet: Packet) -> list[tuple[Any, str]]:
     return [(x.pairs, describe(HYPOTHESES[x.label])) for x in picked]
 
 
+TRAIN_KEYS = (
+    "model", "n_adapt", "n_replay", "n_replay_tune", "support", "rank", "lora_layers",
+    "lora_scale", "adapt_steps", "adapt_lr", "adapt_batch", "gen_max_tokens", "n_demos",
+    "target_terminator", "generations", "extra_arms", "pretrain_families",
+)  # fmt: skip
+
+
+def _check_pinned(cands: dict[str, Any], pinned: dict[str, str] | None) -> None:
+    """Fail closed unless every adapter digest equals the packet's pinned digest."""
+    if not pinned:
+        return
+    got = {a: i["digest"] for a, i in cands.items()}
+    if got != pinned:
+        bad = sorted(a for a in set(got) | set(pinned) if got.get(a) != pinned.get(a))
+        raise DigestError(f"adapters differ from the packet's pinned digests: {bad}")
+
+
+def try_reuse_adapters(packet: Packet, run_dir: Path) -> bool:
+    """Reuse previously trained adapters (packet params `reuse_from`) when the training recipe is
+    identical and their digests equal `pinned_adapters`. Returns False to fall back to training;
+    raises if the source adapters exist but do not match the pinned digests."""
+    import shutil
+
+    from hsi.paths import run_root
+
+    q = packet.params
+    src_id, pinned = q.get("reuse_from"), q.get("pinned_adapters")
+    if not src_id or not pinned:
+        return False
+    src = run_root() / str(src_id)
+    sm, sp = (
+        read_manifest(src / "learning" / "manifest.json"),
+        load_json_safe(src / "packet.frozen.json"),
+    )
+    if sm is None or sp is None:
+        return False
+    old = sp["packet"]
+    if old["seeds"] != packet.seeds or any(old["params"].get(k) != q.get(k) for k in TRAIN_KEYS):
+        return False
+    _check_pinned(sm["candidates"], pinned)
+    for a in sm["candidates"]:
+        if not (src / "learning" / f"{a}.safetensors").exists():
+            return False
+    ld = run_dir / "learning"
+    ld.mkdir(parents=True, exist_ok=True)
+    for a in sm["candidates"]:
+        shutil.copyfile(src / "learning" / f"{a}.safetensors", ld / f"{a}.safetensors")
+    shutil.copyfile(src / "learning" / "training.jsonl", ld / "training.jsonl")
+    man = {k: v for k, v in sm.items() if k != "manifest_digest"}
+    man["packet_digest"] = canonical_digest(packet.model_dump(mode="json"))
+    man["reused_from"] = str(src_id)
+    man["manifest_digest"] = canonical_digest(man)
+    _save(ld / "manifest.json", man)
+    prog = Progress(run_dir, "pilot:prepare")
+    n = len(sm["candidates"])
+    prog.update(n, n, f"reused {n} pinned adapters from run {src_id}")
+    prog.finish()
+    return True
+
+
+def read_manifest(path: Path) -> dict[str, Any] | None:
+    d = load_json_safe(path)
+    if d is None:
+        return None
+    body = {k: v for k, v in d.items() if k != "manifest_digest"}
+    return d if canonical_digest(body) == d.get("manifest_digest") else None
+
+
+def load_json_safe(path: Path) -> dict[str, Any] | None:
+    try:
+        return dict(load_json(path))
+    except (OSError, ValueError):
+        return None
+
+
 def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
@@ -195,6 +270,8 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.learning.prior import true_index
 
     q = packet.params
+    if try_reuse_adapters(packet, run_dir):
+        return
     llm = _ensure_adapter(packet)
     ld = run_dir / "learning"
     ld.mkdir(parents=True, exist_ok=True)
@@ -313,6 +390,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
             "digest": llm.save_adapter(ld / "real_only.safetensors"),
         }
     prog.finish()
+    _check_pinned(cands, q.get("pinned_adapters"))
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
         "runtime": RUNTIME,
@@ -382,6 +460,8 @@ def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Pack
         _STATE["arm"] = arm
     if packet.params.get("eval_mode") == "generate":
         return run_generation_task(llm, arm, family, split, seed, packet)
+    if packet.params.get("eval_mode") == "ground":
+        return run_grounding_task(llm, arm, family, split, seed, packet)
     return run_prior_task(
         LLMPrior(llm, adapter=True), arm, family, split, seed, int(packet.params["support"])
     )
@@ -436,4 +516,45 @@ def run_generation_task(
             "gen_valid": float(valid),
             "gen_consistent": float(consist),
         },
+    )
+
+
+def run_grounding_task(
+    llm: Any, arm: str, family: str, split: Split, seed: int, packet: Packet
+) -> TaskResult:
+    """Generator-level probe: one prompt per world. The model writes a hypothesis for one observed
+    action; success = it is valid AND consistent with the observed evidence ("grounded"). No
+    planning, so the metric has headroom wherever the generator is partly competent."""
+    from hsi.agents.learner import consistent, transitions_of
+    from hsi.environment import RuleWorld
+    from hsi.evaluation.e1 import teacher_trace
+    from hsi.learning.llm import parse_hypothesis, render_prompt, text_signature
+    from hsi.learning.prior import true_index
+
+    support = int(packet.params["support"])
+    env = RuleWorld(family, split, seed)
+    trans = transitions_of(teacher_trace(RuleWorld(family, split, seed), support, tag="/support"))
+    per: dict[int, list[tuple[Any, Any]]] = {}
+    for st, a, st2 in trans:
+        per.setdefault(a, []).append((st, st2))
+    a = random.Random(f"ground/{seed}").choice(sorted(per))
+    pairs = per[a]
+    text = llm.generate(render_prompt(pairs), int(packet.params["gen_max_tokens"]))
+    h = parse_hypothesis(text)
+    idx = true_index(h) if h is not None else None
+    grounded = idx is not None and idx in consistent(pairs)
+    exact = idx is not None and idx == true_index(env.task.actions[a])
+    stats = {
+        "explore_calls": float(support), "calls": 0.0, "gen_seen": 1.0,
+        "gen_valid": float(h is not None), "gen_consistent": float(grounded),
+        "gen_exact": float(exact),
+    }  # fmt: skip
+    return TaskResult(
+        arm,
+        family,
+        seed,
+        bool(grounded),
+        [],
+        stats,
+        decisions=[{"arm": arm, "sig": text_signature(text), "text": text[:60]}],
     )

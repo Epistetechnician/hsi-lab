@@ -283,7 +283,7 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "families beyond 2 points.",
             params=p,
         )
-    if exp == "E6" and variant in ("llm", "llm-gen", "llm-gen2", "llm-gen3"):
+    if exp == "E6" and variant in ("llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
             p.pop(k, None)
@@ -303,16 +303,25 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             min_n=30,
             max_n=100,
         )
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3"):
+        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
             p.update(eval_mode="generate", extra_arms=True, diversity_floor_frac=0.0)
-        if variant in ("llm-gen2", "llm-gen3"):  # v4+: stop marker (v3 never terminated)
+        if variant in (
+            "llm-gen2",
+            "llm-gen3",
+            "llm-ground",
+        ):  # v4+: stop marker (v3 never terminated)
             p.update(target_terminator="\n", adapt_steps=300)
-        if variant == "llm-gen3":  # v5: 7B generator, original data includes tune-type worlds
+        if variant in (
+            "llm-gen3",
+            "llm-ground",
+        ):  # v5: 7B generator, original data includes tune-type worlds
             p.update(model="qwen2.5-7b", n_replay_tune=50)
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3"):
+        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
             t["arms"] = [*t["arms"], "real_only", "frozen_base"]  # type: ignore[misc]
         t.update(
-            version={"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5}[variant],
+            version={"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5, "llm-ground": 6}[
+                variant
+            ],
             hypothesis="With an unconstrained free-text generator (Qwen2.5-1.5B-Instruct), "
             "training "
             "each generation on the previous generation's own hypotheses collapses "
@@ -320,11 +329,28 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "d3 with replay beats d3 without.",
             params=p,
         )
-        if variant in ("llm-gen", "llm-gen2", "llm-gen3"):
+        if variant in ("llm-gen", "llm-gen2", "llm-gen3", "llm-ground"):
             t["hypothesis"] = (
                 "When held-out success is measured by the model's own free-text hypotheses (no "
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
                 "original labeled data is replayed: d3 with replay beats d3 without."
+            )
+        if variant == "llm-ground":  # v6: generator-level metric; reuse the v5 adapters (pinned)
+            from hsi.paths import run_root
+
+            src = "5ace07853340f87d"
+            man = json.loads((run_root() / src / "learning" / "manifest.json").read_text())
+            p.update(
+                eval_mode="ground", reuse_from=src, min_n=100, max_n=400, pilot_tasks=30,
+                diversity_floor_frac=0.5,
+                pinned_adapters={a: c["digest"] for a, c in man["candidates"].items()},
+            )  # fmt: skip
+            t["primary_metric"] = "grounded_generation_rate_diff_d3_replay_minus_d3_no_replay"
+            t["hypothesis"] = (
+                "Measured directly on the generator (valid AND evidence-consistent hypothesis per "
+                "held-out prompt, no planning), recursive self-training degrades generation "
+                "quality by depth 3 unless original labeled data is replayed: d3 with replay "
+                "beats d3 without."
             )
     if exp in ("E4", "E6"):
         t["budget"] = {
@@ -401,7 +427,11 @@ def main(argv: list[str] | None = None) -> int:
     n = pk.add_parser("new")
     n.add_argument("experiment", choices=sorted(EXPERIMENTS))
     n.add_argument("out", type=Path)
-    n.add_argument("--variant", default="", choices=["", "llm", "llm-gen", "llm-gen2", "llm-gen3"])
+    n.add_argument(
+        "--variant",
+        default="",
+        choices=["", "llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground"],
+    )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)
     b = sub.add_parser("baselines")
