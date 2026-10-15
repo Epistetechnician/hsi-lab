@@ -257,6 +257,135 @@ def load_json_safe(path: Path) -> dict[str, Any] | None:
         return None
 
 
+def verify_texts(texts: list[str], samples: list[Any]) -> list[bool]:
+    """Verifier for generated hypotheses: valid AND consistent with the observed transitions
+    (equivalently: re-executing the hypothesis on the evidence reproduces every observation)."""
+    from hsi.learning.llm import parse_hypothesis
+    from hsi.learning.prior import true_index
+
+    out = []
+    for t, smp in zip(texts, samples, strict=True):
+        h = parse_hypothesis(t)
+        idx = true_index(h) if h is not None else None
+        out.append(idx is not None and idx in smp.cands)
+    return out
+
+
+def _real_pool(packet: Packet) -> list[Any]:
+    q = packet.params
+    fams, sup = list(q["pretrain_families"]), int(q["support"])
+    pool, _ = build_samples(fams, Split.FIT, range(int(q["n_replay"])), sup, True)
+    n_rt = int(q.get("n_replay_tune", 0))
+    if n_rt:
+        base = int(q["n_adapt"]) + 50
+        extra, _ = build_samples(fams, Split.TUNE, range(base, base + n_rt), sup, True)
+        pool = pool + extra
+    return pool
+
+
+def train_verified_chain(
+    packet: Packet, run_dir: Path, llm: Any, log: DecisionLog, cands: dict[str, Any]
+) -> None:
+    """Chain d1..dG_verified: generation g keeps only VERIFIED self-generated examples (drawn from
+    a larger proposal pool until the quota is met), plus original labelled data, so each arm has
+    the same example count as the replay arms. Writes adapters; fills `cands`."""
+    from hsi.agents.learner import HYPOTHESES
+    from hsi.learning.llm import describe, few_shot_prompt, render_prompt
+
+    q = packet.params
+    fams, sup, seed = list(q["pretrain_families"]), int(q["support"]), int(packet.seeds[0])
+    ld = run_dir / "learning"
+    base = int(q["verify_pool_base"])
+    pool, _ = build_samples(
+        fams, Split.TUNE, range(base, base + int(q["verify_pool_worlds"])), sup, False
+    )
+    real_pool = _real_pool(packet)
+    n_total = len(build_samples(fams, Split.TUNE, range(int(q["n_adapt"])), sup, False)[0])
+    quota = n_total // 2  # same synthetic quota as the replay arms
+    rng = random.Random(f"e6llm-verified/{seed}")
+    demos, term = _demos(packet), str(q.get("target_terminator", ""))
+    gens = int(q["generations"])
+    prog = Progress(run_dir, "pilot:verified")
+    prog.update(0, gens, "starting")
+    llm.set_adapter(False)  # generation 1 is produced by the frozen base
+    for g in range(1, gens + 1):
+        order = list(pool)
+        rng.shuffle(order)
+        kept: list[tuple[Any, str]] = []
+        proposed = 0
+        for i in range(0, len(order), 8):  # proposals in small blocks; stop at the quota
+            block = order[i : i + 8]
+            texts = [
+                llm.generate(few_shot_prompt(s.pairs, demos), int(q["gen_max_tokens"])) or "unknown"
+                for s in block
+            ]
+            proposed += len(block)
+            for ok, s, t in zip(verify_texts(texts, block), block, texts, strict=True):
+                if ok and len(kept) < quota:
+                    kept.append((s, t))
+            prog.update(g - 1, gens, f"d{g}_verified: {len(kept)}/{quota} verified of {proposed}")
+            if len(kept) >= quota:
+                break
+        short = quota - len(kept)
+        real = rng.sample(real_pool, n_total - len(kept))  # top up with original data if short
+        data = [(render_prompt(s.pairs), t + term) for s, t in kept]
+        data += [(render_prompt(s.pairs), describe(HYPOTHESES[s.label]) + term) for s in real]
+        arm = f"d{g}_verified"
+        for s, t in kept:
+            log.append(
+                {
+                    "sample_id": s.key,
+                    "arm": arm,
+                    "gen": g,
+                    "origin": "generated",
+                    "eligibility": "eligible",
+                    "label_source": "self-verified",
+                    "text": t,
+                }
+            )
+        for s in real:
+            log.append(
+                {
+                    "sample_id": s.key,
+                    "arm": arm,
+                    "gen": g,
+                    "origin": "observed",
+                    "eligibility": "eligible",
+                    "label_source": "oracle",
+                }
+            )
+        llm.reset_lora(seed + 100 + g)
+        steps = int(q["adapt_steps"])
+        loss = llm.train_lora(
+            data, steps, float(q["adapt_lr"]), seed + 100 + g, int(q["adapt_batch"]),
+            on_step=lambda i, ls, a=arm, st=steps, gg=g: prog.update(
+                gg - 1, gens, f"{a}: step {i}/{st} loss {ls:.2f}"),
+        )  # fmt: skip
+        cands[arm] = {
+            "generation": g, "loss": loss, "digest": llm.save_adapter(ld / f"{arm}.safetensors"),
+            "diversity": _text_entropy([t for _, t in kept]), "validity": 1.0,
+            "n_synthetic": len(kept), "n_real": len(real), "proposed": proposed,
+            "yield": len(kept) / max(1, proposed), "shortfall": short,
+        }  # fmt: skip
+        # live weights now equal adapter g: the next generation is produced by it
+    prog.finish()
+
+
+def _extend_with_verified(packet: Packet, run_dir: Path) -> None:
+    """After reusing the pinned adapters, train the verified chain and add it to the manifest."""
+    llm = _ensure_adapter(packet)
+    ld = run_dir / "learning"
+    man: dict[str, Any] = dict(load_json(ld / "manifest.json"))
+    log = DecisionLog(ld / "training.verified.jsonl")
+    cands: dict[str, Any] = dict(man["candidates"])
+    train_verified_chain(packet, run_dir, llm, log, cands)
+    man.pop("manifest_digest", None)
+    man["candidates"] = cands
+    man["verified_log_head"] = log.head
+    man["manifest_digest"] = canonical_digest(man)
+    _save(ld / "manifest.json", man)
+
+
 def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
@@ -272,6 +401,8 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
 
     q = packet.params
     if try_reuse_adapters(packet, run_dir):
+        if q.get("verified_chain"):
+            _extend_with_verified(packet, run_dir)
         return
     llm = _ensure_adapter(packet)
     ld = run_dir / "learning"
@@ -392,6 +523,8 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
         }
     prog.finish()
     _check_pinned(cands, q.get("pinned_adapters"))
+    if q.get("verified_chain"):
+        train_verified_chain(packet, run_dir, llm, log, cands)
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
         "runtime": RUNTIME,
@@ -528,11 +661,8 @@ def _collides(o: int, packet: Packet) -> bool:
     q = packet.params
     n_adapt, n_rt = int(q["n_adapt"]), int(q.get("n_replay_tune", 0))
     off = int(q.get("tune_offset", 0))
-    return (
-        o < n_adapt + 50 + n_rt
-        or off <= o < off + 200
-        or 700_000 <= o < 700_100
-    )  # fmt: skip
+    extra = any(lo <= o < hi for lo, hi in q.get("avoid", []))  # e.g. the verified proposal pool
+    return o < n_adapt + 50 + n_rt or off <= o < off + 200 or 700_000 <= o < 700_100 or extra
 
 
 def resolve_world(family: str, split: Split, seed: int, packet: Packet) -> tuple[str, Split, int]:

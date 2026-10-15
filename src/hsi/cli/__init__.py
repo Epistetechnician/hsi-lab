@@ -35,10 +35,18 @@ E1_PARAMS = {
 }
 
 
-GEN_VARIANTS = {"llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"}
-TERMINATED = {"llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"}
-SEVEN_B = {"llm-gen3", "llm-ground", "llm-confirm"}
-VERSIONS = {"llm": 2, "llm-gen": 3, "llm-gen2": 4, "llm-gen3": 5, "llm-ground": 6, "llm-confirm": 7}
+GEN_VARIANTS = {"llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
+TERMINATED = {"llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
+SEVEN_B = {"llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
+VERSIONS = {
+    "llm": 2,
+    "llm-gen": 3,
+    "llm-gen2": 4,
+    "llm-gen3": 5,
+    "llm-ground": 6,
+    "llm-confirm": 7,
+    "llm-verified": 8,
+}
 
 
 def template(exp: str, variant: str = "") -> dict[str, object]:
@@ -289,14 +297,7 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "families beyond 2 points.",
             params=p,
         )
-    if exp == "E6" and variant in (
-        "llm",
-        "llm-gen",
-        "llm-gen2",
-        "llm-gen3",
-        "llm-ground",
-        "llm-confirm",
-    ):
+    if exp == "E6" and (variant == "llm" or variant in GEN_VARIANTS):
         p = dict(t["params"])  # type: ignore[call-overload]
         for k in ("pretrain_steps", "pretrain_lr", "n_pretrain"):
             p.pop(k, None)
@@ -339,7 +340,7 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
                 "original labeled data is replayed: d3 with replay beats d3 without."
             )
-        if variant in ("llm-ground", "llm-confirm"):  # v6/v7: generator-level metric, pinned reuse
+        if variant in ("llm-ground", "llm-confirm", "llm-verified"):  # v6+: generator-level metric
             from hsi.paths import run_root
 
             src = "5ace07853340f87d"
@@ -372,6 +373,23 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "no-replay."
             )
             t["null_hypothesis"] = "d2 replay does not beat d2 no-replay by the threshold."
+        if variant == "llm-verified":  # v8: does verifying the synthetic half rescue recursion?
+            p.update(
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                depth=2, treatment="d2_verified", baselines=["d2_replay"],
+                verified_chain=True, verify_pool_base=1000, verify_pool_worlds=600,
+                guard_suffix="verified", avoid=[[1000, 1600]],
+            )  # fmt: skip
+            t["arms"] = [*t["arms"], "d1_verified", "d2_verified", "d3_verified"]  # type: ignore[misc]
+            t["primary_metric"] = "grounded_generation_rate_diff_d2_verified_minus_d2_replay"
+            t["hypothesis"] = (
+                "Keeping only verified synthetic examples (a valid hypothesis whose re-execution "
+                "reproduces the observed transitions), with the same original-data half and the "
+                "same example count, yields more grounded generation at recursion depth 2 on "
+                "unseen in-distribution worlds than keeping the unverified synthetic half: d2 "
+                "verified beats d2 replay."
+            )
+            t["null_hypothesis"] = "d2 verified does not beat d2 replay by the threshold."
     if exp in ("E4", "E6"):
         t["budget"] = {
             "max_tokens": 0,
@@ -450,7 +468,7 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument(
         "--variant",
         default="",
-        choices=["", "llm", "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm"],
+        choices=["", "llm", *sorted(GEN_VARIANTS)],
     )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)

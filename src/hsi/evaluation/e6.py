@@ -87,16 +87,17 @@ class E6Spec:
         cands = man["candidates"]
         assert isinstance(cands, dict)
         gens = int(packet.params.get("depth", packet.params["generations"]))
+        suf = str(packet.params.get("guard_suffix", "replay"))  # arm family the guardrails track
         ground = packet.params.get("eval_mode") == "ground"
         if ground:  # diversity of the model's own outputs on held-out prompts, per arm
             div = {
                 a: sig_entropy([str(d["sig"]) for r in results if r.arm == a for d in r.decisions])
                 for a in sorted({r.arm for r in results})
             }
-            min_div = min(div[f"d{g}_replay"] for g in range(1, gens + 1))
+            min_div = min(div[f"d{g}_{suf}"] for g in range(1, gens + 1))
             floor = float(packet.params["diversity_floor_frac"]) * div["d1_no_replay"]
         else:  # diversity of the texts used to train each generation (from the manifest)
-            min_div = min(float(cands[f"d{g}_replay"]["diversity"]) for g in range(1, gens + 1))
+            min_div = min(float(cands[f"d{g}_{suf}"]["diversity"]) for g in range(1, gens + 1))
             floor = float(man["diversity_floor"])
 
         def rate(arm: str) -> float:
@@ -106,11 +107,11 @@ class E6Spec:
         gv = {
             "min_replay_diversity": min_div,
             "diversity_floor": floor,
-            "rate_d1_replay": rate("d1_replay"),
-            f"rate_d{gens}_replay": rate(f"d{gens}_replay"),
+            f"rate_d1_{suf}": rate(f"d1_{suf}"),
+            f"rate_d{gens}_{suf}": rate(f"d{gens}_{suf}"),
             "non_collapse_floor": float(packet.params["non_collapse_floor"]),
         }
-        for arm in (f"d{gens}_replay", f"d{gens}_no_replay"):  # diagnostics (LLM generator only)
+        for arm in (f"d{gens}_{suf}", f"d{gens}_no_replay"):  # diagnostics (LLM generator only)
             for k in ("validity", "diversity"):
                 if k in cands[arm]:
                     gv[f"{k}_{arm}"] = float(cands[arm][k])
@@ -126,6 +127,6 @@ class E6Spec:
                     gv[f"eval_diversity_{arm}"] = div[arm]
         held = (
             min_div >= floor
-            and gv[f"rate_d{gens}_replay"] - gv["rate_d1_replay"] >= -gv["non_collapse_floor"]
+            and gv[f"rate_d{gens}_{suf}"] - gv[f"rate_d1_{suf}"] >= -gv["non_collapse_floor"]
         )
         return gv, held

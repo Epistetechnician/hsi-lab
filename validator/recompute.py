@@ -77,9 +77,11 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
         for r in receipt["family_results"]:
             tot[r["arm"]] = tot.get(r["arm"], 0) + r["n"]
             ok[r["arm"]] = ok.get(r["arm"], 0) + r["successes"]
-        r1, rg = ok["d1_replay"] / tot["d1_replay"], ok[f"d{gens}_replay"] / tot[f"d{gens}_replay"]
-        if not (close(g["rate_d1_replay"], r1) and close(g[f"rate_d{gens}_replay"], rg)):
-            errs.append("replay rates differ from family_results")
+        suf = q.get("guard_suffix", "replay")  # which arm family the guardrails track
+        r1 = ok[f"d1_{suf}"] / tot[f"d1_{suf}"]
+        rg = ok[f"d{gens}_{suf}"] / tot[f"d{gens}_{suf}"]
+        if not (close(g[f"rate_d1_{suf}"], r1) and close(g[f"rate_d{gens}_{suf}"], rg)):
+            errs.append(f"{suf} rates differ from family_results")
         if g["non_collapse_floor"] != q["non_collapse_floor"]:
             errs.append("non_collapse_floor differs from packet")
         return (
