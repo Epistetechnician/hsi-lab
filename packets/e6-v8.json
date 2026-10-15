@@ -1,0 +1,102 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E6",
+  "version": 8,
+  "hypothesis": "Keeping only verified synthetic examples (a valid hypothesis whose re-execution reproduces the observed transitions), with the same original-data half and the same example count, yields more grounded generation at recursion depth 2 on unseen in-distribution worlds than keeping the unverified synthetic half: d2 verified beats d2 replay.",
+  "null_hypothesis": "d2 verified does not beat d2 replay by the threshold.",
+  "arms": [
+    "d1_replay",
+    "d1_no_replay",
+    "d2_replay",
+    "d2_no_replay",
+    "d3_replay",
+    "d3_no_replay",
+    "real_only",
+    "frozen_base",
+    "d1_verified",
+    "d2_verified",
+    "d3_verified"
+  ],
+  "primary_metric": "grounded_generation_rate_diff_d2_verified_minus_d2_replay",
+  "threshold": 0.05,
+  "guardrails": [
+    "generated-task diversity above pilot floor at every depth",
+    "d3_replay not below d1_replay beyond floor"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "pretrain_families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "support": 8,
+    "n_adapt": 50,
+    "adapt_steps": 300,
+    "adapt_lr": 0.0001,
+    "rank": 8,
+    "pilot_tasks": 30,
+    "min_n": 100,
+    "max_n": 400,
+    "tune_offset": 500000,
+    "families": [
+      "rule_induction@tune",
+      "compositional_transfer@tune"
+    ],
+    "generations": 3,
+    "diversity_floor_frac": 0.5,
+    "non_collapse_floor": 0.02,
+    "treatment": "d2_verified",
+    "baselines": [
+      "d2_replay"
+    ],
+    "backbone": "llm",
+    "n_replay": 50,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "adapt_batch": 8,
+    "gen_max_tokens": 20,
+    "n_demos": 2,
+    "eval_mode": "ground",
+    "extra_arms": true,
+    "target_terminator": "\n",
+    "model": "qwen2.5-7b",
+    "n_replay_tune": 50,
+    "reuse_from": "5ace07853340f87d",
+    "pinned_adapters": {
+      "d1_no_replay": "350c253ef058b2389949f73f298f1b777340f437cf2e2d11e35668e8ee75ba15",
+      "d1_replay": "84ae1b1cd4bf10429ab3b261b67f36ee185b000935f6273e1deaa31e6e8058c2",
+      "d2_no_replay": "d6ac1d16f2313710dc412a4faa7378059f25787b4547ab7fb202d90872c49356",
+      "d2_replay": "ff761cc5675d4d22c06e3bc396534d75785df95ee08cf180a6d7bcd8a61063f8",
+      "d3_no_replay": "adc92408c7a56b25489c75286efc2612270908a5c84eac612baa1c60b4080ed7",
+      "d3_replay": "be1fe78c6d0b4e44bc6fbe63df25839ecba10776dc50d37f5a9e567010d3762b",
+      "real_only": "d636a25610d64bd29a040e3f3c3a7b93920ec8a20afbc11a41bc2f64e94d75e6"
+    },
+    "depth": 2,
+    "verified_chain": true,
+    "verify_pool_base": 1000,
+    "verify_pool_worlds": 600,
+    "guard_suffix": "verified",
+    "avoid": [
+      [
+        1000,
+        1600
+      ]
+    ]
+  }
+}
