@@ -332,3 +332,10 @@ in-distribution worlds: -0.002 [-0.016, +0.013]; the +0.08 exploratory signal fr
 replicate. Training on the model's own mostly-invalid text hurts generation immediately (0.078 vs
 0.329 for the oracle-labelled reference); replay preserves output diversity but not quality.
 Receipt `docs/experiments/E6-confirm-receipt.json`; see docs/experiments/E6-confirm.md.
+
+E6 verified synthetic (packet e6-v8): PROMOTE. d2 verified - d2 replay = +0.238 [+0.205, +0.270] on fresh
+in-distribution worlds; the verified chain does not degrade with depth (grounded 0.282/0.297/0.314,
+exact 0.081/0.111/0.152 vs 0.165 for the supervised reference) while unverified arms sit at 0.03-0.08.
+Caveats: no pool-matched unverified control yet; the verifier shares the metric's definition;
+in-distribution only. Receipt `docs/experiments/E6-verified-receipt.json`; see
+docs/experiments/E6-verified.md.

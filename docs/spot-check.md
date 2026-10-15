@@ -209,3 +209,16 @@ d2_no_replay → d2_replay (receipt: diff -0.0015, CI [-0.0165, 0.0134])
 Guardrails: {'diversity_floor': 0.16225727465384066, 'min_replay_diversity': 0.37726109285765164, 'non_collapse_floor': 0.02, 'rate_d1_replay': 0.06707317073170732, 'rate_d2_replay': 0.0350609756097561}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-verified — receipt `eec822901bc3`, threshold 0.05, decision PROMOTE
+
+d2_replay → d2_verified (receipt: diff 0.2375, CI [0.2046, 0.2704])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction@tune | 400 | 10 | 177 | 15 | 198 |
+| compositional_transfer@tune | 400 | 9 | 42 | 14 | 335 |
+
+Guardrails: {'diversity_floor': 0.15648112195519226, 'min_replay_diversity': 0.4084324488631278, 'non_collapse_floor': 0.02, 'rate_d1_verified': 0.2825, 'rate_d2_verified': 0.2975}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
