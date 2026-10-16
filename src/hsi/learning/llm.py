@@ -129,11 +129,32 @@ class LLM:
 
         self.name = name
         self.path = path or model_path(name)
+        self._apply_memory_caps()
         res = load(str(self.path))
         self.model, self.tok = res[0], res[1]
         self.model.freeze()
         self._lora: list[Any] = []
         self.enabled = True
+
+    @staticmethod
+    def _apply_memory_caps() -> None:
+        """Optional per-process GPU budgets so jobs can share the machine safely:
+        HSI_MLX_MEM_GB bounds total GPU memory, HSI_MLX_CACHE_GB bounds the allocator cache
+        (MLX otherwise keeps freed buffers, which can starve a second process)."""
+        import os
+
+        import mlx.core as mx
+
+        if os.environ.get("HSI_MLX_MEM_GB"):
+            mx.set_memory_limit(int(float(os.environ["HSI_MLX_MEM_GB"]) * 1e9))
+        if os.environ.get("HSI_MLX_CACHE_GB"):
+            mx.set_cache_limit(int(float(os.environ["HSI_MLX_CACHE_GB"]) * 1e9))
+
+    @staticmethod
+    def peak_gb() -> float:
+        import mlx.core as mx
+
+        return float(mx.get_peak_memory()) / 1e9
 
     # -- scoring --------------------------------------------------------------
     def _seq_logprobs(self, prompts: list[list[int]], cands: list[list[int]]) -> Any:

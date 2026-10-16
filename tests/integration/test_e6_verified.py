@@ -51,6 +51,9 @@ class FakeLLM:
 
     def set_adapter(self, on: bool) -> None: ...
 
+    def peak_gb(self) -> float:
+        return 0.0
+
     def generate(self, prompt: str, max_tokens: int = 20) -> str:
         self.calls += 1
         return "swap 0 1"
@@ -175,3 +178,73 @@ def test_validator_follows_guard_suffix() -> None:
     rec["receipt_digest"] = val.digest({k: v for k, v in rec.items() if k != "receipt_digest"})
     assert any("verified rates differ" in e for e in val.check(rec, frozen))
     assert json.dumps(g)  # keys are plain floats
+
+
+# ---- v9 (pool-matched unverified control) and v10 (held-out rule types) ----
+def test_v9_v10_templates_preregister_the_followups() -> None:
+    v9 = Packet.model_validate(template("E6", "llm-poolctl"), strict=False)
+    v10 = Packet.model_validate(template("E6", "llm-ood"), strict=False)
+    assert v9.version == 9 and v10.version == 10
+    assert v9.params["baselines"] == ["d2_poolctl"] and v9.params["control_chain"]
+    assert all(f.endswith("@tune") for f in v9.params["families"])
+    assert {"d1_poolctl", "d2_poolctl", "d3_poolctl", "d2_verified"} <= set(v9.arms)
+    assert v10.params["baselines"] == ["d2_replay"] and v10.params["families"] == [
+        "rule_induction", "compositional_transfer"]  # fmt: skip
+    for pk in (v9, v10):  # both reuse the v8 adapters: 7 older + 3 verified, pinned
+        assert len(pk.params["pinned_adapters"]) == 10 and pk.params["reuse_from"]
+        assert pk.params["depth"] == 2 and pk.params["guard_suffix"] == "verified"
+
+
+def test_control_chain_takes_first_proposals_unfiltered(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pk = packet(**SMALL)
+    monkeypatch.setattr(
+        ls, "verify_texts", lambda texts, samples: [i % 4 == 0 for i in range(len(texts))]
+    )
+    llm = FakeLLM()
+    (tmp_path / "learning").mkdir()
+    cands: dict[str, Any] = {}
+    ls.train_chain(pk, tmp_path, llm, DecisionLog(tmp_path / "learning" / "t.jsonl"), cands,
+                   name="poolctl", verify=False)  # fmt: skip
+    assert sorted(cands) == ["d1_poolctl", "d2_poolctl", "d3_poolctl"]
+    for c in cands.values():
+        assert (
+            0 <= c["proposed"] - c["n_synthetic"] < 8
+        )  # unfiltered: quota met in the first block(s)
+        assert c["n_synthetic"] + c["n_real"] == llm.trained[0]  # same example count as verified
+        assert 0.0 < c["validity"] < 1.0 and c["shortfall"] == 0  # most kept are NOT consistent
+    assert (tmp_path / "learning" / "d3_poolctl.safetensors").exists()
+    log = [json.loads(x) for x in (tmp_path / "learning" / "t.jsonl").read_text().splitlines()]
+    assert {r["eligibility"] for r in log if r["origin"] == "generated"} == {"unverified"}
+
+
+def test_extend_chains_trains_only_missing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    from hsi.contracts.packet import canonical_digest
+
+    pk = packet(**SMALL, control_chain=True)
+    ld = tmp_path / "learning"
+    ld.mkdir()
+    man = {
+        "packet_digest": "p",
+        "candidates": {f"d{g}_verified": {"digest": "v"} for g in (1, 2, 3)},
+    }
+    man["manifest_digest"] = canonical_digest(man)
+    (ld / "manifest.json").write_text(json.dumps(man))
+    trained: list[str] = []
+
+    def fake_chain(packet, run_dir, llm, log, cands, name, verify):  # type: ignore[no-untyped-def]
+        trained.append(name)
+        for g in (1, 2, 3):
+            cands[f"d{g}_{name}"] = {"digest": "x"}
+
+    monkeypatch.setattr(ls, "train_chain", fake_chain)
+    monkeypatch.setattr(ls, "_ensure_adapter", lambda p: FakeLLM())
+    ls._extend_chains(pk, tmp_path)
+    assert trained == ["poolctl"]  # the verified chain already exists in the source: not retrained
+    new = json.loads((ld / "manifest.json").read_text())
+    assert sorted(new["candidates"]) == sorted(
+        f"d{g}_{n}" for n in ("poolctl", "verified") for g in (1, 2, 3)
+    )
+    body = {k: v for k, v in new.items() if k != "manifest_digest"}
+    assert new["manifest_digest"] == canonical_digest(body)

@@ -35,9 +35,12 @@ E1_PARAMS = {
 }
 
 
-GEN_VARIANTS = {"llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
-TERMINATED = {"llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
-SEVEN_B = {"llm-gen3", "llm-ground", "llm-confirm", "llm-verified"}
+GEN_VARIANTS = {
+    "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
+    "llm-poolctl", "llm-ood",
+}  # fmt: skip
+TERMINATED = GEN_VARIANTS - {"llm-gen"}
+SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
 VERSIONS = {
     "llm": 2,
     "llm-gen": 3,
@@ -46,6 +49,8 @@ VERSIONS = {
     "llm-ground": 6,
     "llm-confirm": 7,
     "llm-verified": 8,
+    "llm-poolctl": 9,
+    "llm-ood": 10,
 }
 
 
@@ -340,7 +345,11 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "consistency filter), recursive self-training degrades success by depth 3 unless "
                 "original labeled data is replayed: d3 with replay beats d3 without."
             )
-        if variant in ("llm-ground", "llm-confirm", "llm-verified"):  # v6+: generator-level metric
+        if variant in GEN_VARIANTS - {
+            "llm-gen",
+            "llm-gen2",
+            "llm-gen3",
+        }:  # v6+: generator-level metric
             from hsi.paths import run_root
 
             src = "5ace07853340f87d"
@@ -390,6 +399,57 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "verified beats d2 replay."
             )
             t["null_hypothesis"] = "d2 verified does not beat d2 replay by the threshold."
+        if variant in ("llm-poolctl", "llm-ood"):  # v9/v10: follow-ups that reuse the v8 adapters
+            from hsi.paths import run_root
+
+            v8 = "f55ccd542e0e2ad4"
+            m8 = json.loads((run_root() / v8 / "learning" / "manifest.json").read_text())
+            p.update(
+                reuse_from=v8, depth=2, treatment="d2_verified", verified_chain=True,
+                verify_pool_base=1000, verify_pool_worlds=600, guard_suffix="verified",
+                avoid=[[1000, 1600]],
+                pinned_adapters={a: c["digest"] for a, c in m8["candidates"].items()},
+            )  # fmt: skip
+        if variant == "llm-poolctl":  # v9: pool-matched unverified control (in-distribution)
+            p.update(
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                baselines=["d2_poolctl"], control_chain=True,
+            )  # fmt: skip
+            t["arms"] = [
+                "d1_verified", "d2_verified", "d3_verified",
+                "d1_poolctl", "d2_poolctl", "d3_poolctl",
+                "d2_replay", "real_only", "frozen_base",
+            ]  # fmt: skip
+            t["primary_metric"] = "grounded_generation_rate_diff_d2_verified_minus_d2_poolctl"
+            t["hypothesis"] = (
+                "Pool-matched control for the verified-synthetic result: when the unverified "
+                "synthetic examples are drawn from the same 600-world proposal pool and paired "
+                "with the same original-data half and example count, keeping only verified "
+                "examples still yields more grounded generation at depth 2 on unseen "
+                "in-distribution worlds: d2 verified beats d2 pool-matched unverified."
+            )
+            t["null_hypothesis"] = (
+                "d2 verified does not beat d2 pool-matched unverified by the threshold."
+            )
+        if variant == "llm-ood":  # v10: the verified chain on held-out rule TYPES
+            p.update(families=["rule_induction", "compositional_transfer"], baselines=["d2_replay"])
+            t["arms"] = [
+                "d1_verified", "d2_verified", "d3_verified",
+                "d1_replay", "d2_replay", "d3_replay",
+                "d1_no_replay", "d2_no_replay", "d3_no_replay",
+                "real_only", "frozen_base",
+            ]  # fmt: skip
+            t["primary_metric"] = (
+                "grounded_generation_rate_diff_d2_verified_minus_d2_replay_heldout_types"
+            )
+            t["hypothesis"] = (
+                "The advantage of verified over unverified synthetic examples at recursion depth 2 "
+                "carries over to held-out rule types (mix, swap+copy) that never appeared in "
+                "training: d2 verified beats d2 replay on held-out types."
+            )
+            t["null_hypothesis"] = (
+                "d2 verified does not beat d2 replay on held-out types by the threshold."
+            )
     if exp in ("E4", "E6"):
         t["budget"] = {
             "max_tokens": 0,
