@@ -95,7 +95,10 @@ class E6Spec:
                 for a in sorted({r.arm for r in results})
             }
             min_div = min(div[f"d{g}_{suf}"] for g in range(1, gens + 1))
-            floor = float(packet.params["diversity_floor_frac"]) * div["d1_no_replay"]
+            # reference level: the depth-1 no-replay arm when evaluated, else the guarded chain's
+            # own depth-1 arm (packets such as the pool-matched control omit d1_no_replay)
+            ref = "d1_no_replay" if "d1_no_replay" in div else f"d1_{suf}"
+            floor = float(packet.params["diversity_floor_frac"]) * div[ref]
         else:  # diversity of the texts used to train each generation (from the manifest)
             min_div = min(float(cands[f"d{g}_{suf}"]["diversity"]) for g in range(1, gens + 1))
             floor = float(man["diversity_floor"])
@@ -113,7 +116,7 @@ class E6Spec:
         }
         for arm in (f"d{gens}_{suf}", f"d{gens}_no_replay"):  # diagnostics (LLM generator only)
             for k in ("validity", "diversity"):
-                if k in cands[arm]:
+                if k in cands.get(arm, {}):
                     gv[f"{k}_{arm}"] = float(cands[arm][k])
         for arm in sorted({r.arm for r in results}):  # eval-time generation quality (gen mode)
             rs = [r for r in results if r.arm == arm and "gen_seen" in r.stats]

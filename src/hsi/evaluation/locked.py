@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -27,6 +28,33 @@ def _commit() -> str:
         ).stdout.strip()
 
     return g("rev-parse", "HEAD") + ("+dirty" if g("status", "--porcelain") else "")
+
+
+def _load_cache(path: Path, digest: str, lock: str) -> dict[tuple[str, str, int], TaskResult]:
+    """Per-task results saved by an earlier attempt of the SAME packet and lock, if any."""
+    out: dict[tuple[str, str, int], TaskResult] = {}
+    try:
+        lines = path.read_text("utf-8").splitlines()
+    except OSError:
+        return out
+    try:
+        head = json.loads(lines[0])
+    except (IndexError, ValueError):
+        return {}
+    if head.get("packet_digest") != digest or head.get("lock_digest") != lock:
+        path.rename(path.with_suffix(".stale"))  # never mix results across locks
+        return {}
+    for ln in lines[1:]:
+        try:
+            d = json.loads(ln)
+        except ValueError:
+            continue  # a half-written last line
+        if "f" not in d:
+            continue
+        out[(d["f"], d["a"], d["s"])] = TaskResult(
+            d["a"], d["f"], d["s"], d["ok"], [], d["stats"], decisions=d["dec"]
+        )
+    return out
 
 
 def main(run_dir: Path) -> Path:
@@ -55,25 +83,50 @@ def main(run_dir: Path) -> Path:
     res: dict[tuple[str, str], list[TaskResult]] = {}
     prog = Progress(run_dir, "eval")
     total, done = len(fams) * len(packet.arms) * len(offs), 0
-    for fam in fams:
-        for arm in packet.arms:
-            rs = []
-            for o in offs:
-                rs.append(
-                    spec.run_task(arm, fam, Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o, packet)
-                )
-                done += 1
-                if done % 5 == 0 or done == total:
-                    prog.update(done, total, f"{arm} · {fam}")  # counts only, no scores
-            res[(fam, arm)] = rs
-            for r in rs:
-                meter.charge(
-                    calls=int(r.stats.get("calls", 0)),
-                    bytes=int(r.stats.get("payload_bytes", 0))
-                    + int(r.stats.get("message_bytes", 0)),
-                )
-                meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
-                rows.append([fam, r.seed, arm, r.success])
+    cache_path = run_dir / "eval" / "results.jsonl"
+    cache = _load_cache(cache_path, digest, ld)  # resume after a crash: finished tasks are kept
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    fresh = not cache_path.exists() or cache_path.stat().st_size == 0
+    with cache_path.open("a", encoding="utf-8") as cf:
+        if fresh:
+            cf.write(json.dumps({"packet_digest": digest, "lock_digest": ld}) + "\n")
+        for fam in fams:
+            for arm in packet.arms:
+                rs = []
+                for o in offs:
+                    seed = SEED_BASE[Split.HELDOUT] + o
+                    hit = cache.get((fam, arm, seed))
+                    if hit is not None:
+                        rs.append(hit)
+                    else:
+                        r = spec.run_task(arm, fam, Split.HELDOUT, seed, packet)
+                        cf.write(
+                            json.dumps(
+                                {
+                                    "f": fam,
+                                    "a": arm,
+                                    "s": seed,
+                                    "ok": r.success,
+                                    "stats": r.stats,
+                                    "dec": r.decisions,
+                                }
+                            )
+                            + "\n"
+                        )
+                        cf.flush()
+                        rs.append(r)
+                    done += 1
+                    if done % 5 == 0 or done == total:
+                        prog.update(done, total, f"{arm} · {fam}")  # counts only, no scores
+                res[(fam, arm)] = rs
+                for r in rs:
+                    meter.charge(
+                        calls=int(r.stats.get("calls", 0)),
+                        bytes=int(r.stats.get("payload_bytes", 0))
+                        + int(r.stats.get("message_bytes", 0)),
+                    )
+                    meter.failed_proposals += int(r.stats.get("failed_proposals", 0))
+                    rows.append([fam, r.seed, arm, r.success])
     fr = [
         FamilyResult(family=fam, arm=arm, n=n, successes=sum(r.success for r in res[(fam, arm)]))
         for fam in fams

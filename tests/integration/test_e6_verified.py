@@ -248,3 +248,28 @@ def test_extend_chains_trains_only_missing(tmp_path: Path, monkeypatch: pytest.M
     )
     body = {k: v for k, v in new.items() if k != "manifest_digest"}
     assert new["manifest_digest"] == canonical_digest(body)
+
+
+def test_ground_guardrails_work_without_d1_no_replay_arm() -> None:
+    """Regression: the pool-matched control (v9) has no d1_no_replay arm; the diversity floor
+    must fall back to the guarded chain's own depth-1 arm instead of raising KeyError."""
+    from hsi.evaluation.base import TaskResult
+    from hsi.evaluation.e6 import E6Spec
+
+    t = template("E6", "llm-poolctl")
+    pk = Packet.model_validate(t, strict=False)
+    assert "d1_no_replay" not in pk.arms
+    spec = E6Spec()
+    spec.manifest = {"candidates": {}, "diversity_floor": 0.0}
+    rs = []
+    for arm in pk.arms:
+        for i in range(20):
+            rs.append(
+                TaskResult(arm, "rule_induction@tune", i, i < 6, [],
+                           {"gen_seen": 1.0, "gen_valid": 1.0, "gen_consistent": float(i < 6),
+                            "gen_exact": 0.0},
+                           decisions=[{"arm": arm, "sig": ["swap", "add", "copy", "mix"][i % 4]}])
+            )  # fmt: skip
+    gv, held = spec.guardrails(rs, [], pk)
+    assert held and gv["diversity_floor"] > 0
+    assert gv["diversity_floor"] == pytest.approx(0.5 * gv["eval_diversity_d1_verified"])
