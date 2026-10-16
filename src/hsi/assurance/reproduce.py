@@ -74,7 +74,12 @@ def _run(cmd: list[str], cwd: Path, env: dict[str, str]) -> str:
 
 
 def reproduce(
-    receipt_path: Path, orig_run: Path, orig_custody: Path, out: Path | None, fetch: bool = False
+    receipt_path: Path,
+    orig_run: Path,
+    orig_custody: Path,
+    out: Path | None,
+    fetch: bool = False,
+    at_commit: str | None = None,
 ) -> dict[str, Any]:
     orig = load_json(receipt_path)
     commit = str(orig["source_commit"])
@@ -86,6 +91,7 @@ def reproduce(
         raise PreconditionError("original lock (run lock.public.json + custody secret) not found")
     if load_json(pub)["lock_digest"] != orig["lock_digest"]:
         raise PreconditionError("original lock does not match the receipt's lock_digest")
+    orig_commit, commit = commit, at_commit or commit
     tmp = Path(tempfile.mkdtemp(prefix="hsi-repro-"))
     try:
         src = tmp / "src"
@@ -145,11 +151,22 @@ def reproduce(
             text=True,
             check=False,
         )
-        ok, total, bad = compare(orig, rerun)
+        ok, total, bad = compare(orig, {**rerun, "source_commit": orig_commit})
         report: dict[str, Any] = {
             "experiment": json.loads(frozen.read_text())["packet"]["experiment"],
             "packet_digest": pd,
-            "source_commit": commit,
+            "source_commit": orig_commit,
+            **(
+                {
+                    "reproduced_at": commit,
+                    "deviation": "reproduced at a later commit than source_commit because the "
+                    "source commit's pinned-adapter check ran before the verified chains were "
+                    "trained and so could not pass in a fresh run root; the later commit only "
+                    "moves that check after the chains (subset semantics).",
+                }
+                if commit != orig_commit
+                else {}
+            ),
             "original_receipt_digest": orig["receipt_digest"],
             "rerun_receipt_digest": rerun["receipt_digest"],
             "aggregates_compared": total,

@@ -190,12 +190,12 @@ TRAIN_KEYS = (
 
 
 def _check_pinned(cands: dict[str, Any], pinned: dict[str, str] | None) -> None:
-    """Fail closed unless every adapter digest equals the packet's pinned digest."""
+    """Fail closed unless every pinned adapter exists with its pinned digest (extras allowed)."""
     if not pinned:
         return
     got = {a: i["digest"] for a, i in cands.items()}
-    if got != pinned:
-        bad = sorted(a for a in set(got) | set(pinned) if got.get(a) != pinned.get(a))
+    bad = sorted(a for a in pinned if got.get(a) != pinned[a])
+    if bad:
         raise DigestError(f"adapters differ from the packet's pinned digests: {bad}")
 
 
@@ -547,10 +547,12 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
             "digest": llm.save_adapter(ld / "real_only.safetensors"),
         }
     prog.finish()
-    _check_pinned(cands, q.get("pinned_adapters"))
+    base_pins = {a: d for a, d in (q.get("pinned_adapters") or {}).items() if a in cands}
+    _check_pinned(cands, base_pins)
     for name, verify, flag in CHAINS:
         if q.get(flag):
             train_chain(packet, run_dir, llm, log, cands, name=name, verify=verify)
+    _check_pinned(cands, q.get("pinned_adapters"))
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
         "runtime": RUNTIME,

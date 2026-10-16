@@ -73,3 +73,17 @@ def test_stale_cache_from_another_lock_is_never_reused(run_dir: Path) -> None:
     locked.main(run_dir)
     assert (run_dir / "eval" / "results.stale").exists()
     assert json.loads(cache.read_text().splitlines()[0])["lock_digest"] != "0" * 64
+
+
+def test_pinned_check_allows_extras_but_not_missing_or_changed() -> None:
+    import pytest
+
+    from hsi.errors import DigestError
+    from hsi.evaluation.llm_stack import _check_pinned
+
+    cands = {"a": {"digest": "x"}, "b": {"digest": "y"}}
+    _check_pinned(cands, {"a": "x"})
+    with pytest.raises(DigestError):
+        _check_pinned(cands, {"a": "z"})
+    with pytest.raises(DigestError):
+        _check_pinned(cands, {"c": "x"})

@@ -542,6 +542,7 @@ def main(argv: list[str] | None = None) -> int:
     rp.add_argument("--orig-run", type=Path, required=True)
     rp.add_argument("--orig-custody", type=Path, required=True)
     rp.add_argument("--out", type=Path)
+    rp.add_argument("--at-commit", help="reproduce at this commit instead of source_commit")
     rp.add_argument(
         "--fetch",
         action="store_true",
@@ -580,7 +581,7 @@ def main(argv: list[str] | None = None) -> int:
         if a.cmd == "reproduce":
             from hsi.assurance import reproduce
 
-            rep = reproduce(a.path, a.orig_run, a.orig_custody, a.out, a.fetch)
+            rep = reproduce(a.path, a.orig_run, a.orig_custody, a.out, a.fetch, a.at_commit)
             print(
                 f"{rep['experiment']}: matched {rep['aggregates_matched']}/"
                 f"{rep['aggregates_compared']} aggregates; validator "
