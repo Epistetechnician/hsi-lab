@@ -38,6 +38,8 @@ ALL = [
     "E6-ground",
     "E6-confirm",
     "E6-verified",
+    "E6-poolctl",
+    "E6-ood",
     "E7",
 ]  # *-llm: MLX-backbone variants
 

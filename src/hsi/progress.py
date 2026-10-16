@@ -26,6 +26,8 @@ class Progress:
         now = time.time()
         if done > self._last_done and now > self._last_t:
             inst = (now - self._last_t) / (done - self._last_done)
+            if self.rate:
+                inst = min(inst, 3 * self.rate)  # a stall must not blow up the estimate
             self.rate = inst if self.rate == 0 else 0.8 * self.rate + 0.2 * inst
             self._last_t, self._last_done = now, done
         self.done, self.total = done, total

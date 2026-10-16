@@ -59,3 +59,11 @@ across both families). Guardrails held: diversity of the model's own outputs 0.4
   transitions); settings without one cannot do this.
 - One seed; one prompt per world; the apparent improvement with depth is within noise between
   adjacent depths and should not be read as a trend.
+
+## Update: follow-ups (E6-poolctl.md, E6-ood.md)
+
+The pool-size confound above was tested with a pool-matched unverified control. Drawing proposals
+from the larger pool accounts for roughly +0.10 of the +0.238 gap over replay; verification adds a
+further +0.141 beyond that control (also visible in exact match). On held-out rule types the
+verified advantage persists on the grounded metric (+0.091) but is confined to compositional
+transfer, exact match is 0 for every arm, and the packet fails its non-collapse guardrail.

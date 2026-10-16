@@ -1,0 +1,244 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 0.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 4395.25,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 5557.259719833004
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d2_replay",
+      "ci_high": 0.12439819216412865,
+      "ci_low": 0.05810180783587135,
+      "paired_diff": 0.09125,
+      "pairs": [
+        {
+          "both": 54,
+          "family": "rule_induction",
+          "n": 400,
+          "neither": 232,
+          "only_baseline": 55,
+          "only_treatment": 59
+        },
+        {
+          "both": 11,
+          "family": "compositional_transfer",
+          "n": 400,
+          "neither": 308,
+          "only_baseline": 6,
+          "only_treatment": 75
+        }
+      ],
+      "treatment_arm": "d2_verified"
+    }
+  ],
+  "data_digest": "450a96350494382d772df0cc3ab5d48c7115a0b8a1a0f542333642cfa1d4cae8",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "d1_verified",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 164
+    },
+    {
+      "arm": "d2_verified",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 113
+    },
+    {
+      "arm": "d3_verified",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 123
+    },
+    {
+      "arm": "d1_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 107
+    },
+    {
+      "arm": "d2_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 109
+    },
+    {
+      "arm": "d3_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 42
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 79
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 57
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 59
+    },
+    {
+      "arm": "real_only",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 73
+    },
+    {
+      "arm": "frozen_base",
+      "family": "rule_induction",
+      "n": 400,
+      "successes": 0
+    },
+    {
+      "arm": "d1_verified",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 75
+    },
+    {
+      "arm": "d2_verified",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 86
+    },
+    {
+      "arm": "d3_verified",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 85
+    },
+    {
+      "arm": "d1_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 25
+    },
+    {
+      "arm": "d2_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 17
+    },
+    {
+      "arm": "d3_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 28
+    },
+    {
+      "arm": "d1_no_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 25
+    },
+    {
+      "arm": "d2_no_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 8
+    },
+    {
+      "arm": "d3_no_replay",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 6
+    },
+    {
+      "arm": "real_only",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 84
+    },
+    {
+      "arm": "frozen_base",
+      "family": "compositional_transfer",
+      "n": 400,
+      "successes": 0
+    }
+  ],
+  "guardrail_values": {
+    "diversity_d2_no_replay": 0.2721694166675365,
+    "diversity_d2_verified": 0.194760698788235,
+    "diversity_floor": 0.13990508670301466,
+    "eval_consistent_d1_no_replay": 0.13,
+    "eval_consistent_d1_replay": 0.165,
+    "eval_consistent_d1_verified": 0.29875,
+    "eval_consistent_d2_no_replay": 0.08125,
+    "eval_consistent_d2_replay": 0.1575,
+    "eval_consistent_d2_verified": 0.24875,
+    "eval_consistent_d3_no_replay": 0.08125,
+    "eval_consistent_d3_replay": 0.0875,
+    "eval_consistent_d3_verified": 0.26,
+    "eval_consistent_frozen_base": 0.0,
+    "eval_consistent_real_only": 0.19625,
+    "eval_diversity_d1_no_replay": 0.2798101734060293,
+    "eval_diversity_d1_replay": 0.41256837032359633,
+    "eval_diversity_d1_verified": 0.42241139594162136,
+    "eval_diversity_d2_no_replay": 0.1974925108130147,
+    "eval_diversity_d2_replay": 0.3857983867568365,
+    "eval_diversity_d2_verified": 0.500108895291687,
+    "eval_diversity_d3_no_replay": 0.12375345196607289,
+    "eval_diversity_d3_replay": 0.43678608466630653,
+    "eval_diversity_d3_verified": 0.49686438586174936,
+    "eval_diversity_frozen_base": -0.0,
+    "eval_diversity_real_only": 0.4282376088678259,
+    "eval_exact_d1_no_replay": 0.0,
+    "eval_exact_d1_replay": 0.0,
+    "eval_exact_d1_verified": 0.0,
+    "eval_exact_d2_no_replay": 0.0,
+    "eval_exact_d2_replay": 0.0,
+    "eval_exact_d2_verified": 0.0,
+    "eval_exact_d3_no_replay": 0.0,
+    "eval_exact_d3_replay": 0.0,
+    "eval_exact_d3_verified": 0.0,
+    "eval_exact_frozen_base": 0.0,
+    "eval_exact_real_only": 0.0,
+    "eval_valid_d1_no_replay": 0.92,
+    "eval_valid_d1_replay": 0.9275,
+    "eval_valid_d1_verified": 0.99625,
+    "eval_valid_d2_no_replay": 0.85875,
+    "eval_valid_d2_replay": 0.91625,
+    "eval_valid_d2_verified": 0.995,
+    "eval_valid_d3_no_replay": 0.875,
+    "eval_valid_d3_replay": 0.89875,
+    "eval_valid_d3_verified": 0.99,
+    "eval_valid_frozen_base": 0.0,
+    "eval_valid_real_only": 0.99375,
+    "min_replay_diversity": 0.42241139594162136,
+    "non_collapse_floor": 0.02,
+    "rate_d1_verified": 0.29875,
+    "rate_d2_verified": 0.24875,
+    "validity_d2_no_replay": 0.045714285714285714,
+    "validity_d2_verified": 1.0
+  },
+  "guardrails_held": false,
+  "lock_digest": "6c33b36b1b2be9c584c2bc9cc8f50c43c96848e37808cf0c84846cce294aafe6",
+  "model_digest": "de189786ae7064ffdf943d76099c8972a144e87b5da97a3b86ac8549811ba8c4",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "da54f98b6df68143065a826f15904b16200efb0f1f2af990219008ceb946f0cc",
+  "receipt_digest": "3217e5294f49f92270f74b29294a40075376dab608630d65cf0031c7d309e3c3",
+  "schema_version": "hsi-receipt-v1",
+  "seeds": [
+    0
+  ],
+  "source_commit": "529af24ecf10a0af2317e87622603f51f9009aab",
+  "threshold": 0.05
+}

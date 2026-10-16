@@ -339,3 +339,10 @@ exact 0.081/0.111/0.152 vs 0.165 for the supervised reference) while unverified 
 Caveats: no pool-matched unverified control yet; the verifier shares the metric's definition;
 in-distribution only. Receipt `docs/experiments/E6-verified-receipt.json`; see
 docs/experiments/E6-verified.md.
+
+E6 follow-ups on the verified-synthetic result. Pool-matched control (packet e6-v9): PROMOTE, d2 verified
+- d2 pool-matched unverified = +0.141 [+0.106, +0.177]; the earlier +0.238 over replay splits into
+about +0.10 from the larger proposal pool and +0.14 from verification. Held-out rule types (packet
+e6-v10): NO_CANDIDATE by guardrail (d2 verified 0.249 vs d1 verified 0.299) although the primary
+effect is +0.091 [+0.058, +0.124]; exact match is 0 for all arms there. See docs/experiments/
+E6-poolctl.md and E6-ood.md.

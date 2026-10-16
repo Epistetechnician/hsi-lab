@@ -222,3 +222,29 @@ d2_replay → d2_verified (receipt: diff 0.2375, CI [0.2046, 0.2704])
 Guardrails: {'diversity_floor': 0.15648112195519226, 'min_replay_diversity': 0.4084324488631278, 'non_collapse_floor': 0.02, 'rate_d1_verified': 0.2825, 'rate_d2_verified': 0.2975}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-poolctl — receipt `6e0b33050454`, threshold 0.05, decision PROMOTE
+
+d2_poolctl → d2_verified (receipt: diff 0.1413, CI [0.1059, 0.1766])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction@tune | 400 | 59 | 132 | 39 | 170 |
+| compositional_transfer@tune | 400 | 12 | 40 | 20 | 328 |
+
+Guardrails: {'diversity_floor': 0.2038678601747587, 'min_replay_diversity': 0.4077357203495174, 'non_collapse_floor': 0.02, 'rate_d1_verified': 0.28375, 'rate_d2_verified': 0.30375}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## E6-ood — receipt `3217e5294f49`, threshold 0.05, decision NO_CANDIDATE
+
+d2_replay → d2_verified (receipt: diff 0.0912, CI [0.0581, 0.1244])
+
+| family | n | both | only_t | only_b | neither |
+| --- | --- | --- | --- | --- | --- |
+| rule_induction | 400 | 54 | 59 | 55 | 232 |
+| compositional_transfer | 400 | 11 | 75 | 6 | 308 |
+
+Guardrails: {'diversity_floor': 0.13990508670301466, 'min_replay_diversity': 0.42241139594162136, 'non_collapse_floor': 0.02, 'rate_d1_verified': 0.29875, 'rate_d2_verified': 0.24875}
+
+- [ ] hand-recomputed and matches (owner initials/date: ______)
