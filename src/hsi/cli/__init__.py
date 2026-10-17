@@ -37,7 +37,7 @@ E1_PARAMS = {
 
 GEN_VARIANTS = {
     "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
-    "llm-poolctl", "llm-ood",
+    "llm-poolctl", "llm-ood", "llm-torch",
 }  # fmt: skip
 TERMINATED = GEN_VARIANTS - {"llm-gen"}
 SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
@@ -51,6 +51,7 @@ VERSIONS = {
     "llm-verified": 8,
     "llm-poolctl": 9,
     "llm-ood": 10,
+    "llm-torch": 11,
 }
 
 
@@ -382,7 +383,10 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "no-replay."
             )
             t["null_hypothesis"] = "d2 replay does not beat d2 no-replay by the threshold."
-        if variant == "llm-verified":  # v8: does verifying the synthetic half rescue recursion?
+        if variant in (
+            "llm-verified",
+            "llm-torch",
+        ):  # v8: does verifying the synthetic half rescue recursion?
             p.update(
                 families=["rule_induction@tune", "compositional_transfer@tune"],
                 depth=2, treatment="d2_verified", baselines=["d2_replay"],
@@ -399,6 +403,14 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "verified beats d2 replay."
             )
             t["null_hypothesis"] = "d2 verified does not beat d2 replay by the threshold."
+        if variant == "llm-torch":  # v11: v8 re-run on the PyTorch/CUDA runtime, fresh lock
+            for k in ("reuse_from", "pinned_adapters"):
+                p.pop(k, None)
+            p["model"] = "qwen2.5-7b-hf"
+            t["hypothesis"] = (
+                "Replication on a different stack (PyTorch/CUDA, full-precision Qwen2.5-7B-"
+                "Instruct, fresh held-out lock): " + str(t["hypothesis"])
+            )
         if variant in ("llm-poolctl", "llm-ood"):  # v9/v10: follow-ups that reuse the v8 adapters
             from hsi.paths import run_root
 

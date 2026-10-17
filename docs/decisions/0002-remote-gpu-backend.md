@@ -1,6 +1,6 @@
 # 0002 — Remote GPU / PyTorch backend (scoping; nothing built or provisioned)
 
-Status: **proposed**, awaiting owner approval. The owner has said `gman` (givemeanode) may be used
+Status: **accepted 2026-10-17** (spend ceiling USD 50 total, `gman`; see Decisions). The owner has said `gman` (givemeanode) may be used
 for remote GPUs; this record turns that into a bounded plan and says what it would and would not
 change. As of writing, `gman` is signed in with a prepaid balance and no top-up rule; the existing
 H100 nodes in the workspace belong to other projects and are not touched.
@@ -69,3 +69,23 @@ The first cost-bearing action is B3's smoke run, a few GPU-minutes.
 2. Spend ceiling and per-run cap.
 3. Default custody policy for remote held-out eval (recommended: do not; use fresh locks).
 4. Whether B4 replication should precede or follow any new E6/E4 science.
+
+## Decisions (owner, 2026-10-17)
+
+1. Exception approved for LLM-backed packets only.
+2. Spend ceiling: **USD 50 in total** across all remote runs, enforced by checking `gman usage`
+   before and after every remote stage and parking nodes on completion. Per-run cap: USD 15.
+3. Custody: remote nodes never receive the original lock secret. Replication packets use fresh locks
+   created for the torch runtime; their secrets live in `~/hsi-custody` and are shipped to a node
+   only via `gman secret` if a remote held-out eval is needed.
+4. Replication (B4) precedes any new science.
+
+## B1 result (2026-10-17)
+
+`TorchLLM` (`src/hsi/learning/llm_torch.py`) implements the `LLM` contract with a hand-written LoRA
+(same parameterisation as the MLX one; PEFT not used). Gated tests (`HSI_TORCH_TESTS=1`): cached
+scoring equals the full forward within 1e-3; adapter is a bit-exact identity at init and a bit-exact
+no-op when switched off; train/save/load round-trips the digest. Parity against MLX 4-bit on the same
+prompts (`scripts/parity_mlx_torch.py`, 40 prompts x 300 hypotheses): mean Pearson 0.89 (min 0.85),
+top-1 agreement 62.5%. Stated tolerance for the gate: min Pearson >= 0.8. Differences are expected
+(full precision vs 4-bit) and the torch results are replications, not reproductions.

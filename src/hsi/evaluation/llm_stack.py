@@ -23,6 +23,7 @@ _STATE: dict[str, Any] = {}
 
 def get_llm(packet: Packet | None = None) -> Any:
     from hsi.learning.llm import DEFAULT_MODEL, LLM
+    from hsi.learning.llm_torch import TorchLLM
 
     name = (
         str(packet.params.get("model", DEFAULT_MODEL))
@@ -31,7 +32,8 @@ def get_llm(packet: Packet | None = None) -> Any:
     )
     if _STATE.get("name") != name or "llm" not in _STATE:
         _STATE.pop("llm", None)
-        _STATE["llm"], _STATE["name"], _STATE["arm"] = LLM(name=name), name, None
+        cls = TorchLLM if name.endswith("-hf") else LLM
+        _STATE["llm"], _STATE["name"], _STATE["arm"] = cls(name=name), name, None
     return _STATE["llm"]
 
 
@@ -52,7 +54,6 @@ def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
         MODELS,
-        RUNTIME,
         describe,
         render_prompt,
         weights_digest,
@@ -87,7 +88,7 @@ def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
     adapter_digest = llm.save_adapter(ld / "lora_candidate.safetensors")
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
-        "runtime": RUNTIME,
+        "runtime": llm.runtime,
         "python": sys.version.split()[0],
         "seeds": packet.seeds,
         "backbone": "llm",
@@ -116,7 +117,7 @@ def prepare_e4_llm(packet: Packet, run_dir: Path) -> None:
 
 
 def bind_e4_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
-    from hsi.learning.llm import RUNTIME, weights_digest
+    from hsi.learning.llm import weights_digest
 
     ld = run_dir / "learning"
     if not (ld / "manifest.json").exists():
@@ -130,7 +131,7 @@ def bind_e4_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
     if man["packet_digest"] != canonical_digest(packet.model_dump(mode="json")):
         raise DigestError("candidate not bound to this packet")
     llm = _ensure_adapter(packet)
-    if man["runtime"] != RUNTIME or man["weights_digest"] != weights_digest(llm.path):
+    if man["runtime"] != llm.runtime or man["weights_digest"] != weights_digest(llm.path):
         raise DigestError("runtime or checkpoint mismatch")
     llm.load_adapter(ld / "lora_candidate.safetensors")
     if llm.adapter_digest() != man["adapter_digest"]:
@@ -416,7 +417,6 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import (
         MODELS,
-        RUNTIME,
         describe,
         few_shot_prompt,
         parse_hypothesis,
@@ -555,7 +555,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     _check_pinned(cands, q.get("pinned_adapters"))
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
-        "runtime": RUNTIME,
+        "runtime": llm.runtime,
         "python": sys.version.split()[0],
         "seeds": packet.seeds,
         "backbone": "llm",
@@ -573,7 +573,7 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
 
 
 def bind_e6_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
-    from hsi.learning.llm import RUNTIME, weights_digest
+    from hsi.learning.llm import weights_digest
 
     ld = run_dir / "learning"
     if not (ld / "manifest.json").exists():
@@ -587,7 +587,7 @@ def bind_e6_llm(packet: Packet, run_dir: Path) -> dict[str, Any]:
     if man["packet_digest"] != canonical_digest(packet.model_dump(mode="json")):
         raise DigestError("candidates not bound to this packet")
     llm = _ensure_adapter(packet)
-    if man["runtime"] != RUNTIME or man["weights_digest"] != weights_digest(llm.path):
+    if man["runtime"] != llm.runtime or man["weights_digest"] != weights_digest(llm.path):
         raise DigestError("runtime or checkpoint mismatch")
     for arm, info in man["candidates"].items():  # type: ignore[attr-defined]
         llm.load_adapter(ld / f"{arm}.safetensors")

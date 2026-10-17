@@ -32,6 +32,22 @@ MODELS: dict[str, tuple[str, str, str]] = {  # name -> (HF repo, pinned revision
         "c26a38f6a37d0a51b4e9a1eb3026530fa35d9fed",
         "apache-2.0",
     ),
+    # full-precision checkpoints for the PyTorch backend (ADR 0002); names end in "-hf"
+    "qwen2.5-1.5b-hf": (
+        "Qwen/Qwen2.5-1.5B-Instruct",
+        "989aa7980e4cf806f80c7fef2b1adb7bc71aa306",
+        "apache-2.0",
+    ),
+    "qwen2.5-7b-hf": (
+        "Qwen/Qwen2.5-7B-Instruct",
+        "a09a35458c702b33eeacc393d103063234e8bc28",
+        "apache-2.0",
+    ),
+    "qwen2.5-14b-hf": (
+        "Qwen/Qwen2.5-14B-Instruct",
+        "cf98f3b3bbb457ad9e2bb7baf9a0125b6b88caa8",
+        "apache-2.0",
+    ),
 }
 DEFAULT_MODEL = "qwen2.5-1.5b"
 MODEL_REPO, MODEL_REVISION, MODEL_LICENSE = MODELS[DEFAULT_MODEL]
@@ -122,6 +138,8 @@ def text_signature(text: str) -> str:
 class LLM:
     """Loaded base model + tokenizer with scoring, LoRA attach/train/save/load, and an exact
     adapter off-switch."""
+
+    runtime = RUNTIME
 
     def __init__(self, path: Path | None = None, name: str = DEFAULT_MODEL) -> None:
         import mlx.core as mx  # noqa: F401

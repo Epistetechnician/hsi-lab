@@ -11,6 +11,12 @@ hsi = "hsi.cli:main"
 mlx = [
     "mlx-lm>=0.20",
 ]
+torch = [
+    "torch>=2.4",
+    "transformers>=4.46,<5",
+    "safetensors>=0.4",
+    "accelerate>=1.0",
+]
 
 [dependency-groups]
 dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.5", "mypy>=1.10"]
