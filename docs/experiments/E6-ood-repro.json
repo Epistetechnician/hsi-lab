@@ -1,0 +1,24 @@
+{
+  "aggregates_compared": 175,
+  "aggregates_matched": 175,
+  "deviation": "reproduced at a later commit than source_commit because the source commit's pinned-adapter check ran before the verified chains were trained and so could not pass in a fresh run root; the later commit only moves that check after the chains (subset semantics).",
+  "excluded": [
+    "budget_used.wall_seconds",
+    "budget_used.peak_mem_mb",
+    "receipt_digest"
+  ],
+  "experiment": "E6",
+  "match": true,
+  "match_fraction": 1.0,
+  "method": "fresh clone at source_commit, fresh uv venv from uv.lock, fresh run root, original held-out lock imported",
+  "mismatches": [],
+  "original_receipt_digest": "3217e5294f49f92270f74b29294a40075376dab608630d65cf0031c7d309e3c3",
+  "packet_digest": "da54f98b6df68143065a826f15904b16200efb0f1f2af990219008ceb946f0cc",
+  "platform": "macOS-26.6.1-arm64-arm-64bit",
+  "python": "3.12.13",
+  "reproduced_at": "b94e3f3bdfdf66f0687e08278aba94fdea8d3096",
+  "rerun_receipt_digest": "aa7af09ba1dab6774acc895b585cca9b6f1675fc88351daef3c33acbb98d2a47",
+  "rerun_validator_ok": true,
+  "source_commit": "529af24ecf10a0af2317e87622603f51f9009aab",
+  "uv_lock_sha256": "1a08db4a70db03400d340622aec5bdf7d7eaf9a007a3d5151e0e3588d8505681"
+}
