@@ -248,3 +248,9 @@ d2_replay → d2_verified (receipt: diff 0.0912, CI [0.0581, 0.1244])
 Guardrails: {'diversity_floor': 0.13990508670301466, 'min_replay_diversity': 0.42241139594162136, 'non_collapse_floor': 0.02, 'rate_d1_verified': 0.29875, 'rate_d2_verified': 0.24875}
 
 - [ ] hand-recomputed and matches (owner initials/date: ______)
+
+## Agent hand-recompute (2026-10-17)
+
+All 17 committed receipts were recomputed with the formulas above in a separate script (no shared code with `validator/recompute.py`): paired diffs, CIs and decisions matched for every comparison. This was performed by the build agent, not an independent human, so it does not count toward A4; the boxes above remain for the owner.
+
+`hsi decide` was run on all 17 receipts at the owner's request, recording each receipt's rule decision as the owner decision (`decisions.jsonl` in each run root).
