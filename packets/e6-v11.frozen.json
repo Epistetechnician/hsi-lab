@@ -1,0 +1,95 @@
+{
+  "packet": {
+    "arms": [
+      "d1_replay",
+      "d1_no_replay",
+      "d2_replay",
+      "d2_no_replay",
+      "d3_replay",
+      "d3_no_replay",
+      "real_only",
+      "frozen_base",
+      "d1_verified",
+      "d2_verified",
+      "d3_verified"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "Replication on a different stack (PyTorch/CUDA, full-precision Qwen2.5-7B-Instruct, fresh held-out lock): Keeping only verified synthetic examples (a valid hypothesis whose re-execution reproduces the observed transitions), with the same original-data half and the same example count, yields more grounded generation at recursion depth 2 on unseen in-distribution worlds than keeping the unverified synthetic half: d2 verified beats d2 replay.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d2 verified does not beat d2 replay by the threshold.",
+    "params": {
+      "adapt_batch": 8,
+      "adapt_lr": 0.0001,
+      "adapt_steps": 300,
+      "avoid": [
+        [
+          1000,
+          1600
+        ]
+      ],
+      "backbone": "llm",
+      "baselines": [
+        "d2_replay"
+      ],
+      "depth": 2,
+      "diversity_floor_frac": 0.5,
+      "eval_mode": "ground",
+      "extra_arms": true,
+      "families": [
+        "rule_induction@tune",
+        "compositional_transfer@tune"
+      ],
+      "gen_max_tokens": 20,
+      "generations": 3,
+      "guard_suffix": "verified",
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "max_n": 400,
+      "min_n": 100,
+      "model": "qwen2.5-7b-hf",
+      "n_adapt": 50,
+      "n_demos": 2,
+      "n_replay": 50,
+      "n_replay_tune": 50,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 30,
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "rank": 8,
+      "support": 8,
+      "target_terminator": "\n",
+      "treatment": "d2_verified",
+      "tune_offset": 500000,
+      "verified_chain": true,
+      "verify_pool_base": 1000,
+      "verify_pool_worlds": 600
+    },
+    "primary_metric": "grounded_generation_rate_diff_d2_verified_minus_d2_replay",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 11
+  },
+  "packet_digest": "5a8cd61e7eaf0840a9a0bfa2d30273aa229db1c3098b0168c6596ae2230288ad"
+}
