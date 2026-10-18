@@ -179,11 +179,22 @@ def reproduce(
             "python": platform.python_version(),
             "platform": platform.platform(),
             "excluded": ["budget_used.wall_seconds", "budget_used.peak_mem_mb", "receipt_digest"],
+            "rerun_decision": rerun["decision"],
+            "rerun_comparisons": [
+                {
+                    "treatment": c["treatment_arm"],
+                    "baseline": c["baseline_arm"],
+                    "paired_diff": c["paired_diff"],
+                    "ci": [c["ci_low"], c["ci_high"]],
+                }
+                for c in rerun["comparisons"]
+            ],
             "method": "fresh clone at source_commit, fresh uv venv from uv.lock, fresh run root, "
             "original held-out lock imported",
         }
         if out:
             write_json(out, report)
+            shutil.copyfile(rerun_path, out.with_name(out.stem + ".rerun-receipt.json"))
         return report
     finally:
         shutil.rmtree(tmp, ignore_errors=True)

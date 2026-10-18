@@ -30,6 +30,10 @@ d2 verified vs d2 replay (grounded generation rate): **+0.109, 95% CI [0.073, 0.
 ## Limits
 - One seed, one generator size, synthetic worlds only. Not independent validation (A4).
 - The torch arm uses a fresh lock, so it is a new held-out cohort, not the v8 cohort.
-- Not yet reproduced in a clean environment (A3): that needs this lock's secret, which is on the
-  GPU node and has not been copied to local custody (see ADR 0002 B4 follow-up).
-- Cost: USD 7.43 of the USD 50 ceiling.
+- **Clean-environment rerun (A3) failed, as ADR 0002 predicted:** a fresh clone at the source commit,
+  fresh venv, fresh run root and the original lock matched only 96 of 175 aggregates (55%). Model and
+  data digests differ because CUDA training is not bit-reproducible, so adapters, generations and every
+  downstream count differ. The rerun's validator passed. The first report did not keep the rerun's
+  decision or effect size (its temp directory was deleted), so it cannot say whether the conclusion
+  held; `hsi reproduce` now saves both. A second run to capture them is pending.
+- Cost: USD 15.02 of the USD 50 ceiling after the first run and the rerun.
