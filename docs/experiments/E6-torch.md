@@ -30,10 +30,14 @@ d2 verified vs d2 replay (grounded generation rate): **+0.109, 95% CI [0.073, 0.
 ## Limits
 - One seed, one generator size, synthetic worlds only. Not independent validation (A4).
 - The torch arm uses a fresh lock, so it is a new held-out cohort, not the v8 cohort.
-- **Clean-environment rerun (A3) failed, as ADR 0002 predicted:** a fresh clone at the source commit,
-  fresh venv, fresh run root and the original lock matched only 96 of 175 aggregates (55%). Model and
-  data digests differ because CUDA training is not bit-reproducible, so adapters, generations and every
-  downstream count differ. The rerun's validator passed. The first report did not keep the rerun's
-  decision or effect size (its temp directory was deleted), so it cannot say whether the conclusion
-  held; `hsi reproduce` now saves both. A second run to capture them is pending.
-- Cost: USD 15.02 of the USD 50 ceiling after the first run and the rerun.
+- **Clean-environment rerun (A3) failed, as ADR 0002 predicted:** two fresh reruns (fresh clone at the
+  source commit, fresh venv, fresh run root, original lock) each matched only 96 of 175 aggregates
+  (55%), with different mismatches each time. Model and data digests differ because CUDA training is
+  not bit-reproducible. Both reruns' validators passed.
+- **The conclusion did replicate in the second rerun** (`E6-torch-repro.rerun-receipt.json`): decision
+  PROMOTE, d2 verified minus d2 replay **+0.1675, CI [0.133, 0.202]**, against +0.109 [0.073, 0.144]
+  in the original; the intervals overlap. Run 1's report (`E6-torch-repro-run1.json`) did not keep its
+  rerun receipt, so only the mismatch count survives for it. Three fresh trainings on the same lock
+  (original, rerun 1, rerun 2) therefore agree on the aggregate-count level but not on the exact numbers;
+  two of the three have measured effects, both PROMOTE.
+- Cost: USD 24.61 of the USD 50 ceiling (original run and two reruns).

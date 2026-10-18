@@ -27,7 +27,6 @@
     "family_results[10].successes",
     "family_results[11].successes",
     "family_results[12].successes",
-    "family_results[13].successes",
     "family_results[14].successes",
     "family_results[15].successes",
     "family_results[16].successes",
@@ -82,6 +81,7 @@
     "guardrail_values.eval_valid_d2_no_replay",
     "guardrail_values.eval_valid_d2_replay",
     "guardrail_values.eval_valid_d2_verified",
+    "guardrail_values.eval_valid_d3_no_replay",
     "guardrail_values.eval_valid_d3_replay",
     "guardrail_values.eval_valid_d3_verified",
     "guardrail_values.eval_valid_real_only",
@@ -95,7 +95,19 @@
   "packet_digest": "5a8cd61e7eaf0840a9a0bfa2d30273aa229db1c3098b0168c6596ae2230288ad",
   "platform": "Linux-5.15.0-194-generic-x86_64-with-glibc2.39",
   "python": "3.12.3",
-  "rerun_receipt_digest": "31916afebadf1e2cfdbe0e22e6e51a5e931fbcebac9862d3ca47703338842ddf",
+  "rerun_comparisons": [
+    {
+      "baseline": "d2_replay",
+      "ci": [
+        0.13294066786669625,
+        0.2020593321333037
+      ],
+      "paired_diff": 0.16749999999999998,
+      "treatment": "d2_verified"
+    }
+  ],
+  "rerun_decision": "PROMOTE",
+  "rerun_receipt_digest": "e6573786d63c73b527970432ef3e151224c2af1eef6eab5c69f92fb9b538a160",
   "rerun_validator_ok": true,
   "source_commit": "f69c6cb86b124cd62fd6d1e93b360fb99c651415",
   "uv_lock_sha256": "64ae6f4c8c41852c13616b555d7241ffb8534eba9688c06eab66fed36aba2dcb"
