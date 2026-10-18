@@ -89,3 +89,12 @@ no-op when switched off; train/save/load round-trips the digest. Parity against 
 prompts (`scripts/parity_mlx_torch.py`, 40 prompts x 300 hypotheses): mean Pearson 0.89 (min 0.85),
 top-1 agreement 62.5%. Stated tolerance for the gate: min Pearson >= 0.8. Differences are expected
 (full precision vs 4-bit) and the torch results are replications, not reproductions.
+
+## B2-B4 result (2026-10-18)
+
+Remote stages ran through `gman` on one H100 (`hsi-lab-torch`, now deleted; USD 24.61 of the 50 ceiling).
+E6 v8 was replicated as packet e6-v11 (torch, Qwen2.5-7B full precision, fresh lock): PROMOTE, +0.109
+[0.073, 0.144]; see `docs/experiments/E6-torch.md`. Two clean reruns each matched 96 of 175 aggregates
+(CUDA nondeterminism), so the torch result stays below A3; the second rerun's decision was PROMOTE,
++0.1675 [0.133, 0.202]. The v11 lock secret was copied by the owner to `~/hsi-custody` (verified against
+the public lock) and backed up; the node, and with it its copy, was deleted. B5 (scale-up) not started.
