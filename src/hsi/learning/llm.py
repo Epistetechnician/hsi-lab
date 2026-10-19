@@ -247,6 +247,11 @@ class LLM:
         out = generate(self.model, self.tok, prompt=prompt, max_tokens=max_tokens)
         return str(out).strip().split("\n")[0].strip()
 
+    def mean_logprob(self, prompt: str, text: str) -> float:
+        """Mean per-token log P(" " + text | prompt): the model's confidence in its own text."""
+        n = max(1, len(self.tok.encode(" " + text)))
+        return self.score(prompt, [text])[0] / n
+
     # -- LoRA -----------------------------------------------------------------
     def attach_lora(self, rank: int, layers: int, seed: int, scale: float = 20.0) -> None:
         import mlx.core as mx

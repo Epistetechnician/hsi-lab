@@ -299,14 +299,18 @@ def train_chain(
     cands: dict[str, Any],
     name: str,
     verify: bool,
+    spec: Any = None,
+    gens: int | None = None,
 ) -> None:
     """Chain d1..dG_<name>: generation g draws proposals from a larger pool until the synthetic
     quota is met, plus original labelled data, so each arm has the same example count as the
     replay arms. verify=True keeps only VERIFIED proposals (the 'verified' chain); verify=False
-    keeps the first proposals unfiltered (the pool-matched 'poolctl' control). Writes adapters
-    and fills `cands`."""
+    keeps the first proposals unfiltered (the pool-matched 'poolctl' control). `spec` (a
+    VerifierSpec, ADR 0003) replaces both with an imperfect verifier and adds a ground-truth
+    audit of the kept set. Writes adapters and fills `cands`."""
     from hsi.agents.learner import HYPOTHESES
-    from hsi.learning.llm import describe, few_shot_prompt, render_prompt
+    from hsi.learning.llm import describe, few_shot_prompt, parse_hypothesis, render_prompt
+    from hsi.verification.verifiers import accepts, probe_correct, probes_agree, true_rule
 
     q = packet.params
     fams, sup, seed = list(q["pretrain_families"]), int(q["support"]), int(packet.seeds[0])
@@ -320,7 +324,7 @@ def train_chain(
     quota = n_total // 2  # same synthetic quota as the replay arms
     rng = random.Random(f"e6llm-{name}/{seed}")
     demos, term = _demos(packet), str(q.get("target_terminator", ""))
-    gens = int(q["generations"])
+    gens = int(gens if gens is not None else q["generations"])
     prog = Progress(run_dir, f"pilot:{name}")
     prog.update(0, gens, "starting")
     llm.set_adapter(False)  # generation 1 is produced by the frozen base
@@ -328,18 +332,40 @@ def train_chain(
         order = list(pool)
         rng.shuffle(order)
         kept: list[tuple[Any, str]] = []
-        proposed = n_consistent = 0
+        proposed = n_consistent = n_correct = 0
         for i in range(0, len(order), 8):  # proposals in small blocks; stop at the quota
             block = order[i : i + 8]
-            texts = [
-                llm.generate(few_shot_prompt(s.pairs, demos), int(q["gen_max_tokens"])) or "unknown"
-                for s in block
-            ]
+            prompts = [few_shot_prompt(s.pairs, demos) for s in block]
+            texts = [llm.generate(pr, int(q["gen_max_tokens"])) or "unknown" for pr in prompts]
             proposed += len(block)
-            for ok, s, t in zip(verify_texts(texts, block), block, texts, strict=True):
-                if (ok or not verify) and len(kept) < quota:
+            cons = verify_texts(texts, block)
+            if spec is None:
+                take = [ok or not verify for ok in cons]
+            else:
+                lps = [
+                    llm.mean_logprob(pr, t) if spec.kind == "confidence" else None
+                    for pr, t in zip(prompts, texts, strict=True)
+                ]
+                take = [
+                    accepts(
+                        spec, seed, g, s.key, t,
+                        parses=parse_hypothesis(t) is not None, consistent=ok, mean_logprob=lp,
+                        extra_ok=(
+                            probes_agree(
+                                parse_hypothesis(t), true_rule(s.key), f"train/{s.key}",
+                                spec.extra_probes,
+                            )
+                            if spec.kind == "tested" and ok else None
+                        ),
+                    )
+                    for s, t, ok, lp in zip(block, texts, cons, lps, strict=True)
+                ]  # fmt: skip
+            for take_it, ok, s, t in zip(take, cons, block, texts, strict=True):
+                if take_it and len(kept) < quota:
                     kept.append((s, t))
                     n_consistent += ok
+                    if spec is not None:  # audit only: truth never decides a verdict
+                        n_correct += probe_correct(parse_hypothesis(t), true_rule(s.key), s.key)
             prog.update(g - 1, gens, f"d{g}_{name}: {len(kept)}/{quota} kept of {proposed}")
             if len(kept) >= quota:
                 break
@@ -355,8 +381,14 @@ def train_chain(
                     "arm": arm,
                     "gen": g,
                     "origin": "generated",
-                    "eligibility": "eligible" if verify else "unverified",
-                    "label_source": "self-verified" if verify else "self-generated",
+                    "eligibility": "eligible" if (verify or spec is not None) else "unverified",
+                    "label_source": (
+                        f"self-verified:{spec.kind}"
+                        if spec is not None
+                        else "self-verified"
+                        if verify
+                        else "self-generated"
+                    ),
                     "text": t,
                 }
             )
@@ -371,7 +403,11 @@ def train_chain(
                     "label_source": "oracle",
                 }
             )
-        tseed = seed + (100 if verify else 200) + g
+        tseed = (
+            seed + spec.train_seed_offset + g
+            if spec is not None
+            else seed + (100 if verify else 200) + g
+        )
         llm.reset_lora(tseed)
         steps = int(q["adapt_steps"])
         loss = llm.train_lora(
@@ -386,6 +422,11 @@ def train_chain(
             "n_synthetic": len(kept), "n_real": len(real), "proposed": proposed,
             "yield": n_consistent / max(1, proposed), "shortfall": short,
         }  # fmt: skip
+        if spec is not None:
+            cands[arm].update(
+                precision=n_correct / max(1, len(kept)), accept_rate=len(kept) / max(1, proposed),
+                verifier=spec.name,
+            )  # fmt: skip
         # live weights now equal adapter g: the next generation is produced by it
     prog.finish()
 
@@ -399,18 +440,31 @@ def _extend_chains(packet: Packet, run_dir: Path) -> None:
     ld = run_dir / "learning"
     man: dict[str, Any] = dict(load_json(ld / "manifest.json"))
     cands: dict[str, Any] = dict(man["candidates"])
+    from hsi.verification.verifiers import specs_of
+
     todo = [(n, v) for n, v, flag in CHAINS if q.get(flag) and f"d1_{n}" not in cands]
-    if not todo:
+    depth = int(q.get("verifier_depth", q["generations"]))
+    vtodo = [sp for sp in specs_of(q) if f"d{depth}_{sp.name}" not in cands]
+    if not todo and not vtodo:
         return
     llm = _ensure_adapter(packet)
     log = DecisionLog(ld / "training.extra.jsonl")
+
+    def persist() -> None:  # after every finished chain: a crash keeps what is already trained
+        man.pop("manifest_digest", None)
+        man["candidates"] = cands
+        man["extra_log_head"] = log.head
+        man["manifest_digest"] = canonical_digest(man)
+        _save(ld / "manifest.json", man)
+
     for name, verify in todo:
         train_chain(packet, run_dir, llm, log, cands, name=name, verify=verify)
-    man.pop("manifest_digest", None)
-    man["candidates"] = cands
-    man["extra_log_head"] = log.head
-    man["manifest_digest"] = canonical_digest(man)
-    _save(ld / "manifest.json", man)
+        persist()
+    for sp in vtodo:
+        train_chain(
+            packet, run_dir, llm, log, cands, name=sp.name, verify=True, spec=sp, gens=depth
+        )
+        persist()
 
 
 def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
@@ -622,7 +676,7 @@ def run_llm_e6_task(arm: str, family: str, split: Split, seed: int, packet: Pack
         _STATE["arm"] = arm
     if packet.params.get("eval_mode") == "generate":
         return run_generation_task(llm, arm, family, split, seed, packet)
-    if packet.params.get("eval_mode") == "ground":
+    if packet.params.get("eval_mode") in ("ground", "probe"):
         return run_grounding_task(llm, arm, family, split, seed, packet)
     return run_prior_task(
         LLMPrior(llm, adapter=True), arm, family, split, seed, int(packet.params["support"])
@@ -743,11 +797,19 @@ def run_grounding_task(
         "gen_valid": float(h is not None), "gen_consistent": float(grounded),
         "gen_exact": float(exact),
     }  # fmt: skip
+    success = bool(grounded)
+    if packet.params.get("eval_mode") == "probe":
+        # success = behaves like the true rule on fresh probe states the model never saw and no
+        # verifier used: the evidence-consistency check is no longer the metric (ADR 0003)
+        from hsi.verification.verifiers import probe_correct
+
+        success = probe_correct(h, env.task.actions[a], f"eval/{fam0}/{seed0}/{a}")
+        stats["gen_probe"] = float(success)
     return TaskResult(
         arm,
         family,
         seed,
-        bool(grounded),
+        success,
         [],
         stats,
         decisions=[{"arm": arm, "sig": text_signature(text), "text": text[:60]}],

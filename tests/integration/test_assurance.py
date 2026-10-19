@@ -21,7 +21,7 @@ def test_validator_is_stdlib_only() -> None:
             mods |= {a.name for a in n.names}
         elif isinstance(n, ast.ImportFrom) and n.module:
             mods.add(n.module)
-    assert mods <= {"hashlib", "json", "math", "sys"}
+    assert mods <= {"hashlib", "json", "math", "statistics", "sys"}
 
 
 def receipt() -> dict[str, object]:

@@ -29,6 +29,8 @@ CORE = [
     "seeds",
     "family_results",
     "comparisons",
+    "secondary_z",
+    "secondary_comparisons",
     "guardrail_values",
     "threshold",
     "guardrails_held",
@@ -52,7 +54,8 @@ def _flat(prefix: str, v: Any, out: dict[str, Any]) -> None:
 def leaves(receipt: dict[str, Any]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for k in CORE:
-        _flat(k, receipt[k], out)
+        if k in receipt:  # secondary_* exist only on packets that declare secondary contrasts
+            _flat(k, receipt[k], out)
     for k in BUDGET:
         _flat(f"budget_used.{k}", receipt["budget_used"][k], out)
     return out

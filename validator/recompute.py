@@ -19,7 +19,7 @@ def close(a, b):
     return math.isclose(a, b, rel_tol=1e-9, abs_tol=1e-12)
 
 
-def stats(pairs, errs, succ, base, treat):
+def stats(pairs, errs, succ, base, treat, z=1.96):
     ds, vs = [], []
     for p in pairs:
         n, ot, ob = p["n"], p["only_treatment"], p["only_baseline"]
@@ -35,7 +35,7 @@ def stats(pairs, errs, succ, base, treat):
     k = len(ds)
     mean = sum(ds) / k
     se = math.sqrt(sum(vs)) / k
-    return ds, mean, mean - 1.96 * se, mean + 1.96 * se
+    return ds, mean, mean - z * se, mean + z * se
 
 
 def guardrails(exp, pk, receipt, comps_ds, errs):
@@ -140,6 +140,30 @@ def check(receipt, frozen):
             if not close(got, want):
                 errs.append(f"{c['baseline_arm']} {name}: receipt {got} != recomputed {want}")
         cis.append((lo, hi))
+    sec = pk["params"].get("secondary", [])
+    got = receipt.get("secondary_comparisons", [])
+    if [(c["baseline_arm"], c["treatment_arm"]) for c in got] != [
+        (c["baseline"], c["treatment"]) for c in sec
+    ]:
+        errs.append("secondary comparisons differ from packet")
+    if sec:
+        from statistics import NormalDist
+
+        zs = NormalDist().inv_cdf(1 - 0.025 / len(sec))
+        if not close(receipt.get("secondary_z", -1.0), zs):
+            errs.append("secondary_z")
+        for c in got:
+            b_arm, t_arm = c["baseline_arm"], c["treatment_arm"]
+            _, mean, lo, hi = stats(c["pairs"], errs, succ, b_arm, t_arm, zs)
+            for name, g_, w_ in (
+                ("paired_diff", c["paired_diff"], mean),
+                ("ci_low", c["ci_low"], lo),
+                ("ci_high", c["ci_high"], hi),
+            ):
+                if not close(g_, w_):
+                    errs.append(f"secondary {c['treatment_arm']} vs {c['baseline_arm']} {name}")
+    elif "secondary_z" in receipt:
+        errs.append("secondary_z without secondary comparisons")
     held = guardrails(pk["experiment"], pk, receipt, comps_ds, errs)
     if held != receipt["guardrails_held"]:
         errs.append("guardrails_held")

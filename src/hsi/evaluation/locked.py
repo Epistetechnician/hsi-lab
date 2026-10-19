@@ -16,7 +16,7 @@ from hsi.environment import SEED_BASE
 from hsi.errors import DigestError, HsiError, LockError, PreconditionError
 from hsi.evaluation.base import TaskResult, arms_of
 from hsi.evaluation.registry import SPECS
-from hsi.evaluation.stats import decide, overall
+from hsi.evaluation.stats import bonferroni_z, decide, overall
 from hsi.paths import REPO, custody_root
 from hsi.progress import Progress
 
@@ -161,6 +161,34 @@ def main(run_dir: Path) -> Path:
                 ci_high=hi,
             )
         )
+    sec_comps, sec_z = [], None
+    sec_spec = list(q.get("secondary", []))  # exploratory contrasts: reported, never decide
+    if sec_spec:
+        sec_z = bonferroni_z(len(sec_spec))
+        for c in sec_spec:
+            pairs = []
+            for fam in fams:
+                b, t = res[(fam, c["baseline"])], res[(fam, c["treatment"])]
+                ot = sum(y.success and not x.success for x, y in zip(b, t, strict=True))
+                ob = sum(x.success and not y.success for x, y in zip(b, t, strict=True))
+                both = sum(x.success and y.success for x, y in zip(b, t, strict=True))
+                pairs.append(
+                    PairedFamily(
+                        family=fam, n=n, both=both, only_treatment=ot, only_baseline=ob,
+                        neither=n - both - ot - ob,
+                    )
+                )  # fmt: skip
+            mean, lo, hi = overall(pairs, sec_z)
+            sec_comps.append(
+                Comparison(
+                    baseline_arm=c["baseline"],
+                    treatment_arm=c["treatment"],
+                    pairs=pairs,
+                    paired_diff=mean,
+                    ci_low=lo,
+                    ci_high=hi,
+                )  # fmt: skip
+            )
     allr = [r for rs in res.values() for r in rs]
     gv, held = spec.guardrails(allr, comps, packet)
     body = Receipt(
@@ -176,6 +204,8 @@ def main(run_dir: Path) -> Path:
         budget_used=meter.snapshot(),
         family_results=fr,
         comparisons=comps,
+        secondary_comparisons=sec_comps,
+        secondary_z=sec_z,
         guardrail_values=gv,
         threshold=packet.threshold,
         guardrails_held=held,
@@ -184,6 +214,9 @@ def main(run_dir: Path) -> Path:
         receipt_digest="",
     )
     d = body.model_dump(mode="json")
+    if not sec_comps:  # receipts of packets without secondary contrasts keep their old shape
+        d.pop("secondary_comparisons")
+        d.pop("secondary_z")
     d.pop("receipt_digest")
     d["receipt_digest"] = canonical_digest(d)
     out = run_dir / "eval" / "receipt.json"

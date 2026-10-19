@@ -88,7 +88,7 @@ class E6Spec:
         assert isinstance(cands, dict)
         gens = int(packet.params.get("depth", packet.params["generations"]))
         suf = str(packet.params.get("guard_suffix", "replay"))  # arm family the guardrails track
-        ground = packet.params.get("eval_mode") == "ground"
+        ground = packet.params.get("eval_mode") in ("ground", "probe")
         if ground:  # diversity of the model's own outputs on held-out prompts, per arm
             div = {
                 a: sig_entropy([str(d["sig"]) for r in results if r.arm == a for d in r.decisions])
@@ -126,6 +126,8 @@ class E6Spec:
                 gv[f"eval_consistent_{arm}"] = sum(r.stats["gen_consistent"] for r in rs) / tot
                 if "gen_exact" in rs[0].stats:
                     gv[f"eval_exact_{arm}"] = sum(r.stats["gen_exact"] for r in rs) / tot
+                if "gen_probe" in rs[0].stats:
+                    gv[f"eval_probe_{arm}"] = sum(r.stats["gen_probe"] for r in rs) / tot
                 if ground:
                     gv[f"eval_diversity_{arm}"] = div[arm]
         held = (

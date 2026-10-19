@@ -18,15 +18,22 @@ def family_diff(p: PairedFamily) -> tuple[float, float]:
     return d, var
 
 
-def overall(pairs: list[PairedFamily]) -> tuple[float, float, float]:
+def overall(pairs: list[PairedFamily], z: float = Z95) -> tuple[float, float, float]:
     f = len(pairs)
     ds = [family_diff(p) for p in pairs]
     mean = sum(d for d, _ in ds) / f
     se = math.sqrt(sum(v for _, v in ds)) / f
-    return mean, mean - Z95 * se, mean + Z95 * se
+    return mean, mean - z * se, mean + z * se
 
 
 def decide(cis: list[tuple[float, float]], threshold: float, guardrails_held: bool) -> Outcome:
     if not guardrails_held or any(hi < threshold for _, hi in cis):
         return Outcome.NO_CANDIDATE
     return Outcome.PROMOTE if all(lo >= threshold for lo, _ in cis) else Outcome.INCONCLUSIVE
+
+
+def bonferroni_z(m: int) -> float:
+    """Two-sided multiplier for a family-wise 95% level over m contrasts (m=1 gives 1.96)."""
+    from statistics import NormalDist
+
+    return NormalDist().inv_cdf(1 - 0.025 / m)

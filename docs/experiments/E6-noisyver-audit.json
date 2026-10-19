@@ -1,0 +1,4845 @@
+{
+ "summary": {
+  "n": 600,
+  "valid": 0.7416666666666667,
+  "consistent": 0.07333333333333333,
+  "correct": 0.005,
+  "correct_given_consistent": 0.06818181818181818,
+  "auc_logprob_vs_consistent": 0.5834277941509862,
+  "auc_logprob_vs_correct": 0.3152337858220211,
+  "confidence": {
+   "50": {
+    "tau": -0.21272201538085939,
+    "kept": 223,
+    "precision_consistent": 0.13452914798206278,
+    "precision_correct": 0.004484304932735426
+   },
+   "70": {
+    "tau": -0.1457000732421875,
+    "kept": 134,
+    "precision_consistent": 0.13432835820895522,
+    "precision_correct": 0.0
+   },
+   "80": {
+    "tau": -0.10840034484863281,
+    "kept": 89,
+    "precision_consistent": 0.14606741573033707,
+    "precision_correct": 0.0
+   },
+   "90": {
+    "tau": -0.0630035400390625,
+    "kept": 45,
+    "precision_consistent": 0.17777777777777778,
+    "precision_correct": 0.0
+   }
+  },
+  "noisy_contamination": {
+   "0.03": 0.27488464073829927,
+   "0.1": 0.5582329317269077,
+   "0.3": 0.7912713472485768,
+   "1.0": 0.9266666666666666
+  }
+ },
+ "rows": [
+  {
+   "key": "compositional_transfer-tune-1001633/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17852935791015626
+  },
+  {
+   "key": "rule_induction-tune-1001677/a1",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23182182312011718
+  },
+  {
+   "key": "rule_induction-tune-1001860/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.030635833740234375
+  },
+  {
+   "key": "compositional_transfer-tune-1001704/a3",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.3473350524902344
+  },
+  {
+   "key": "rule_induction-tune-1001709/a3",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001798/a3",
+   "text": "copy 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.37491722106933595
+  },
+  {
+   "key": "rule_induction-tune-1001741/a3",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001727/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23163299560546874
+  },
+  {
+   "key": "rule_induction-tune-1001679/a2",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06248931884765625
+  },
+  {
+   "key": "compositional_transfer-tune-1001848/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.015868759155273436
+  },
+  {
+   "key": "rule_induction-tune-1001706/a3",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.33559837341308596
+  },
+  {
+   "key": "rule_induction-tune-1001736/a0",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13734207153320313
+  },
+  {
+   "key": "rule_induction-tune-1001729/a2",
+   "text": "add 0 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001875/a1",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2340606689453125
+  },
+  {
+   "key": "compositional_transfer-tune-1001627/a0",
+   "text": "add 0 5, add 1 3, add 3 4, add",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001791/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1278240203857422
+  },
+  {
+   "key": "rule_induction-tune-1001603/a3",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5084983825683593
+  },
+  {
+   "key": "rule_induction-tune-1001727/a2",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.43247146606445314
+  },
+  {
+   "key": "compositional_transfer-tune-1001855/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001641/a1",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12766456604003906
+  },
+  {
+   "key": "rule_induction-tune-1001849/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3015312194824219
+  },
+  {
+   "key": "rule_induction-tune-1001881/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2702831268310547
+  },
+  {
+   "key": "rule_induction-tune-1001720/a3",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18135986328125
+  },
+  {
+   "key": "rule_induction-tune-1001890/a1",
+   "text": "copy 3 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001884/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2990989685058594
+  },
+  {
+   "key": "compositional_transfer-tune-1001666/a0",
+   "text": "add 0 3, add 1 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001720/a0",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001636/a3",
+   "text": "copy 1 0, add 0 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001895/a1",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20520553588867188
+  },
+  {
+   "key": "rule_induction-tune-1001676/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001764/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001860/a1",
+   "text": "mix 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09449691772460937
+  },
+  {
+   "key": "rule_induction-tune-1001889/a1",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3129886627197266
+  },
+  {
+   "key": "compositional_transfer-tune-1001896/a1",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24018096923828125
+  },
+  {
+   "key": "compositional_transfer-tune-1001683/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3432361602783203
+  },
+  {
+   "key": "rule_induction-tune-1001811/a3",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.29639358520507814
+  },
+  {
+   "key": "rule_induction-tune-1001796/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001851/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.0630035400390625
+  },
+  {
+   "key": "rule_induction-tune-1001630/a2",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.245721435546875
+  },
+  {
+   "key": "compositional_transfer-tune-1001676/a2",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18609580993652344
+  },
+  {
+   "key": "rule_induction-tune-1001859/a0",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2665565490722656
+  },
+  {
+   "key": "rule_induction-tune-1001810/a2",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06990928649902343
+  },
+  {
+   "key": "rule_induction-tune-1001791/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001661/a3",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26439590454101564
+  },
+  {
+   "key": "compositional_transfer-tune-1001698/a0",
+   "text": "add 3 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23124618530273439
+  },
+  {
+   "key": "compositional_transfer-tune-1001681/a2",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1456329345703125
+  },
+  {
+   "key": "compositional_transfer-tune-1001635/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10846672058105469
+  },
+  {
+   "key": "rule_induction-tune-1001660/a0",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22497062683105468
+  },
+  {
+   "key": "compositional_transfer-tune-1001703/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07041435241699219
+  },
+  {
+   "key": "rule_induction-tune-1001756/a1",
+   "text": "add 3 5",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.09316520690917969
+  },
+  {
+   "key": "rule_induction-tune-1001753/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001887/a2",
+   "text": "none (identity operation)",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001637/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001650/a1",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23058052062988282
+  },
+  {
+   "key": "compositional_transfer-tune-1001776/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.054650497436523435
+  },
+  {
+   "key": "compositional_transfer-tune-1001683/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14911384582519532
+  },
+  {
+   "key": "rule_induction-tune-1001696/a3",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001655/a3",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2671684265136719
+  },
+  {
+   "key": "compositional_transfer-tune-1001650/a3",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18658103942871093
+  },
+  {
+   "key": "rule_induction-tune-1001784/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10759468078613281
+  },
+  {
+   "key": "compositional_transfer-tune-1001674/a2",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2625232696533203
+  },
+  {
+   "key": "rule_induction-tune-1001772/a2",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06456642150878907
+  },
+  {
+   "key": "rule_induction-tune-1001756/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3408855438232422
+  },
+  {
+   "key": "rule_induction-tune-1001880/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11656379699707031
+  },
+  {
+   "key": "rule_induction-tune-1001814/a1",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001767/a1",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10821151733398438
+  },
+  {
+   "key": "rule_induction-tune-1001717/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001770/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.0121551513671875
+  },
+  {
+   "key": "rule_induction-tune-1001809/a1",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.22237319946289064
+  },
+  {
+   "key": "compositional_transfer-tune-1001669/a1",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18481483459472656
+  },
+  {
+   "key": "rule_induction-tune-1001630/a0",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.246759033203125
+  },
+  {
+   "key": "rule_induction-tune-1001705/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.1130096435546875
+  },
+  {
+   "key": "compositional_transfer-tune-1001831/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16129150390625
+  },
+  {
+   "key": "rule_induction-tune-1001775/a3",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14782485961914063
+  },
+  {
+   "key": "rule_induction-tune-1001768/a3",
+   "text": "copy 0 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001856/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1047332763671875
+  },
+  {
+   "key": "compositional_transfer-tune-1001895/a3",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.36365966796875
+  },
+  {
+   "key": "rule_induction-tune-1001716/a3",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001673/a2",
+   "text": "add 0 1, add 1 1, add 2 1, add",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001746/a0",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.13072509765625
+  },
+  {
+   "key": "compositional_transfer-tune-1001880/a3",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.0446319580078125
+  },
+  {
+   "key": "rule_induction-tune-1001716/a1",
+   "text": "add 3 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2915977478027344
+  },
+  {
+   "key": "compositional_transfer-tune-1001771/a1",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.32099380493164065
+  },
+  {
+   "key": "rule_induction-tune-1001616/a2",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.37117462158203124
+  },
+  {
+   "key": "rule_induction-tune-1001871/a3",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001811/a1",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19783401489257812
+  },
+  {
+   "key": "compositional_transfer-tune-1001801/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26117935180664065
+  },
+  {
+   "key": "compositional_transfer-tune-1001605/a2",
+   "text": "mix 0 3, copy 0 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001783/a1",
+   "text": "add 0 3, add 3 2",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001718/a3",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13431434631347655
+  },
+  {
+   "key": "rule_induction-tune-1001839/a3",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001888/a2",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.25272178649902344
+  },
+  {
+   "key": "rule_induction-tune-1001828/a3",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001783/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12161636352539062
+  },
+  {
+   "key": "compositional_transfer-tune-1001611/a3",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.01493988037109375
+  },
+  {
+   "key": "compositional_transfer-tune-1001657/a0",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27524681091308595
+  },
+  {
+   "key": "compositional_transfer-tune-1001690/a2",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2539196014404297
+  },
+  {
+   "key": "compositional_transfer-tune-1001659/a0",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3923622131347656
+  },
+  {
+   "key": "rule_induction-tune-1001824/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4656963348388672
+  },
+  {
+   "key": "compositional_transfer-tune-1001712/a2",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1987285614013672
+  },
+  {
+   "key": "compositional_transfer-tune-1001622/a0",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.03848457336425781
+  },
+  {
+   "key": "compositional_transfer-tune-1001699/a2",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3515293121337891
+  },
+  {
+   "key": "rule_induction-tune-1001838/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001768/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23442115783691406
+  },
+  {
+   "key": "compositional_transfer-tune-1001685/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08542900085449219
+  },
+  {
+   "key": "rule_induction-tune-1001804/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001628/a3",
+   "text": "add 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.34754486083984376
+  },
+  {
+   "key": "compositional_transfer-tune-1001677/a3",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19146308898925782
+  },
+  {
+   "key": "compositional_transfer-tune-1001701/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5606346130371094
+  },
+  {
+   "key": "compositional_transfer-tune-1001810/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08597984313964843
+  },
+  {
+   "key": "rule_induction-tune-1001702/a0",
+   "text": "add 4 5",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.26929397583007814
+  },
+  {
+   "key": "rule_induction-tune-1001625/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001644/a1",
+   "text": "copy 2 4",
+   "valid": true,
+   "consistent": true,
+   "correct": true,
+   "mean_logprob": -0.32625999450683596
+  },
+  {
+   "key": "compositional_transfer-tune-1001666/a2",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1561798095703125
+  },
+  {
+   "key": "rule_induction-tune-1001646/a0",
+   "text": "add 3 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26729621887207033
+  },
+  {
+   "key": "rule_induction-tune-1001845/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001621/a3",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.05327606201171875
+  },
+  {
+   "key": "rule_induction-tune-1001855/a3",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001636/a1",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2275665283203125
+  },
+  {
+   "key": "compositional_transfer-tune-1001744/a3",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14156761169433593
+  },
+  {
+   "key": "rule_induction-tune-1001833/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.015615081787109375
+  },
+  {
+   "key": "compositional_transfer-tune-1001812/a3",
+   "text": "mix 2 4, copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001667/a3",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3388011932373047
+  },
+  {
+   "key": "compositional_transfer-tune-1001714/a0",
+   "text": "add 1 3, swap 0 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001674/a0",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1585479736328125
+  },
+  {
+   "key": "rule_induction-tune-1001794/a0",
+   "text": "copy 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22758026123046876
+  },
+  {
+   "key": "rule_induction-tune-1001739/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001739/a0",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27738418579101565
+  },
+  {
+   "key": "rule_induction-tune-1001869/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.02296600341796875
+  },
+  {
+   "key": "rule_induction-tune-1001737/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001632/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20437850952148437
+  },
+  {
+   "key": "compositional_transfer-tune-1001891/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.35689430236816405
+  },
+  {
+   "key": "compositional_transfer-tune-1001648/a0",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16472358703613282
+  },
+  {
+   "key": "rule_induction-tune-1001751/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001888/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.0423492431640625
+  },
+  {
+   "key": "compositional_transfer-tune-1001603/a1",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10411605834960938
+  },
+  {
+   "key": "compositional_transfer-tune-1001864/a2",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.35597076416015627
+  },
+  {
+   "key": "compositional_transfer-tune-1001832/a3",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4167217254638672
+  },
+  {
+   "key": "rule_induction-tune-1001796/a3",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.196600341796875
+  },
+  {
+   "key": "compositional_transfer-tune-1001837/a3",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001825/a3",
+   "text": "add 0 1, add 1 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001760/a1",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27245101928710935
+  },
+  {
+   "key": "rule_induction-tune-1001820/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1470855712890625
+  },
+  {
+   "key": "rule_induction-tune-1001721/a3",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12138137817382813
+  },
+  {
+   "key": "compositional_transfer-tune-1001711/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3054008483886719
+  },
+  {
+   "key": "rule_induction-tune-1001737/a1",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.15366096496582032
+  },
+  {
+   "key": "rule_induction-tune-1001730/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.25831947326660154
+  },
+  {
+   "key": "rule_induction-tune-1001813/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07201690673828125
+  },
+  {
+   "key": "rule_induction-tune-1001698/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001757/a3",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24094009399414062
+  },
+  {
+   "key": "compositional_transfer-tune-1001787/a0",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.7403827667236328
+  },
+  {
+   "key": "compositional_transfer-tune-1001792/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10975990295410157
+  },
+  {
+   "key": "compositional_transfer-tune-1001858/a2",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22651901245117187
+  },
+  {
+   "key": "compositional_transfer-tune-1001622/a3",
+   "text": "mix 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19413528442382813
+  },
+  {
+   "key": "rule_induction-tune-1001631/a2",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1245452880859375
+  },
+  {
+   "key": "rule_induction-tune-1001878/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.00972137451171875
+  },
+  {
+   "key": "rule_induction-tune-1001720/a2",
+   "text": "copy 1 0",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20730972290039062
+  },
+  {
+   "key": "rule_induction-tune-1001711/a1",
+   "text": "add 0 6",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.07107658386230468
+  },
+  {
+   "key": "rule_induction-tune-1001820/a0",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001777/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001898/a1",
+   "text": "add 2 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4532917022705078
+  },
+  {
+   "key": "rule_induction-tune-1001619/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.5155868530273438
+  },
+  {
+   "key": "compositional_transfer-tune-1001745/a2",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.013552093505859375
+  },
+  {
+   "key": "rule_induction-tune-1001637/a0",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10808677673339843
+  },
+  {
+   "key": "rule_induction-tune-1001604/a3",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10919075012207032
+  },
+  {
+   "key": "rule_induction-tune-1001895/a0",
+   "text": "copy 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3974460601806641
+  },
+  {
+   "key": "rule_induction-tune-1001719/a0",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23907890319824218
+  },
+  {
+   "key": "compositional_transfer-tune-1001889/a2",
+   "text": "add 0 1, copy 0 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001795/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4147510528564453
+  },
+  {
+   "key": "compositional_transfer-tune-1001623/a3",
+   "text": "add 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.41291084289550783
+  },
+  {
+   "key": "compositional_transfer-tune-1001774/a3",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.175054931640625
+  },
+  {
+   "key": "compositional_transfer-tune-1001688/a3",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26169700622558595
+  },
+  {
+   "key": "compositional_transfer-tune-1001856/a3",
+   "text": "mix 0 4, mix 1 2",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001624/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001619/a0",
+   "text": "add 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3151424407958984
+  },
+  {
+   "key": "rule_induction-tune-1001699/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09933395385742187
+  },
+  {
+   "key": "rule_induction-tune-1001699/a2",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.10793075561523438
+  },
+  {
+   "key": "compositional_transfer-tune-1001701/a2",
+   "text": "mix 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23779335021972656
+  },
+  {
+   "key": "compositional_transfer-tune-1001665/a2",
+   "text": "add 0 5, swap 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001602/a2",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.48573150634765627
+  },
+  {
+   "key": "compositional_transfer-tune-1001858/a1",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.39090118408203123
+  },
+  {
+   "key": "rule_induction-tune-1001746/a2",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2210784912109375
+  },
+  {
+   "key": "compositional_transfer-tune-1001832/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.026336288452148436
+  },
+  {
+   "key": "compositional_transfer-tune-1001778/a2",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.15185585021972656
+  },
+  {
+   "key": "rule_induction-tune-1001864/a1",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001755/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.08383026123046874
+  },
+  {
+   "key": "compositional_transfer-tune-1001603/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.29428863525390625
+  },
+  {
+   "key": "rule_induction-tune-1001652/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12631759643554688
+  },
+  {
+   "key": "compositional_transfer-tune-1001675/a1",
+   "text": "add 0 1, add 1 1, mix 0 1, mix",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001688/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06800918579101563
+  },
+  {
+   "key": "compositional_transfer-tune-1001639/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5678287506103515
+  },
+  {
+   "key": "compositional_transfer-tune-1001877/a2",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23449478149414063
+  },
+  {
+   "key": "compositional_transfer-tune-1001619/a1",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.366754150390625
+  },
+  {
+   "key": "compositional_transfer-tune-1001721/a1",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.1374073028564453
+  },
+  {
+   "key": "rule_induction-tune-1001603/a1",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11295204162597657
+  },
+  {
+   "key": "compositional_transfer-tune-1001784/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.43017044067382815
+  },
+  {
+   "key": "compositional_transfer-tune-1001611/a2",
+   "text": "add 2 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.09902458190917969
+  },
+  {
+   "key": "rule_induction-tune-1001712/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001625/a3",
+   "text": "add 1 -1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001606/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22717018127441407
+  },
+  {
+   "key": "compositional_transfer-tune-1001732/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17409133911132812
+  },
+  {
+   "key": "compositional_transfer-tune-1001849/a0",
+   "text": "add 0 1, swap 0 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001878/a2",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2390880584716797
+  },
+  {
+   "key": "rule_induction-tune-1001601/a0",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.03655242919921875
+  },
+  {
+   "key": "rule_induction-tune-1001840/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001681/a2",
+   "text": "add 1 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001741/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3165580749511719
+  },
+  {
+   "key": "rule_induction-tune-1001675/a3",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001815/a2",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.347833251953125
+  },
+  {
+   "key": "rule_induction-tune-1001766/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001735/a1",
+   "text": "copy 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26760711669921877
+  },
+  {
+   "key": "rule_induction-tune-1001779/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.32500228881835935
+  },
+  {
+   "key": "rule_induction-tune-1001785/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07315292358398437
+  },
+  {
+   "key": "rule_induction-tune-1001723/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001636/a3",
+   "text": "add 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2165599822998047
+  },
+  {
+   "key": "rule_induction-tune-1001697/a1",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.45464248657226564
+  },
+  {
+   "key": "rule_induction-tune-1001782/a1",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18801498413085938
+  },
+  {
+   "key": "rule_induction-tune-1001840/a3",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001620/a1",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19715499877929688
+  },
+  {
+   "key": "compositional_transfer-tune-1001889/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.237738037109375
+  },
+  {
+   "key": "rule_induction-tune-1001788/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2165130615234375
+  },
+  {
+   "key": "compositional_transfer-tune-1001680/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.28792800903320315
+  },
+  {
+   "key": "rule_induction-tune-1001875/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001678/a1",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.32650032043457033
+  },
+  {
+   "key": "compositional_transfer-tune-1001609/a1",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.33282127380371096
+  },
+  {
+   "key": "compositional_transfer-tune-1001696/a0",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.059660720825195315
+  },
+  {
+   "key": "compositional_transfer-tune-1001834/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.349603271484375
+  },
+  {
+   "key": "compositional_transfer-tune-1001679/a2",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13781204223632812
+  },
+  {
+   "key": "compositional_transfer-tune-1001828/a3",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22295875549316407
+  },
+  {
+   "key": "rule_induction-tune-1001675/a0",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26445808410644533
+  },
+  {
+   "key": "compositional_transfer-tune-1001620/a3",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.017770767211914062
+  },
+  {
+   "key": "compositional_transfer-tune-1001879/a1",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07231025695800782
+  },
+  {
+   "key": "rule_induction-tune-1001844/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1710895538330078
+  },
+  {
+   "key": "compositional_transfer-tune-1001702/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001759/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.254351806640625
+  },
+  {
+   "key": "rule_induction-tune-1001841/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001648/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5366592407226562
+  },
+  {
+   "key": "compositional_transfer-tune-1001733/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001812/a2",
+   "text": "add 0 1, add 1 5",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001654/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001721/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001792/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.47428092956542967
+  },
+  {
+   "key": "rule_induction-tune-1001780/a3",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18677101135253907
+  },
+  {
+   "key": "rule_induction-tune-1001642/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001659/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.025120925903320313
+  },
+  {
+   "key": "rule_induction-tune-1001806/a3",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08442916870117187
+  },
+  {
+   "key": "compositional_transfer-tune-1001855/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26448860168457033
+  },
+  {
+   "key": "compositional_transfer-tune-1001679/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.46790275573730467
+  },
+  {
+   "key": "compositional_transfer-tune-1001852/a0",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.15605239868164061
+  },
+  {
+   "key": "compositional_transfer-tune-1001884/a0",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14123878479003907
+  },
+  {
+   "key": "compositional_transfer-tune-1001862/a2",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.519809341430664
+  },
+  {
+   "key": "compositional_transfer-tune-1001777/a2",
+   "text": "add 4 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2886962890625
+  },
+  {
+   "key": "rule_induction-tune-1001894/a0",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1555164337158203
+  },
+  {
+   "key": "rule_induction-tune-1001825/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07892532348632812
+  },
+  {
+   "key": "compositional_transfer-tune-1001715/a3",
+   "text": "copy 4 0",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.18279685974121093
+  },
+  {
+   "key": "compositional_transfer-tune-1001803/a2",
+   "text": "add 3 1, add 4 1, mix 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001630/a3",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.33612899780273436
+  },
+  {
+   "key": "compositional_transfer-tune-1001643/a3",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26051788330078124
+  },
+  {
+   "key": "compositional_transfer-tune-1001722/a2",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4163921356201172
+  },
+  {
+   "key": "compositional_transfer-tune-1001671/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001668/a2",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09062080383300782
+  },
+  {
+   "key": "rule_induction-tune-1001605/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21272201538085939
+  },
+  {
+   "key": "compositional_transfer-tune-1001777/a3",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5153007507324219
+  },
+  {
+   "key": "rule_induction-tune-1001849/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20557785034179688
+  },
+  {
+   "key": "compositional_transfer-tune-1001863/a0",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2686931610107422
+  },
+  {
+   "key": "compositional_transfer-tune-1001778/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4915290832519531
+  },
+  {
+   "key": "rule_induction-tune-1001830/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2563480377197266
+  },
+  {
+   "key": "compositional_transfer-tune-1001779/a2",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2508880615234375
+  },
+  {
+   "key": "rule_induction-tune-1001674/a0",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.25278396606445314
+  },
+  {
+   "key": "rule_induction-tune-1001679/a3",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001819/a3",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22899208068847657
+  },
+  {
+   "key": "rule_induction-tune-1001604/a1",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001748/a3",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.35070457458496096
+  },
+  {
+   "key": "rule_induction-tune-1001788/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001819/a2",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2686809539794922
+  },
+  {
+   "key": "rule_induction-tune-1001743/a2",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17634849548339843
+  },
+  {
+   "key": "rule_induction-tune-1001771/a0",
+   "text": "copy 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11389694213867188
+  },
+  {
+   "key": "compositional_transfer-tune-1001737/a1",
+   "text": "add 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2543201446533203
+  },
+  {
+   "key": "rule_induction-tune-1001784/a0",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.02237701416015625
+  },
+  {
+   "key": "rule_induction-tune-1001634/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001664/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001777/a2",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2461376190185547
+  },
+  {
+   "key": "compositional_transfer-tune-1001883/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4243770599365234
+  },
+  {
+   "key": "compositional_transfer-tune-1001608/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22209014892578124
+  },
+  {
+   "key": "compositional_transfer-tune-1001687/a0",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10832977294921875
+  },
+  {
+   "key": "rule_induction-tune-1001769/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001857/a1",
+   "text": "add 0 1, swap 0 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001839/a1",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24823455810546874
+  },
+  {
+   "key": "compositional_transfer-tune-1001755/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.15888595581054688
+  },
+  {
+   "key": "compositional_transfer-tune-1001707/a3",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.025357818603515624
+  },
+  {
+   "key": "rule_induction-tune-1001642/a0",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.498822021484375
+  },
+  {
+   "key": "compositional_transfer-tune-1001782/a1",
+   "text": "add 2 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2945228576660156
+  },
+  {
+   "key": "rule_induction-tune-1001661/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001665/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3160053253173828
+  },
+  {
+   "key": "rule_induction-tune-1001734/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001851/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001690/a0",
+   "text": "add 0 3, swap 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001796/a0",
+   "text": "add 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23850440979003906
+  },
+  {
+   "key": "rule_induction-tune-1001872/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001626/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.4209266662597656
+  },
+  {
+   "key": "rule_induction-tune-1001806/a2",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2686717987060547
+  },
+  {
+   "key": "rule_induction-tune-1001770/a2",
+   "text": "add 4 6",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20630035400390626
+  },
+  {
+   "key": "compositional_transfer-tune-1001732/a1",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.043623733520507815
+  },
+  {
+   "key": "rule_induction-tune-1001732/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.03591575622558594
+  },
+  {
+   "key": "rule_induction-tune-1001665/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001667/a1",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12749862670898438
+  },
+  {
+   "key": "rule_induction-tune-1001784/a2",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.29175872802734376
+  },
+  {
+   "key": "rule_induction-tune-1001617/a0",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001706/a3",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24259376525878906
+  },
+  {
+   "key": "compositional_transfer-tune-1001828/a1",
+   "text": "mix 0 3, mix 1 4, swap 2 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001723/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17058830261230468
+  },
+  {
+   "key": "rule_induction-tune-1001653/a3",
+   "text": "copy 1 0",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4305747985839844
+  },
+  {
+   "key": "rule_induction-tune-1001830/a1",
+   "text": "copy 3 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001647/a1",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20219078063964843
+  },
+  {
+   "key": "compositional_transfer-tune-1001856/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.05616836547851563
+  },
+  {
+   "key": "rule_induction-tune-1001703/a2",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2710121154785156
+  },
+  {
+   "key": "rule_induction-tune-1001799/a2",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001887/a1",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001805/a2",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": true,
+   "correct": true,
+   "mean_logprob": -0.18322257995605468
+  },
+  {
+   "key": "compositional_transfer-tune-1001615/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1826446533203125
+  },
+  {
+   "key": "rule_induction-tune-1001662/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.5265140533447266
+  },
+  {
+   "key": "compositional_transfer-tune-1001840/a1",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1894519805908203
+  },
+  {
+   "key": "rule_induction-tune-1001770/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.05189361572265625
+  },
+  {
+   "key": "compositional_transfer-tune-1001602/a3",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23955345153808594
+  },
+  {
+   "key": "compositional_transfer-tune-1001809/a2",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07116775512695313
+  },
+  {
+   "key": "rule_induction-tune-1001858/a2",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.28067855834960936
+  },
+  {
+   "key": "rule_induction-tune-1001871/a2",
+   "text": "none (identity operation)",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001873/a2",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001837/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13817100524902343
+  },
+  {
+   "key": "rule_induction-tune-1001617/a2",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14767723083496093
+  },
+  {
+   "key": "compositional_transfer-tune-1001887/a3",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5606166839599609
+  },
+  {
+   "key": "rule_induction-tune-1001665/a1",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2931640625
+  },
+  {
+   "key": "rule_induction-tune-1001811/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.40784873962402346
+  },
+  {
+   "key": "rule_induction-tune-1001829/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.279913330078125
+  },
+  {
+   "key": "rule_induction-tune-1001835/a0",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19021034240722656
+  },
+  {
+   "key": "rule_induction-tune-1001880/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.026511001586914062
+  },
+  {
+   "key": "compositional_transfer-tune-1001716/a2",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3831489562988281
+  },
+  {
+   "key": "rule_induction-tune-1001874/a1",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1564556121826172
+  },
+  {
+   "key": "rule_induction-tune-1001635/a3",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3612667083740234
+  },
+  {
+   "key": "rule_induction-tune-1001834/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001886/a0",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4173236846923828
+  },
+  {
+   "key": "compositional_transfer-tune-1001890/a3",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3227794647216797
+  },
+  {
+   "key": "compositional_transfer-tune-1001640/a1",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.04320106506347656
+  },
+  {
+   "key": "rule_induction-tune-1001650/a0",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12851371765136718
+  },
+  {
+   "key": "compositional_transfer-tune-1001733/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12073020935058594
+  },
+  {
+   "key": "compositional_transfer-tune-1001684/a3",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1814563751220703
+  },
+  {
+   "key": "rule_induction-tune-1001615/a2",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.15974349975585939
+  },
+  {
+   "key": "rule_induction-tune-1001762/a2",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.31402587890625
+  },
+  {
+   "key": "compositional_transfer-tune-1001670/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08941116333007812
+  },
+  {
+   "key": "rule_induction-tune-1001671/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001785/a1",
+   "text": "mix 1 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27756576538085936
+  },
+  {
+   "key": "rule_induction-tune-1001638/a1",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21317520141601562
+  },
+  {
+   "key": "compositional_transfer-tune-1001711/a0",
+   "text": "copy 1 4, add 4 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001876/a2",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07372207641601562
+  },
+  {
+   "key": "compositional_transfer-tune-1001786/a2",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.31484031677246094
+  },
+  {
+   "key": "compositional_transfer-tune-1001867/a3",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3372943878173828
+  },
+  {
+   "key": "compositional_transfer-tune-1001759/a3",
+   "text": "add 1 6",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3860012054443359
+  },
+  {
+   "key": "compositional_transfer-tune-1001829/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001829/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001804/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001634/a3",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001863/a2",
+   "text": "copy 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4202117919921875
+  },
+  {
+   "key": "compositional_transfer-tune-1001749/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.19261245727539061
+  },
+  {
+   "key": "compositional_transfer-tune-1001613/a0",
+   "text": "add 0 5, mix 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001770/a3",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1457000732421875
+  },
+  {
+   "key": "rule_induction-tune-1001773/a0",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10843276977539062
+  },
+  {
+   "key": "compositional_transfer-tune-1001740/a1",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26292953491210935
+  },
+  {
+   "key": "compositional_transfer-tune-1001673/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2665912628173828
+  },
+  {
+   "key": "rule_induction-tune-1001663/a1",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001602/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001890/a1",
+   "text": "add 4 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1284259796142578
+  },
+  {
+   "key": "compositional_transfer-tune-1001825/a1",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1954181671142578
+  },
+  {
+   "key": "rule_induction-tune-1001670/a0",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1544178009033203
+  },
+  {
+   "key": "rule_induction-tune-1001739/a3",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001797/a0",
+   "text": "copy 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1927398681640625
+  },
+  {
+   "key": "compositional_transfer-tune-1001628/a1",
+   "text": "mix 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.26619491577148435
+  },
+  {
+   "key": "rule_induction-tune-1001793/a3",
+   "text": "copy 0 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001680/a2",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.00948944091796875
+  },
+  {
+   "key": "rule_induction-tune-1001627/a2",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.275830078125
+  },
+  {
+   "key": "rule_induction-tune-1001628/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.044489288330078126
+  },
+  {
+   "key": "rule_induction-tune-1001842/a0",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3047393798828125
+  },
+  {
+   "key": "compositional_transfer-tune-1001850/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09638595581054688
+  },
+  {
+   "key": "compositional_transfer-tune-1001749/a3",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27484893798828125
+  },
+  {
+   "key": "compositional_transfer-tune-1001803/a3",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1483734130859375
+  },
+  {
+   "key": "compositional_transfer-tune-1001724/a2",
+   "text": "add 0 3, swap 0 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001716/a2",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12002525329589844
+  },
+  {
+   "key": "compositional_transfer-tune-1001791/a1",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001702/a0",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5323986053466797
+  },
+  {
+   "key": "rule_induction-tune-1001618/a1",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001795/a0",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17614517211914063
+  },
+  {
+   "key": "rule_induction-tune-1001619/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23783454895019532
+  },
+  {
+   "key": "compositional_transfer-tune-1001788/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4832286834716797
+  },
+  {
+   "key": "rule_induction-tune-1001874/a0",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.023431396484375
+  },
+  {
+   "key": "rule_induction-tune-1001623/a0",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10840034484863281
+  },
+  {
+   "key": "compositional_transfer-tune-1001742/a2",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.27738380432128906
+  },
+  {
+   "key": "compositional_transfer-tune-1001766/a2",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.05853347778320313
+  },
+  {
+   "key": "rule_induction-tune-1001669/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001670/a2",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13217697143554688
+  },
+  {
+   "key": "compositional_transfer-tune-1001729/a3",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24477081298828124
+  },
+  {
+   "key": "rule_induction-tune-1001803/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001825/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06763763427734375
+  },
+  {
+   "key": "compositional_transfer-tune-1001785/a3",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09092559814453124
+  },
+  {
+   "key": "rule_induction-tune-1001790/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1712188720703125
+  },
+  {
+   "key": "compositional_transfer-tune-1001878/a3",
+   "text": "add 0 1, swap 0 4, add 4 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001733/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.41800537109375
+  },
+  {
+   "key": "compositional_transfer-tune-1001709/a1",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.33398094177246096
+  },
+  {
+   "key": "rule_induction-tune-1001601/a1",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.19263916015625
+  },
+  {
+   "key": "rule_induction-tune-1001687/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.3055400848388672
+  },
+  {
+   "key": "rule_induction-tune-1001621/a1",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001899/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.5114841461181641
+  },
+  {
+   "key": "compositional_transfer-tune-1001899/a0",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21005821228027344
+  },
+  {
+   "key": "rule_induction-tune-1001797/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07183341979980469
+  },
+  {
+   "key": "compositional_transfer-tune-1001794/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14527397155761718
+  },
+  {
+   "key": "rule_induction-tune-1001845/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.04761238098144531
+  },
+  {
+   "key": "compositional_transfer-tune-1001718/a2",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2703372955322266
+  },
+  {
+   "key": "rule_induction-tune-1001847/a3",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.45731544494628906
+  },
+  {
+   "key": "rule_induction-tune-1001735/a1",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": true,
+   "correct": true,
+   "mean_logprob": -0.3492839813232422
+  },
+  {
+   "key": "compositional_transfer-tune-1001792/a1",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.009676361083984375
+  },
+  {
+   "key": "compositional_transfer-tune-1001626/a1",
+   "text": "add 2 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.19730491638183595
+  },
+  {
+   "key": "rule_induction-tune-1001891/a3",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.11891746520996094
+  },
+  {
+   "key": "rule_induction-tune-1001736/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001761/a0",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.04986419677734375
+  },
+  {
+   "key": "compositional_transfer-tune-1001844/a1",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4745052337646484
+  },
+  {
+   "key": "compositional_transfer-tune-1001657/a2",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13312416076660155
+  },
+  {
+   "key": "rule_induction-tune-1001616/a1",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14500579833984376
+  },
+  {
+   "key": "compositional_transfer-tune-1001780/a3",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17162437438964845
+  },
+  {
+   "key": "compositional_transfer-tune-1001885/a1",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17703895568847655
+  },
+  {
+   "key": "compositional_transfer-tune-1001712/a1",
+   "text": "mix 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22535438537597657
+  },
+  {
+   "key": "rule_induction-tune-1001655/a1",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001800/a3",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001618/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001698/a1",
+   "text": "add 2 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5401729583740235
+  },
+  {
+   "key": "compositional_transfer-tune-1001810/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2078277587890625
+  },
+  {
+   "key": "compositional_transfer-tune-1001850/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23174591064453126
+  },
+  {
+   "key": "rule_induction-tune-1001617/a3",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11636009216308593
+  },
+  {
+   "key": "rule_induction-tune-1001830/a2",
+   "text": "mix 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21845970153808594
+  },
+  {
+   "key": "rule_induction-tune-1001633/a0",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.471527099609375
+  },
+  {
+   "key": "rule_induction-tune-1001638/a3",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23085975646972656
+  },
+  {
+   "key": "compositional_transfer-tune-1001682/a1",
+   "text": "mix 0 3, mix 1 2, copy 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001715/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.46476211547851565
+  },
+  {
+   "key": "compositional_transfer-tune-1001809/a1",
+   "text": "mix 0 3, copy 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001801/a1",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.17221412658691407
+  },
+  {
+   "key": "rule_induction-tune-1001645/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.204705810546875
+  },
+  {
+   "key": "rule_induction-tune-1001860/a1",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5008590698242188
+  },
+  {
+   "key": "rule_induction-tune-1001665/a3",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2931640625
+  },
+  {
+   "key": "compositional_transfer-tune-1001773/a3",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17435722351074218
+  },
+  {
+   "key": "compositional_transfer-tune-1001657/a1",
+   "text": "add 0 1, swap 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001800/a2",
+   "text": "add 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23711166381835938
+  },
+  {
+   "key": "compositional_transfer-tune-1001873/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.07887763977050781
+  },
+  {
+   "key": "rule_induction-tune-1001852/a0",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11403427124023438
+  },
+  {
+   "key": "rule_induction-tune-1001713/a0",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06826324462890625
+  },
+  {
+   "key": "compositional_transfer-tune-1001602/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.0970703125
+  },
+  {
+   "key": "rule_induction-tune-1001807/a2",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.15497589111328125
+  },
+  {
+   "key": "compositional_transfer-tune-1001696/a2",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1916942596435547
+  },
+  {
+   "key": "compositional_transfer-tune-1001836/a0",
+   "text": "add 0 3, mix 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001701/a1",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5710536956787109
+  },
+  {
+   "key": "rule_induction-tune-1001704/a3",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.21894569396972657
+  },
+  {
+   "key": "rule_induction-tune-1001847/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3088661193847656
+  },
+  {
+   "key": "rule_induction-tune-1001719/a3",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.04050750732421875
+  },
+  {
+   "key": "compositional_transfer-tune-1001842/a2",
+   "text": "add 0 1, swap 0 2",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001816/a1",
+   "text": "add 4 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17783470153808595
+  },
+  {
+   "key": "compositional_transfer-tune-1001608/a1",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4023780822753906
+  },
+  {
+   "key": "rule_induction-tune-1001740/a3",
+   "text": "copy 0 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001815/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001787/a1",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001755/a0",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16036529541015626
+  },
+  {
+   "key": "rule_induction-tune-1001829/a0",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3227973937988281
+  },
+  {
+   "key": "rule_induction-tune-1001848/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13659515380859374
+  },
+  {
+   "key": "rule_induction-tune-1001866/a0",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17581787109375
+  },
+  {
+   "key": "rule_induction-tune-1001748/a0",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21528396606445313
+  },
+  {
+   "key": "rule_induction-tune-1001743/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.03436775207519531
+  },
+  {
+   "key": "rule_induction-tune-1001890/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001701/a0",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001847/a3",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.37871475219726564
+  },
+  {
+   "key": "rule_induction-tune-1001794/a1",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.026667022705078126
+  },
+  {
+   "key": "rule_induction-tune-1001868/a2",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001792/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3958427429199219
+  },
+  {
+   "key": "rule_induction-tune-1001801/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001887/a0",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001895/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08563995361328125
+  },
+  {
+   "key": "compositional_transfer-tune-1001730/a2",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.049697494506835936
+  },
+  {
+   "key": "rule_induction-tune-1001873/a0",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001614/a2",
+   "text": "add 1 3, add 2 3, add 3 3, add",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001622/a1",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2267139434814453
+  },
+  {
+   "key": "rule_induction-tune-1001647/a2",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24547920227050782
+  },
+  {
+   "key": "rule_induction-tune-1001876/a0",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001731/a3",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.28246383666992186
+  },
+  {
+   "key": "rule_induction-tune-1001757/a3",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.34244766235351565
+  },
+  {
+   "key": "compositional_transfer-tune-1001763/a2",
+   "text": "add 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24548683166503907
+  },
+  {
+   "key": "compositional_transfer-tune-1001634/a2",
+   "text": "add 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11293716430664062
+  },
+  {
+   "key": "rule_induction-tune-1001717/a0",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4081840515136719
+  },
+  {
+   "key": "compositional_transfer-tune-1001894/a0",
+   "text": "mix 0 3, copy 3 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001688/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5244770050048828
+  },
+  {
+   "key": "compositional_transfer-tune-1001676/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16409988403320314
+  },
+  {
+   "key": "compositional_transfer-tune-1001798/a0",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21318588256835938
+  },
+  {
+   "key": "rule_induction-tune-1001818/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001641/a0",
+   "text": "add 4 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3046440124511719
+  },
+  {
+   "key": "rule_induction-tune-1001653/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16839637756347656
+  },
+  {
+   "key": "compositional_transfer-tune-1001677/a0",
+   "text": "add 2 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3880287170410156
+  },
+  {
+   "key": "rule_induction-tune-1001723/a0",
+   "text": "add 2 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3380126953125
+  },
+  {
+   "key": "compositional_transfer-tune-1001808/a1",
+   "text": "add 0 1, swap 0 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001694/a2",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001825/a3",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.15666427612304687
+  },
+  {
+   "key": "rule_induction-tune-1001859/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001657/a2",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13063735961914064
+  },
+  {
+   "key": "compositional_transfer-tune-1001866/a2",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.4117473602294922
+  },
+  {
+   "key": "rule_induction-tune-1001622/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10922889709472657
+  },
+  {
+   "key": "compositional_transfer-tune-1001897/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10361289978027344
+  },
+  {
+   "key": "compositional_transfer-tune-1001751/a0",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.31720924377441406
+  },
+  {
+   "key": "rule_induction-tune-1001776/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001601/a2",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.32201499938964845
+  },
+  {
+   "key": "rule_induction-tune-1001718/a0",
+   "text": "add 3 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.20550003051757812
+  },
+  {
+   "key": "rule_induction-tune-1001805/a1",
+   "text": "add 4 6",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09827423095703125
+  },
+  {
+   "key": "compositional_transfer-tune-1001674/a1",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.36721153259277345
+  },
+  {
+   "key": "compositional_transfer-tune-1001798/a2",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08707847595214843
+  },
+  {
+   "key": "rule_induction-tune-1001810/a3",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.019518661499023437
+  },
+  {
+   "key": "rule_induction-tune-1001754/a3",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.12394332885742188
+  },
+  {
+   "key": "compositional_transfer-tune-1001781/a2",
+   "text": "add 3 1, add 4 1",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001711/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001853/a0",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.23195037841796876
+  },
+  {
+   "key": "rule_induction-tune-1001778/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24524459838867188
+  },
+  {
+   "key": "compositional_transfer-tune-1001697/a0",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2694042205810547
+  },
+  {
+   "key": "compositional_transfer-tune-1001876/a2",
+   "text": "mix 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.17004852294921874
+  },
+  {
+   "key": "rule_induction-tune-1001607/a3",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3772369384765625
+  },
+  {
+   "key": "compositional_transfer-tune-1001756/a1",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.21610107421875
+  },
+  {
+   "key": "rule_induction-tune-1001869/a3",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.4961498260498047
+  },
+  {
+   "key": "rule_induction-tune-1001814/a3",
+   "text": "add 4 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001756/a2",
+   "text": "add 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19837532043457032
+  },
+  {
+   "key": "rule_induction-tune-1001766/a1",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.25996246337890627
+  },
+  {
+   "key": "rule_induction-tune-1001776/a2",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.10747756958007812
+  },
+  {
+   "key": "rule_induction-tune-1001846/a2",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001831/a0",
+   "text": "add 0 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.02702674865722656
+  },
+  {
+   "key": "rule_induction-tune-1001655/a0",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001710/a0",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.13575248718261718
+  },
+  {
+   "key": "rule_induction-tune-1001854/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.14668693542480468
+  },
+  {
+   "key": "compositional_transfer-tune-1001654/a1",
+   "text": "add 3 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.15559043884277343
+  },
+  {
+   "key": "compositional_transfer-tune-1001628/a2",
+   "text": "add 0 3, add 1 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001695/a1",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.29516258239746096
+  },
+  {
+   "key": "rule_induction-tune-1001800/a2",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001798/a3",
+   "text": "add 0 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.15769729614257813
+  },
+  {
+   "key": "rule_induction-tune-1001613/a1",
+   "text": "add 0 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001635/a2",
+   "text": "copy 0 4",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.46146163940429685
+  },
+  {
+   "key": "rule_induction-tune-1001782/a2",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001725/a3",
+   "text": "add 1 5, mix 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001804/a2",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.05607757568359375
+  },
+  {
+   "key": "rule_induction-tune-1001877/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.050838470458984375
+  },
+  {
+   "key": "compositional_transfer-tune-1001803/a0",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.39116592407226564
+  },
+  {
+   "key": "compositional_transfer-tune-1001754/a1",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20839347839355468
+  },
+  {
+   "key": "compositional_transfer-tune-1001700/a3",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.06059761047363281
+  },
+  {
+   "key": "rule_induction-tune-1001661/a0",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.29290008544921875
+  },
+  {
+   "key": "compositional_transfer-tune-1001860/a3",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.11676521301269531
+  },
+  {
+   "key": "rule_induction-tune-1001872/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001726/a2",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3479347229003906
+  },
+  {
+   "key": "rule_induction-tune-1001626/a1",
+   "text": "copy 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.22712135314941406
+  },
+  {
+   "key": "rule_induction-tune-1001649/a3",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.08575019836425782
+  },
+  {
+   "key": "compositional_transfer-tune-1001772/a3",
+   "text": "add 1 3, add 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001783/a0",
+   "text": "mix 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20266380310058593
+  },
+  {
+   "key": "compositional_transfer-tune-1001890/a0",
+   "text": "mix 2 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09000320434570312
+  },
+  {
+   "key": "rule_induction-tune-1001819/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001673/a2",
+   "text": "copy 4 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2225738525390625
+  },
+  {
+   "key": "compositional_transfer-tune-1001708/a3",
+   "text": "add 1 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19182205200195312
+  },
+  {
+   "key": "compositional_transfer-tune-1001695/a2",
+   "text": "add 0 3, add 1 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001650/a0",
+   "text": "mix 0 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.254638671875
+  },
+  {
+   "key": "rule_induction-tune-1001860/a2",
+   "text": "add 3 0",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001835/a0",
+   "text": "mix 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2720043182373047
+  },
+  {
+   "key": "rule_induction-tune-1001829/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001854/a0",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.30565948486328126
+  },
+  {
+   "key": "rule_induction-tune-1001709/a1",
+   "text": "copy 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.25641517639160155
+  },
+  {
+   "key": "rule_induction-tune-1001839/a2",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001631/a3",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.170220947265625
+  },
+  {
+   "key": "rule_induction-tune-1001613/a0",
+   "text": "add 4 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1536834716796875
+  },
+  {
+   "key": "compositional_transfer-tune-1001669/a0",
+   "text": "add 4 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20911178588867188
+  },
+  {
+   "key": "compositional_transfer-tune-1001794/a3",
+   "text": "add 1 1, swap 0 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001756/a3",
+   "text": "add 0 5",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3919517517089844
+  },
+  {
+   "key": "compositional_transfer-tune-1001681/a0",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.15885772705078124
+  },
+  {
+   "key": "compositional_transfer-tune-1001644/a3",
+   "text": "add 1 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.09167404174804687
+  },
+  {
+   "key": "rule_induction-tune-1001640/a3",
+   "text": "nothing",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001725/a1",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001660/a0",
+   "text": "add 3 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24978256225585938
+  },
+  {
+   "key": "compositional_transfer-tune-1001680/a1",
+   "text": "add 1 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20059967041015625
+  },
+  {
+   "key": "compositional_transfer-tune-1001893/a0",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.04241676330566406
+  },
+  {
+   "key": "compositional_transfer-tune-1001837/a0",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.34430389404296874
+  },
+  {
+   "key": "rule_induction-tune-1001899/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24133567810058593
+  },
+  {
+   "key": "rule_induction-tune-1001774/a2",
+   "text": "copy 0 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.24785995483398438
+  },
+  {
+   "key": "compositional_transfer-tune-1001751/a1",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2566539764404297
+  },
+  {
+   "key": "rule_induction-tune-1001724/a2",
+   "text": "add 4 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.16391677856445314
+  },
+  {
+   "key": "compositional_transfer-tune-1001780/a0",
+   "text": "no change",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001800/a1",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2990081787109375
+  },
+  {
+   "key": "compositional_transfer-tune-1001824/a2",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.3003532409667969
+  },
+  {
+   "key": "compositional_transfer-tune-1001732/a3",
+   "text": "add 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.1913665771484375
+  },
+  {
+   "key": "compositional_transfer-tune-1001734/a1",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.20199851989746093
+  },
+  {
+   "key": "rule_induction-tune-1001663/a0",
+   "text": "copy 4 4",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "rule_induction-tune-1001647/a3",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.52236328125
+  },
+  {
+   "key": "rule_induction-tune-1001683/a3",
+   "text": "add 1 2",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.2696865081787109
+  },
+  {
+   "key": "compositional_transfer-tune-1001605/a1",
+   "text": "add 3 1",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.13840484619140625
+  },
+  {
+   "key": "rule_induction-tune-1001892/a3",
+   "text": "add 3 2",
+   "valid": true,
+   "consistent": true,
+   "correct": false,
+   "mean_logprob": -0.19369277954101563
+  },
+  {
+   "key": "compositional_transfer-tune-1001634/a0",
+   "text": "mix 3 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.119219970703125
+  },
+  {
+   "key": "compositional_transfer-tune-1001632/a3",
+   "text": "add 0 3, swap 0 3",
+   "valid": false,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": null
+  },
+  {
+   "key": "compositional_transfer-tune-1001708/a1",
+   "text": "mix 0 3",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.5450469970703125
+  },
+  {
+   "key": "compositional_transfer-tune-1001765/a0",
+   "text": "mix 2 4",
+   "valid": true,
+   "consistent": false,
+   "correct": false,
+   "mean_logprob": -0.19386024475097657
+  }
+ ]
+}

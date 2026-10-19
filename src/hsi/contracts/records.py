@@ -149,6 +149,8 @@ class Receipt(Strict):
     budget_used: dict[str, float]
     family_results: list[FamilyResult]
     comparisons: list[Comparison] = Field(min_length=1)
+    secondary_comparisons: list[Comparison] = Field(default_factory=list)  # exploratory, adjusted
+    secondary_z: float | None = None  # Bonferroni-adjusted two-sided 95% multiplier
     guardrail_values: dict[str, float]
     threshold: float
     guardrails_held: bool

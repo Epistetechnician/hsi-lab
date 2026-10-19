@@ -37,7 +37,7 @@ E1_PARAMS = {
 
 GEN_VARIANTS = {
     "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
-    "llm-poolctl", "llm-ood", "llm-torch",
+    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver",
 }  # fmt: skip
 TERMINATED = GEN_VARIANTS - {"llm-gen"}
 SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
@@ -52,7 +52,35 @@ VERSIONS = {
     "llm-poolctl": 9,
     "llm-ood": 10,
     "llm-torch": 11,
+    "llm-noisyver": 12,
 }
+
+
+# ADR 0003 (v12). Verifier chains train to depth 2 on the same 600-world proposal pool as the
+# earlier verified and pool-matched chains; each has its own training seed. tau is the 80th
+# percentile of mean token log-probability over the audit proposals (docs/experiments/
+# E6-noisyver-audit.md), fixed before the packet was frozen.
+NOISYVER_CHAINS = [
+    {"name": "noisy10", "kind": "noisy", "fpr": 0.10, "salt": "a", "train_seed_offset": 300},
+    {"name": "noisy10b", "kind": "noisy", "fpr": 0.10, "salt": "b", "train_seed_offset": 400},
+    {"name": "noisy30", "kind": "noisy", "fpr": 0.30, "salt": "a", "train_seed_offset": 500},
+    {"name": "tested", "kind": "tested", "extra_probes": 2, "train_seed_offset": 600},
+    {"name": "conf", "kind": "confidence", "tau": -0.108, "train_seed_offset": 700},
+]
+NOISYVER_ARMS = [
+    "frozen_base", "real_only", "d2_replay",
+    "d1_verified", "d2_verified", "d1_poolctl", "d2_poolctl",
+    "d1_noisy10", "d2_noisy10", "d2_noisy10b", "d2_noisy30", "d2_tested", "d2_conf",
+]  # fmt: skip
+NOISYVER_SECONDARY = [  # exploratory; Bonferroni over 7; never decide the packet
+    {"treatment": "d2_verified", "baseline": "d2_poolctl"},
+    {"treatment": "d2_noisy30", "baseline": "d2_poolctl"},
+    {"treatment": "d2_noisy10b", "baseline": "d2_poolctl"},
+    {"treatment": "d2_tested", "baseline": "d2_verified"},
+    {"treatment": "d2_conf", "baseline": "d2_poolctl"},
+    {"treatment": "d2_verified", "baseline": "d2_noisy10"},
+    {"treatment": "d2_noisy10b", "baseline": "d2_noisy10"},
+]
 
 
 def template(exp: str, variant: str = "") -> dict[str, object]:
@@ -461,6 +489,37 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             )
             t["null_hypothesis"] = (
                 "d2 verified does not beat d2 replay on held-out types by the threshold."
+            )
+        if variant == "llm-noisyver":  # v12: ADR 0003, imperfect verifiers + a non-circular metric
+            from hsi.paths import run_root
+
+            v9 = "fda4e460ea88bf7b"  # holds every earlier adapter: replay, verified, poolctl
+            m9 = json.loads((run_root() / v9 / "learning" / "manifest.json").read_text())
+            p.update(
+                eval_mode="probe", reuse_from=v9, depth=2, verifier_depth=2,
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                verified_chain=True, control_chain=True,
+                verify_pool_base=1000, verify_pool_worlds=600,
+                audit_base=1600, audit_worlds=300, avoid=[[1000, 1600], [1600, 1900]],
+                min_n=100, max_n=400, pilot_tasks=30, diversity_floor_frac=0.5,
+                guard_suffix="noisy10",
+                pinned_adapters={a: c["digest"] for a, c in m9["candidates"].items()},
+                verifier_chains=NOISYVER_CHAINS,
+                treatment="d2_noisy10", baselines=["d2_poolctl"],
+                secondary=NOISYVER_SECONDARY,
+            )  # fmt: skip
+            t["arms"] = NOISYVER_ARMS
+            t["primary_metric"] = "probe_success_rate_diff_d2_noisy10_minus_d2_poolctl"
+            t["hypothesis"] = (
+                "A verifier that wrongly accepts 10% of the proposals that contradict the "
+                "observed evidence still earns its keep: at recursion depth 2, on unseen "
+                "in-distribution worlds, scored on fresh probe states that no verifier saw, a "
+                "generator trained on the noisy-verified half beats one trained on the "
+                "pool-matched unverified half (same original-data half, same example count)."
+            )
+            t["null_hypothesis"] = (
+                "d2 with a 10%-false-accept verifier does not beat the pool-matched unverified "
+                "control by the threshold."
             )
     if exp in ("E4", "E6"):
         t["budget"] = {

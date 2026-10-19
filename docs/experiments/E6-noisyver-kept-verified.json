@@ -1,0 +1,23 @@
+{
+ "d1_verified": {
+  "consistent": 1.0,
+  "exact": 0.1657142857142857,
+  "n": 175,
+  "probe_correct": 0.19428571428571428,
+  "valid": 1.0
+ },
+ "d2_verified": {
+  "consistent": 1.0,
+  "exact": 0.32,
+  "n": 175,
+  "probe_correct": 0.37714285714285717,
+  "valid": 1.0
+ },
+ "d3_verified": {
+  "consistent": 1.0,
+  "exact": 0.37714285714285717,
+  "n": 175,
+  "probe_correct": 0.42857142857142855,
+  "valid": 1.0
+ }
+}
