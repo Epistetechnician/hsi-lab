@@ -1,0 +1,467 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 0.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 4596.046875,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 10196.278980541014
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d2_poolctl",
+      "ci_high": 0.09195524662521318,
+      "ci_low": 0.04304475337478683,
+      "paired_diff": 0.0675,
+      "pairs": [
+        {
+          "both": 18,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 303,
+          "only_baseline": 20,
+          "only_treatment": 59
+        },
+        {
+          "both": 5,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 370,
+          "only_baseline": 5,
+          "only_treatment": 20
+        }
+      ],
+      "treatment_arm": "d2_noisy10"
+    }
+  ],
+  "data_digest": "0816530c5644b1ee251eb15b626761ecf975e597bebf13ae12825063ca26fd9e",
+  "decision": "INCONCLUSIVE",
+  "family_results": [
+    {
+      "arm": "frozen_base",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 0
+    },
+    {
+      "arm": "real_only",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 105
+    },
+    {
+      "arm": "d2_replay",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 0
+    },
+    {
+      "arm": "d1_verified",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 67
+    },
+    {
+      "arm": "d2_verified",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 89
+    },
+    {
+      "arm": "d1_poolctl",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 27
+    },
+    {
+      "arm": "d2_poolctl",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 38
+    },
+    {
+      "arm": "d1_noisy10",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 54
+    },
+    {
+      "arm": "d2_noisy10",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 77
+    },
+    {
+      "arm": "d2_noisy10b",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 70
+    },
+    {
+      "arm": "d2_noisy30",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 92
+    },
+    {
+      "arm": "d2_tested",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 146
+    },
+    {
+      "arm": "d2_conf",
+      "family": "rule_induction@tune",
+      "n": 400,
+      "successes": 52
+    },
+    {
+      "arm": "frozen_base",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 0
+    },
+    {
+      "arm": "real_only",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 55
+    },
+    {
+      "arm": "d2_replay",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 6
+    },
+    {
+      "arm": "d1_verified",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 17
+    },
+    {
+      "arm": "d2_verified",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 20
+    },
+    {
+      "arm": "d1_poolctl",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 6
+    },
+    {
+      "arm": "d2_poolctl",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 10
+    },
+    {
+      "arm": "d1_noisy10",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 17
+    },
+    {
+      "arm": "d2_noisy10",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 25
+    },
+    {
+      "arm": "d2_noisy10b",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 13
+    },
+    {
+      "arm": "d2_noisy30",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 30
+    },
+    {
+      "arm": "d2_tested",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 47
+    },
+    {
+      "arm": "d2_conf",
+      "family": "compositional_transfer@tune",
+      "n": 400,
+      "successes": 15
+    }
+  ],
+  "guardrail_values": {
+    "diversity_d2_no_replay": 0.2721694166675365,
+    "diversity_d2_noisy10": 0.2713212351229511,
+    "diversity_floor": 0.19849012864477145,
+    "eval_consistent_d1_noisy10": 0.2325,
+    "eval_consistent_d1_poolctl": 0.1175,
+    "eval_consistent_d1_verified": 0.28625,
+    "eval_consistent_d2_conf": 0.205,
+    "eval_consistent_d2_noisy10": 0.26875,
+    "eval_consistent_d2_noisy10b": 0.24625,
+    "eval_consistent_d2_noisy30": 0.31,
+    "eval_consistent_d2_poolctl": 0.17375,
+    "eval_consistent_d2_replay": 0.06375,
+    "eval_consistent_d2_tested": 0.4,
+    "eval_consistent_d2_verified": 0.29375,
+    "eval_consistent_frozen_base": 0.0,
+    "eval_consistent_real_only": 0.36,
+    "eval_diversity_d1_noisy10": 0.3969802572895429,
+    "eval_diversity_d1_poolctl": 0.44637375171166904,
+    "eval_diversity_d1_verified": 0.40150624468793567,
+    "eval_diversity_d2_conf": 0.3915070195922405,
+    "eval_diversity_d2_noisy10": 0.4025184977476912,
+    "eval_diversity_d2_noisy10b": 0.4642407460660981,
+    "eval_diversity_d2_noisy30": 0.45094653542285584,
+    "eval_diversity_d2_poolctl": 0.4549241995196511,
+    "eval_diversity_d2_replay": 0.3793626997743964,
+    "eval_diversity_d2_tested": 0.29720118378957766,
+    "eval_diversity_d2_verified": 0.41393081902493034,
+    "eval_diversity_frozen_base": -0.0,
+    "eval_diversity_real_only": 0.2889693697602652,
+    "eval_exact_d1_noisy10": 0.0725,
+    "eval_exact_d1_poolctl": 0.0325,
+    "eval_exact_d1_verified": 0.08625,
+    "eval_exact_d2_conf": 0.06375,
+    "eval_exact_d2_noisy10": 0.09875,
+    "eval_exact_d2_noisy10b": 0.07625,
+    "eval_exact_d2_noisy30": 0.11125,
+    "eval_exact_d2_poolctl": 0.0475,
+    "eval_exact_d2_replay": 0.0075,
+    "eval_exact_d2_tested": 0.19625,
+    "eval_exact_d2_verified": 0.10875,
+    "eval_exact_frozen_base": 0.0,
+    "eval_exact_real_only": 0.15,
+    "eval_probe_d1_noisy10": 0.08875,
+    "eval_probe_d1_poolctl": 0.04125,
+    "eval_probe_d1_verified": 0.105,
+    "eval_probe_d2_conf": 0.08375,
+    "eval_probe_d2_noisy10": 0.1275,
+    "eval_probe_d2_noisy10b": 0.10375,
+    "eval_probe_d2_noisy30": 0.1525,
+    "eval_probe_d2_poolctl": 0.06,
+    "eval_probe_d2_replay": 0.0075,
+    "eval_probe_d2_tested": 0.24125,
+    "eval_probe_d2_verified": 0.13625,
+    "eval_probe_frozen_base": 0.0,
+    "eval_probe_real_only": 0.2,
+    "eval_valid_d1_noisy10": 0.985,
+    "eval_valid_d1_poolctl": 0.83625,
+    "eval_valid_d1_verified": 0.99,
+    "eval_valid_d2_conf": 0.99125,
+    "eval_valid_d2_noisy10": 0.9975,
+    "eval_valid_d2_noisy10b": 0.9825,
+    "eval_valid_d2_noisy30": 0.9675,
+    "eval_valid_d2_poolctl": 0.855,
+    "eval_valid_d2_replay": 0.87625,
+    "eval_valid_d2_tested": 0.99375,
+    "eval_valid_d2_verified": 0.9975,
+    "eval_valid_frozen_base": 0.0,
+    "eval_valid_real_only": 0.99,
+    "min_replay_diversity": 0.3969802572895429,
+    "non_collapse_floor": 0.02,
+    "rate_d1_noisy10": 0.08875,
+    "rate_d2_noisy10": 0.1275,
+    "validity_d2_no_replay": 0.045714285714285714,
+    "validity_d2_noisy10": 0.64
+  },
+  "guardrails_held": true,
+  "lock_digest": "a6c1cbe2e6e2cf38f79c968b90603309cc8ccc54de6c4700a937762b3364b8bf",
+  "model_digest": "f223c65bc98678a85b8cbf05923792c35720e4006c5b936aede47069830fde8b",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "packet_digest": "2617fd5a0d15f69f210d8d62fc3c80993eb7a7fc407ed3fe179b981a8d3fdfae",
+  "receipt_digest": "ba3820d487a56c46a7f5579ac796b48561252293272b80db5aa1b2838805d320",
+  "schema_version": "hsi-receipt-v1",
+  "secondary_comparisons": [
+    {
+      "baseline_arm": "d2_poolctl",
+      "ci_high": 0.111557287227773,
+      "ci_low": 0.04094271277222699,
+      "paired_diff": 0.07625,
+      "pairs": [
+        {
+          "both": 16,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 289,
+          "only_baseline": 22,
+          "only_treatment": 73
+        },
+        {
+          "both": 4,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 374,
+          "only_baseline": 6,
+          "only_treatment": 16
+        }
+      ],
+      "treatment_arm": "d2_verified"
+    },
+    {
+      "baseline_arm": "d2_poolctl",
+      "ci_high": 0.1292913048551717,
+      "ci_low": 0.0557086951448283,
+      "paired_diff": 0.0925,
+      "pairs": [
+        {
+          "both": 18,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 288,
+          "only_baseline": 20,
+          "only_treatment": 74
+        },
+        {
+          "both": 3,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 363,
+          "only_baseline": 7,
+          "only_treatment": 27
+        }
+      ],
+      "treatment_arm": "d2_noisy30"
+    },
+    {
+      "baseline_arm": "d2_poolctl",
+      "ci_high": 0.07607638073316723,
+      "ci_low": 0.01142361926683276,
+      "paired_diff": 0.04375,
+      "pairs": [
+        {
+          "both": 16,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 308,
+          "only_baseline": 22,
+          "only_treatment": 54
+        },
+        {
+          "both": 2,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 379,
+          "only_baseline": 8,
+          "only_treatment": 11
+        }
+      ],
+      "treatment_arm": "d2_noisy10b"
+    },
+    {
+      "baseline_arm": "d2_verified",
+      "ci_high": 0.14806998407171051,
+      "ci_low": 0.06193001592828949,
+      "paired_diff": 0.105,
+      "pairs": [
+        {
+          "both": 53,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 218,
+          "only_baseline": 36,
+          "only_treatment": 93
+        },
+        {
+          "both": 11,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 344,
+          "only_baseline": 9,
+          "only_treatment": 36
+        }
+      ],
+      "treatment_arm": "d2_tested"
+    },
+    {
+      "baseline_arm": "d2_poolctl",
+      "ci_high": 0.05711432335599913,
+      "ci_low": -0.009614323355999127,
+      "paired_diff": 0.02375,
+      "pairs": [
+        {
+          "both": 7,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 317,
+          "only_baseline": 31,
+          "only_treatment": 45
+        },
+        {
+          "both": 1,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 376,
+          "only_baseline": 9,
+          "only_treatment": 14
+        }
+      ],
+      "treatment_arm": "d2_conf"
+    },
+    {
+      "baseline_arm": "d2_noisy10",
+      "ci_high": 0.04890184195891738,
+      "ci_low": -0.031401841958917376,
+      "paired_diff": 0.008749999999999999,
+      "pairs": [
+        {
+          "both": 27,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 261,
+          "only_baseline": 50,
+          "only_treatment": 62
+        },
+        {
+          "both": 7,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 362,
+          "only_baseline": 18,
+          "only_treatment": 13
+        }
+      ],
+      "treatment_arm": "d2_verified"
+    },
+    {
+      "baseline_arm": "d2_noisy10",
+      "ci_high": 0.015250427654368182,
+      "ci_low": -0.06275042765436818,
+      "paired_diff": -0.02375,
+      "pairs": [
+        {
+          "both": 22,
+          "family": "rule_induction@tune",
+          "n": 400,
+          "neither": 275,
+          "only_baseline": 55,
+          "only_treatment": 48
+        },
+        {
+          "both": 3,
+          "family": "compositional_transfer@tune",
+          "n": 400,
+          "neither": 365,
+          "only_baseline": 22,
+          "only_treatment": 10
+        }
+      ],
+      "treatment_arm": "d2_noisy10b"
+    }
+  ],
+  "secondary_z": 2.6901095271588664,
+  "seeds": [
+    0
+  ],
+  "source_commit": "41e024e59c031fd7dd46a94310fc65df5a4e0c9d",
+  "threshold": 0.05
+}

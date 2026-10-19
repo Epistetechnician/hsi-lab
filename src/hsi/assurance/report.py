@@ -41,6 +41,7 @@ ALL = [
     "E6-poolctl",
     "E6-ood",
     "E6-torch",
+    "E6-noisyver",
     "E7",
 ]  # *-llm: MLX-backbone variants
 

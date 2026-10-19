@@ -107,6 +107,7 @@ def test_assess_reports_all_seven() -> None:
         "E6-poolctl",
         "E6-ood",
         "E6-torch",
+        "E6-noisyver",
         "E7",
     ]
     assert all(r["level"] in ("A2", "A3") for r in rows)
