@@ -1,0 +1,186 @@
+{
+  "packet": {
+    "arms": [
+      "frozen_base",
+      "real_only",
+      "d2_replay",
+      "d1_verified",
+      "d2_verified",
+      "d1_poolctl",
+      "d2_poolctl",
+      "d1_noisy10",
+      "d2_noisy10",
+      "d2_noisy10b",
+      "d2_noisy30",
+      "d2_tested",
+      "d2_conf"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "A verifier that wrongly accepts 10% of the proposals that contradict the observed evidence still earns its keep: at recursion depth 2, on unseen in-distribution worlds, scored on fresh probe states that no verifier saw, a generator trained on the noisy-verified half beats one trained on the pool-matched unverified half (same original-data half, same example count).",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d2 with a 10%-false-accept verifier does not beat the pool-matched unverified control by the threshold.",
+    "params": {
+      "adapt_batch": 8,
+      "adapt_lr": 0.0001,
+      "adapt_steps": 300,
+      "audit_base": 1600,
+      "audit_worlds": 300,
+      "avoid": [
+        [
+          1000,
+          1600
+        ],
+        [
+          1600,
+          1900
+        ]
+      ],
+      "backbone": "llm",
+      "baselines": [
+        "d2_poolctl"
+      ],
+      "control_chain": true,
+      "depth": 2,
+      "diversity_floor_frac": 0.5,
+      "eval_mode": "probe",
+      "extra_arms": true,
+      "families": [
+        "rule_induction@tune",
+        "compositional_transfer@tune"
+      ],
+      "gen_max_tokens": 20,
+      "generations": 3,
+      "guard_suffix": "noisy10",
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "max_n": 400,
+      "min_n": 100,
+      "model": "qwen2.5-7b",
+      "n_adapt": 50,
+      "n_demos": 2,
+      "n_replay": 50,
+      "n_replay_tune": 50,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 30,
+      "pinned_adapters": {
+        "d1_no_replay": "350c253ef058b2389949f73f298f1b777340f437cf2e2d11e35668e8ee75ba15",
+        "d1_poolctl": "ef8f5c3860f53fcc6c962a0295dd6d54728a0a9ba7a3da094e5ea2824274b66b",
+        "d1_replay": "84ae1b1cd4bf10429ab3b261b67f36ee185b000935f6273e1deaa31e6e8058c2",
+        "d1_verified": "14aae8a7f30d121d4fb08f39dc8eb8ada66aa0a6a381e5c2c3e399d1fabe2a39",
+        "d2_no_replay": "d6ac1d16f2313710dc412a4faa7378059f25787b4547ab7fb202d90872c49356",
+        "d2_poolctl": "43c49eba780142e3abcc0861fd07555cbb7ec34ad591a5dbd6e5117da73ec5c2",
+        "d2_replay": "ff761cc5675d4d22c06e3bc396534d75785df95ee08cf180a6d7bcd8a61063f8",
+        "d2_verified": "9f3c2fd67d6c641966e3fa1f5321b1f7d981f2b11aeef6a2d5190bccb9bdb7a9",
+        "d3_no_replay": "adc92408c7a56b25489c75286efc2612270908a5c84eac612baa1c60b4080ed7",
+        "d3_poolctl": "58aacb33a5841e3f67a1b07736e352ac0854123e3997015c3bdd8616f9d79cf6",
+        "d3_replay": "be1fe78c6d0b4e44bc6fbe63df25839ecba10776dc50d37f5a9e567010d3762b",
+        "d3_verified": "7bf90a16040fc5ef46d98fa478300f2e66661f601281121c228bf21a8fa4694f",
+        "real_only": "d636a25610d64bd29a040e3f3c3a7b93920ec8a20afbc11a41bc2f64e94d75e6"
+      },
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "rank": 8,
+      "reuse_from": "fda4e460ea88bf7b",
+      "secondary": [
+        {
+          "baseline": "d2_poolctl",
+          "treatment": "d2_verified"
+        },
+        {
+          "baseline": "d2_poolctl",
+          "treatment": "d2_noisy30"
+        },
+        {
+          "baseline": "d2_poolctl",
+          "treatment": "d2_noisy10b"
+        },
+        {
+          "baseline": "d2_verified",
+          "treatment": "d2_tested"
+        },
+        {
+          "baseline": "d2_poolctl",
+          "treatment": "d2_conf"
+        },
+        {
+          "baseline": "d2_noisy10",
+          "treatment": "d2_verified"
+        },
+        {
+          "baseline": "d2_noisy10",
+          "treatment": "d2_noisy10b"
+        }
+      ],
+      "support": 8,
+      "target_terminator": "\n",
+      "treatment": "d2_noisy10",
+      "tune_offset": 500000,
+      "verified_chain": true,
+      "verifier_chains": [
+        {
+          "fpr": 0.1,
+          "kind": "noisy",
+          "name": "noisy10",
+          "salt": "a",
+          "train_seed_offset": 300
+        },
+        {
+          "fpr": 0.1,
+          "kind": "noisy",
+          "name": "noisy10b",
+          "salt": "b",
+          "train_seed_offset": 400
+        },
+        {
+          "fpr": 0.3,
+          "kind": "noisy",
+          "name": "noisy30",
+          "salt": "a",
+          "train_seed_offset": 500
+        },
+        {
+          "extra_probes": 2,
+          "kind": "tested",
+          "name": "tested",
+          "train_seed_offset": 600
+        },
+        {
+          "kind": "confidence",
+          "name": "conf",
+          "tau": -0.108,
+          "train_seed_offset": 700
+        }
+      ],
+      "verifier_depth": 2,
+      "verify_pool_base": 1000,
+      "verify_pool_worlds": 600
+    },
+    "primary_metric": "probe_success_rate_diff_d2_noisy10_minus_d2_poolctl",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.05,
+    "version": 12
+  },
+  "packet_digest": "2617fd5a0d15f69f210d8d62fc3c80993eb7a7fc407ed3fe179b981a8d3fdfae"
+}
