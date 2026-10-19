@@ -88,6 +88,19 @@ def guardrails(exp, pk, receipt, comps_ds, errs):
             g["min_replay_diversity"] >= g["diversity_floor"]
             and rg - r1 >= -g["non_collapse_floor"]
         )
+    if exp == "E8":
+        q = pk["params"]
+        tot, ok = {}, {}
+        for r in receipt["family_results"]:
+            tot[r["arm"]] = tot.get(r["arm"], 0) + r["n"]
+            ok[r["arm"]] = ok.get(r["arm"], 0) + r["successes"]
+        suf, gens = q["guard_suffix"], q["depth"]
+        r1, rg = ok[f"d1_{suf}"] / tot[f"d1_{suf}"], ok[f"d{gens}_{suf}"] / tot[f"d{gens}_{suf}"]
+        if not (close(g[f"rate_d1_{suf}"], r1) and close(g[f"rate_d{gens}_{suf}"], rg)):
+            errs.append(f"{suf} rates differ from family_results")
+        if g["non_collapse_floor"] != q["non_collapse_floor"]:
+            errs.append("non_collapse_floor differs from packet")
+        return rg - r1 >= -g["non_collapse_floor"]
     if exp == "E5":
         if g["message_byte_cap"] != pk["budget"]["max_message_bytes"]:
             errs.append("message cap differs from packet")

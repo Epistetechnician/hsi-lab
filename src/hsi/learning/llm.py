@@ -247,6 +247,27 @@ class LLM:
         out = generate(self.model, self.tok, prompt=prompt, max_tokens=max_tokens)
         return str(out).strip().split("\n")[0].strip()
 
+    def chat(self, user: str) -> str:
+        """Chat-template prompt string ending at the assistant turn."""
+        msgs = [{"role": "user", "content": user}]
+        return str(self.tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True))
+
+    def complete(
+        self, prompt: str, max_tokens: int = 320, temp: float = 0.0, seed: int = 0
+    ) -> str:
+        """Free-text completion; greedy at temp 0, else sampled with a fixed seed."""
+        import mlx.core as mx
+        from mlx_lm import generate
+        from mlx_lm.sample_utils import make_sampler
+
+        mx.random.seed(seed)
+        return str(
+            generate(
+                self.model, self.tok, prompt=prompt, max_tokens=max_tokens,
+                sampler=make_sampler(temp=temp),
+            )
+        )
+
     def mean_logprob(self, prompt: str, text: str) -> float:
         """Mean per-token log P(" " + text | prompt): the model's confidence in its own text."""
         n = max(1, len(self.tok.encode(" " + text)))
@@ -318,6 +339,7 @@ class LLM:
         seed: int,
         batch: int = 8,
         on_step: Callable[[int, float], None] | None = None,
+        lead: str = " ",
     ) -> float:
         """Supervised fine-tuning of the adapter only: maximise log P(target | prompt)."""
         import random
@@ -337,7 +359,7 @@ class LLM:
         for step in range(steps):
             mb = rng.sample(samples, min(batch, len(samples)))
             ps = [self.tok.encode(p) for p, _ in mb]
-            cs = [self.tok.encode(" " + t) for _, t in mb]
+            cs = [self.tok.encode(lead + t) for _, t in mb]
             loss, grads = vg(self.model, ps, cs)
             opt.update(self.model, grads)
             mx.eval(self.model.parameters(), opt.state, loss)

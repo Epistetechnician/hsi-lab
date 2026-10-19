@@ -111,12 +111,17 @@ def _lock_digest(digest: str, n: int, commitment: str) -> str:
     return canonical_digest({"packet_digest": digest, "n_per_family": n, "commitment": commitment})
 
 
-def holdout_offsets(salt: str, n: int) -> list[int]:
-    return random.Random(salt).sample(range(1_000_000), n)
+def holdout_offsets(salt: str, n: int, mod: int = 0) -> list[int]:
+    """Salt-determined held-out offsets. With `mod`, offsets are distinct modulo `mod` (n <= mod),
+    so `offset % mod` is an injective task index for finite task pools."""
+    rng = random.Random(salt)
+    if not mod:
+        return rng.sample(range(1_000_000), n)
+    return [r + mod * rng.randrange(1_000_000 // mod) for r in rng.sample(range(mod), n)]
 
 
 def lock(packet_file: Path) -> Path:
-    _, digest, d = _setup(packet_file)
+    packet, digest, d = _setup(packet_file)
     if not (d / "pilot.json").exists():
         raise PreconditionError("pilot missing; run `hsi pilot` first")
     if (d / "lock.public.json").exists():
@@ -128,7 +133,7 @@ def lock(packet_file: Path) -> Path:
         raise LockError("custody root is group/world accessible")
     n = int(load_json(d / "pilot.json")["n_per_family"])  # type: ignore[call-overload]
     salt = os.urandom(16).hex()
-    offs = holdout_offsets(salt, n)
+    offs = holdout_offsets(salt, n, int(packet.params.get("holdout_mod", 0)))
     com = _commitment(salt, offs)
     secret = croot / f"{digest[:16]}.lock.json"
     secret.write_text(json.dumps({"packet_digest": digest, "salt": salt, "n_per_family": n}))

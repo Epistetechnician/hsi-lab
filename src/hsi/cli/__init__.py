@@ -83,6 +83,55 @@ NOISYVER_SECONDARY = [  # exploratory; Bonferroni over 7; never decide the packe
 ]
 
 
+E8_CHAINS = [
+    {"name": "none", "tier": "none", "seed_offset": 10},
+    {"name": "ex", "tier": "ex", "seed_offset": 20},
+    {"name": "base", "tier": "base", "seed_offset": 30},
+    {"name": "plus", "tier": "plus", "seed_offset": 40},
+    {"name": "plusb", "tier": "plus", "seed_offset": 50},
+]
+E8_ARMS = [
+    "frozen_base",
+    *[f"d{g}_{c['name']}" for c in E8_CHAINS for g in (1, 2)],
+]
+E8_SECONDARY = [  # exploratory; Bonferroni over 6; never decide the packet
+    {"treatment": "d2_plus", "baseline": "d2_none"},
+    {"treatment": "d2_plus", "baseline": "d2_base"},
+    {"treatment": "d2_base", "baseline": "d2_ex"},
+    {"treatment": "d2_ex", "baseline": "d2_none"},
+    {"treatment": "d2_plus", "baseline": "frozen_base"},
+    {"treatment": "d2_plusb", "baseline": "d2_ex"},
+]
+E8_PARAMS = {
+    "model": "qwen2.5-1.5b",
+    "families": ["mbpp_a", "mbpp_b", "mbpp_c"],
+    "tune_frac": 0.4,
+    "holdout_mod": 75,
+    "pilot_tasks": 3,
+    "min_n": 75,
+    "max_n": 75,
+    "depth": 2,
+    "k": 8,
+    "temp": 0.8,
+    "per_task": 2,
+    "quota": 150,
+    "max_tokens": 320,
+    "workers": 6,
+    "rank": 8,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "lr": 1e-4,
+    "steps": 150,
+    "batch": 8,
+    "non_collapse_floor": 0.02,
+    "guard_suffix": "plus",
+    "chains": E8_CHAINS,
+    "treatment": "d2_plus",
+    "baselines": ["d2_ex"],
+    "secondary": E8_SECONDARY,
+}
+
+
 def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION,
@@ -177,6 +226,35 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "max_calls": 10_000_000,
             "max_wall_seconds": 3600,
             "max_message_bytes": 24,
+        }
+    if exp == "E8":
+        t.update(
+            hypothesis="When a code model trains on its own sampled solutions, filtering them with "
+            "the strong EvalPlus tests beats filtering with only the single example assertion shown "
+            "in the prompt: at recursion depth 2, greedy pass@1 on held-out MBPP+ tasks under the "
+            "strong tests is higher for the plus-filtered chain than for the example-filtered one "
+            "(same sampling budget, same example quota).",
+            null_hypothesis="d2 plus-filtered does not beat d2 example-filtered by the threshold.",
+            arms=E8_ARMS,
+            primary_metric="mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
+            threshold=0.03,
+            guardrails=[
+                "d2_plus not below d1_plus beyond the floor",
+                "held-out tasks never used by any chain",
+            ],
+            params=E8_PARAMS,
+        )
+        t["claim_ceiling"] = "LocalSmallModelCodeBenchmarkOnly"
+        t["nonclaims"] = [
+            "no general intelligence claim",
+            "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+            "held-out membership is public by design; the lock fixes order only",
+        ]
+        t["budget"] = {
+            "max_tokens": 0,
+            "max_calls": 10_000_000,
+            "max_wall_seconds": 3600,
+            "max_message_bytes": 0,
         }
     if exp == "E7":
         t.update(

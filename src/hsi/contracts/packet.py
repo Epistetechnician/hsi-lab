@@ -10,7 +10,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 SCHEMA_VERSION = "hsi-packet-v1"
-EXPERIMENTS = {"E1", "E2", "E3", "E4", "E5", "E6", "E7"}
+EXPERIMENTS = {"E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8"}
 
 
 class Strict(BaseModel):

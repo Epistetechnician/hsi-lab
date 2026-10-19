@@ -69,7 +69,7 @@ def main(run_dir: Path) -> Path:
         raise PreconditionError("no custody lock")
     sec = load_json(sec_path)
     n = int(sec["n_per_family"])  # type: ignore[call-overload]
-    offs = holdout_offsets(str(sec["salt"]), n)
+    offs = holdout_offsets(str(sec["salt"]), n, int(packet.params.get("holdout_mod", 0)))
     ld = _lock_digest(digest, n, _commitment(str(sec["salt"]), offs))
     if ld != man["lock_digest"] or n != man["n_per_family"]:
         raise LockError("lock digest mismatch")
