@@ -1,0 +1,134 @@
+{
+  "packet": {
+    "arms": [
+      "frozen_base",
+      "d1_none",
+      "d2_none",
+      "d1_ex",
+      "d2_ex",
+      "d1_plus",
+      "d2_plus"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSmallModelCodeBenchmarkOnly",
+    "experiment": "E8",
+    "guardrails": [
+      "d2_plus not below d1_plus beyond the floor",
+      "held-out tasks never used by any chain"
+    ],
+    "hypothesis": "On a competent 7B generator, at recursion depth 2, greedy pass@1 under the EvalPlus tests on held-out MBPP+ and HumanEval+ tasks is higher for chains that filter their own solutions with the strong tests than for chains that filter with only the one example assertion shown in the prompt (same sampling budget and example quota).",
+    "nonclaims": [
+      "no general intelligence claim",
+      "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+      "held-out membership is public by design; the lock fixes order only"
+    ],
+    "null_hypothesis": "d2 plus-filtered does not beat d2 example-filtered by the threshold.",
+    "params": {
+      "baselines": [
+        "d2_ex"
+      ],
+      "batch": 8,
+      "chains": [
+        {
+          "name": "none",
+          "replicates": 1,
+          "seed_offset": 10,
+          "tier": "none"
+        },
+        {
+          "name": "ex",
+          "replicates": 3,
+          "seed_offset": 20,
+          "tier": "ex"
+        },
+        {
+          "name": "plus",
+          "replicates": 3,
+          "seed_offset": 40,
+          "tier": "plus"
+        }
+      ],
+      "depth": 2,
+      "eval_pools": {
+        "he": [
+          "he_a",
+          "he_b"
+        ],
+        "mbpp": [
+          "mbpp_a",
+          "mbpp_b",
+          "mbpp_c"
+        ]
+      },
+      "families": [
+        "mbpp_a",
+        "mbpp_b",
+        "mbpp_c",
+        "he_a",
+        "he_b"
+      ],
+      "gen_batch": 64,
+      "guard_suffix": "plus",
+      "holdout_mod": 81,
+      "k": 6,
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "lr": 5e-05,
+      "max_n": 81,
+      "max_tokens": 320,
+      "min_n": 81,
+      "model": "qwen2.5-7b-hf",
+      "non_collapse_floor": 0.02,
+      "per_task": 2,
+      "pilot_tasks": 3,
+      "quota": 100,
+      "rank": 8,
+      "secondary": [
+        {
+          "baseline": "d2_none",
+          "treatment": "d2_plus"
+        },
+        {
+          "baseline": "d2_none",
+          "treatment": "d2_ex"
+        },
+        {
+          "baseline": "frozen_base",
+          "treatment": "d2_plus"
+        },
+        {
+          "baseline": "d1_ex",
+          "treatment": "d1_plus"
+        }
+      ],
+      "steps": 100,
+      "temp": 0.8,
+      "treatment": "d2_plus",
+      "tune_families": [
+        "mbpp_a",
+        "mbpp_b",
+        "mbpp_c",
+        "mbpp_a",
+        "mbpp_b"
+      ],
+      "tune_frac": 0.3,
+      "workers": 8
+    },
+    "primary_metric": "mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.03,
+    "version": 4
+  },
+  "packet_digest": "5cf8ef68765be9c21f40df9104f664e573839f6f9185697ee1490b775b6f0b5d"
+}

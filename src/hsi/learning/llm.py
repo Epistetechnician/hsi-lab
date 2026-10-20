@@ -269,6 +269,19 @@ class LLM:
             )
         )
 
+    def complete_many(
+        self,
+        prompts: list[str],
+        max_tokens: int = 320,
+        temp: float = 0.0,
+        seeds: list[int] | None = None,
+    ) -> list[str]:
+        """Same contract as the torch backend; MLX runs them one at a time with per-item seeds."""
+        sd = seeds or [0] * len(prompts)
+        return [
+            self.complete(p, max_tokens, temp, seed=x) for p, x in zip(prompts, sd, strict=True)
+        ]
+
     def mean_logprob(self, prompt: str, text: str) -> float:
         """Mean per-token log P(" " + text | prompt): the model's confidence in its own text."""
         n = max(1, len(self.tok.encode(" " + text)))

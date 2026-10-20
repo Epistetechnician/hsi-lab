@@ -111,6 +111,11 @@ class FakeLLM:
         code = t.code if good else f"def {name}(*a):\n    return None"
         return f"```python\n{code}\n```"
 
+    def complete_many(
+        self, prompts: list[str], max_tokens: int = 0, temp: float = 0.0, seeds: Any = None
+    ) -> list[str]:
+        return [self.complete(p, max_tokens, temp, s) for p, s in zip(prompts, seeds, strict=True)]
+
     def set_adapter(self, on: bool) -> None:
         self.on = on
 
@@ -203,3 +208,44 @@ def test_reuse_refuses_adapters_that_differ_from_the_pins(
     pk = _v3(monkeypatch, {"d1_plus_r0": "real"})
     assert try_reuse_adapters(pk, tmp_path / "new")
     assert (tmp_path / "new" / "learning" / "d1_plus_r0.safetensors").exists()
+
+
+class RefLLM(FakeLLM):
+    """Batched fake: answers every prompt with the task's reference solution."""
+
+    def complete_many(self, prompts: list[str], *a: Any, **k: Any) -> list[str]:
+        from hsi.verification import humaneval as he
+
+        out = []
+        for p in prompts:
+            ht = next((t for t in he.tasks().values() if t.prompt.strip() in p), None)
+            if ht is not None:
+                out.append("```python\n" + ht.prompt + ht.solution + "\n```")
+            else:
+                t = next(t for t in tasks().values() if t.prompt in p)
+                out.append(f"```python\n{t.code}\n```")
+        self.calls = getattr(self, "calls", 0) + 1
+        return out
+
+
+def test_v4_scores_both_benchmarks_with_batched_prefetch(
+    tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import hsi.evaluation.e8 as e8
+    import hsi.evaluation.llm_stack as ls
+
+    pk = Packet.model_validate(template("E8", "e8-7b"))
+    assert pk.params["holdout_mod"] == 81 and pk.params["gen_batch"] == 64
+    llm = RefLLM()
+    monkeypatch.setattr(e8, "_llm", lambda packet: llm)
+    monkeypatch.setitem(ls._STATE, "run_dir", tmp_path)
+    e8._STATE.pop("gen", None)
+    spec = e8.E8Spec()
+    base = SEED_BASE[Split.HELDOUT]
+    for fam, n in (("he_b", 6), ("mbpp_c", 6)):
+        rs = [spec.run_task("frozen_base", fam, Split.HELDOUT, base + o, pk) for o in range(n)]
+        assert all(r.success and r.stats["valid"] == 1.0 for r in rs), fam
+    assert llm.calls == 2 * 2  # 81 tasks per family / batch 64 = 2 batches, each family once
+    # tune split (pilot/run) stays on the unbatched MBPP+ path
+    r = spec.run_task("frozen_base", "he_a", Split.TUNE, SEED_BASE[Split.TUNE] + 1, pk)
+    assert "pass_ex" in r.stats

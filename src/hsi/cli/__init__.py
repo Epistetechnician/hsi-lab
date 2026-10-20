@@ -159,6 +159,14 @@ E8R_PARAMS = {
 }
 
 
+E8_7B_CHAINS = [
+    {"name": "none", "tier": "none", "seed_offset": 10, "replicates": 1},
+    {"name": "ex", "tier": "ex", "seed_offset": 20, "replicates": 3},
+    {"name": "plus", "tier": "plus", "seed_offset": 40, "replicates": 3},
+]
+E8_7B_ARMS = ["frozen_base", *[f"d{g}_{c['name']}" for c in E8_7B_CHAINS for g in (1, 2)]]
+
+
 E8_V2_RUN = "d55611f54cc09b94"  # the e8-v2 run whose 20 adapters v3 evaluates on HumanEval+
 
 
@@ -272,16 +280,44 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "under the strong tests is higher for the plus-filtered chain than for the "
             "example-filtered one (same sampling budget, same example quota).",
             null_hypothesis="d2 plus-filtered does not beat d2 example-filtered by the threshold.",
-            arms=E8R_ARMS if variant in ("e8-rep", "e8-he") else E8_ARMS,
+            arms=E8R_ARMS if variant in ("e8-rep", "e8-he", "e8-7b") else E8_ARMS,
             primary_metric="mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
             threshold=0.03,
             guardrails=[
                 "d2_plus not below d1_plus beyond the floor",
                 "held-out tasks never used by any chain",
             ],
-            params=E8R_PARAMS if variant in ("e8-rep", "e8-he") else E8_PARAMS,
-            version={"e8-rep": 2, "e8-he": 3}.get(variant, 1),
+            params=E8R_PARAMS if variant in ("e8-rep", "e8-he", "e8-7b") else E8_PARAMS,
+            version={"e8-rep": 2, "e8-he": 3, "e8-7b": 4}.get(variant, 1),
         )
+        if variant == "e8-7b":  # v4: ADR 0007, the same question on Qwen2.5-7B-Instruct bf16 (CUDA)
+            t["hypothesis"] = (
+                "On a competent 7B generator, at recursion depth 2, greedy pass@1 under the "
+                "EvalPlus tests on held-out MBPP+ and HumanEval+ tasks is higher for chains that "
+                "filter their own solutions with the strong tests than for chains that filter "
+                "with only the one example assertion shown in the prompt (same sampling budget and "
+                "example quota)."
+            )
+            t["params"] = {
+                **E8R_PARAMS,
+                "model": "qwen2.5-7b-hf",
+                "families": ["mbpp_a", "mbpp_b", "mbpp_c", "he_a", "he_b"],
+                "eval_pools": {"mbpp": ["mbpp_a", "mbpp_b", "mbpp_c"], "he": ["he_a", "he_b"]},
+                "tune_families": ["mbpp_a", "mbpp_b", "mbpp_c", "mbpp_a", "mbpp_b"],
+                "holdout_mod": 81,
+                "min_n": 81,
+                "max_n": 81,
+                "gen_batch": 64,
+                "workers": 8,
+                "chains": E8_7B_CHAINS,
+            }
+            t["arms"] = E8_7B_ARMS
+            t["claim_ceiling"] = "LocalSmallModelCodeBenchmarkOnly"
+            t["nonclaims"] = [
+                "no general intelligence claim",
+                "one 7B model, two benchmarks (MBPP+, HumanEval+), possibly seen in pretraining",
+                "PyTorch/CUDA runtime: a replication stack, not a digest-level reproduction of MLX",
+            ]
         if variant == "e8-he":  # v3: the v2 adapters, scored on a benchmark they never saw
             t["hypothesis"] = (
                 "On HumanEval+ (163 tasks no chain trained on or was tuned against), greedy pass@1 "
@@ -289,7 +325,7 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "chains of e8-v2 than for the example-filtered ones."
             )
             t["primary_metric"] = "humanevalplus_pass_at_1_diff_d2_plus_minus_d2_ex"
-            t["params"] = {  # type: ignore[assignment]
+            t["params"] = {
                 **E8R_PARAMS,
                 "eval_pool": "humaneval",
                 "families": ["he_a", "he_b", "he_c"],
@@ -739,7 +775,7 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument(
         "--variant",
         default="",
-        choices=["", "llm", "e8-rep", "e8-he", *sorted(GEN_VARIANTS)],
+        choices=["", "llm", "e8-rep", "e8-he", "e8-7b", *sorted(GEN_VARIANTS)],
     )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)

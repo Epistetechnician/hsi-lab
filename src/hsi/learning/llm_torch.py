@@ -154,6 +154,50 @@ class TorchLLM:
         text = self.tok.decode(o[0, ids.shape[1] :], skip_special_tokens=True)
         return str(text).strip().split("\n")[0].strip()
 
+    def chat(self, user: str) -> str:
+        """Chat-template prompt string ending at the assistant turn (same template as MLX)."""
+        msgs = [{"role": "user", "content": user}]
+        return str(self.tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True))
+
+    def complete_many(
+        self,
+        prompts: list[str],
+        max_tokens: int = 320,
+        temp: float = 0.0,
+        seeds: list[int] | None = None,
+    ) -> list[str]:
+        """Batched free-text completion (left-padded). Greedy at temp 0, else sampled; one RNG seed
+        per batch derived from `seeds`, so a fixed batch composition reproduces exactly."""
+        import torch
+
+        if not prompts:
+            return []
+        old = self.tok.padding_side
+        self.tok.padding_side = "left"
+        try:
+            enc = self.tok(prompts, return_tensors="pt", padding=True, add_special_tokens=False)
+        finally:
+            self.tok.padding_side = old
+        ids, att = enc.input_ids.to(self.dev), enc.attention_mask.to(self.dev)
+        kw: dict[str, Any] = {
+            "do_sample": temp > 0,
+            "temperature": None,
+            "top_p": None,
+            "top_k": None,
+        }
+        if temp > 0:
+            kw |= {"temperature": temp, "top_k": 0}
+            torch.manual_seed(sum(seeds or [0]) % (2**31))
+        with torch.no_grad():
+            o = self.model.generate(
+                input_ids=ids, attention_mask=att, max_new_tokens=max_tokens,
+                pad_token_id=self.tok.pad_token_id or self.tok.eos_token_id, **kw,
+            )  # fmt: skip
+        return [str(self.tok.decode(row[ids.shape[1] :], skip_special_tokens=True)) for row in o]
+
+    def complete(self, prompt: str, max_tokens: int = 320, temp: float = 0.0, seed: int = 0) -> str:
+        return self.complete_many([prompt], max_tokens, temp, [seed])[0]
+
     # -- LoRA -----------------------------------------------------------------
     def attach_lora(self, rank: int, layers: int, seed: int, scale: float = 20.0) -> None:
         import torch
@@ -230,6 +274,7 @@ class TorchLLM:
         seed: int,
         batch: int = 8,
         on_step: Callable[[int, float], None] | None = None,
+        lead: str = " ",
     ) -> float:
         import torch
 
@@ -240,7 +285,7 @@ class TorchLLM:
         for step in range(steps):
             mb = rng.sample(samples, min(batch, len(samples)))
             ps = [self.encode(p) for p, _ in mb]
-            cs = [self.encode(" " + t) for _, t in mb]
+            cs = [self.encode(lead + t) for _, t in mb]
             opt.zero_grad()
             loss = -self._seq_logprobs(ps, cs).mean()
             loss.backward()
