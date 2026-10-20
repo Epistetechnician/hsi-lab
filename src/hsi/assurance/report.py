@@ -43,6 +43,7 @@ ALL = [
     "E6-torch",
     "E6-noisyver",
     "E7",
+    "E8",
 ]  # *-llm: MLX-backbone variants
 
 

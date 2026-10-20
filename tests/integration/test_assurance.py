@@ -109,6 +109,7 @@ def test_assess_reports_all_seven() -> None:
         "E6-torch",
         "E6-noisyver",
         "E7",
+        "E8",
     ]
     assert all(r["level"] in ("A2", "A3") for r in rows)
     assert "of 7" in render(rows)
