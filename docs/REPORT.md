@@ -27,8 +27,11 @@ kept. The cost of this rigor is that most packets did not promote.
 - Unverified recursion (E6, E6-llm, E6-llmgen): no promotion; E2 verified-vs-unverified only +0.023.
 - **Code (E8 v1, MBPP+, 1.5B): NO_CANDIDATE.** Test strength gave +0.049 [-0.009, 0.107] (below +0.03 bar with
   CI through zero) and a guardrail failed. Two chains with the same filter differed by 0.07, and nearly all
-  self-trained models scored below the untouched base (0.502). v2 (replicated chains, gentler recipe) is the
-  pre-registered follow-up; its power to promote at a true +0.05 is only about 23% (260 paired tasks).
+  self-trained models scored below the untouched base (0.502). **v2 (E8-rep: replicated chains,
+  gentler recipe, 261 tasks): INCONCLUSIVE.** plus minus ex +0.019 [-0.030, 0.068] (bar +0.03), guardrail held.
+  Exploratory (Bonferroni): filtering with any execution test beats no filter at depth 2 (ex-none +0.081
+  [0.013, 0.148], plus-none +0.100 [0.023, 0.177]); a strong test is not distinguishable from the one shown
+  example. The gentler recipe no longer collapses (d2 plus 0.479 vs base 0.513, CI includes 0).
 - E7 (relations): INCONCLUSIVE. E6-llm7b: INCONCLUSIVE.
 
 ## Corrections of our own claims

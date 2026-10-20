@@ -1,0 +1,353 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 1827.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 1310.578125,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 1289.7983033329947
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d2_ex",
+      "ci_high": 0.0679178632981657,
+      "ci_low": -0.029603687052954974,
+      "paired_diff": 0.019157088122605363,
+      "pairs": [
+        {
+          "both": 38,
+          "family": "mbpp_a",
+          "n": 87,
+          "neither": 38,
+          "only_baseline": 7,
+          "only_treatment": 4
+        },
+        {
+          "both": 30,
+          "family": "mbpp_b",
+          "n": 87,
+          "neither": 41,
+          "only_baseline": 8,
+          "only_treatment": 8
+        },
+        {
+          "both": 33,
+          "family": "mbpp_c",
+          "n": 87,
+          "neither": 38,
+          "only_baseline": 4,
+          "only_treatment": 12
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    }
+  ],
+  "data_digest": "914369af502a7272558cdb62a00c4ec02ec28b193fb743a5f2d0617d2b0f54ee",
+  "decision": "INCONCLUSIVE",
+  "family_results": [
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 48
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 48
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 35
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 48
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 45
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 46
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_a",
+      "n": 87,
+      "successes": 42
+    },
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 44
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 39
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 39
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 39
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 38
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 45
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_b",
+      "n": 87,
+      "successes": 38
+    },
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 42
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 32
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 25
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 37
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 37
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 38
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_c",
+      "n": 87,
+      "successes": 45
+    }
+  ],
+  "guardrail_values": {
+    "eval_pass_base_d1_ex": 0.5402298850574713,
+    "eval_pass_base_d1_none": 0.5440613026819924,
+    "eval_pass_base_d1_plus": 0.578544061302682,
+    "eval_pass_base_d2_ex": 0.5287356321839081,
+    "eval_pass_base_d2_none": 0.4674329501915709,
+    "eval_pass_base_d2_plus": 0.5632183908045977,
+    "eval_pass_base_frozen_base": 0.6015325670498084,
+    "eval_pass_ex_d1_ex": 0.6015325670498084,
+    "eval_pass_ex_d1_none": 0.5938697318007663,
+    "eval_pass_ex_d1_plus": 0.6168582375478927,
+    "eval_pass_ex_d2_ex": 0.5977011494252874,
+    "eval_pass_ex_d2_none": 0.524904214559387,
+    "eval_pass_ex_d2_plus": 0.6091954022988506,
+    "eval_pass_ex_frozen_base": 0.6475095785440613,
+    "eval_valid_d1_ex": 1.0,
+    "eval_valid_d1_none": 1.0,
+    "eval_valid_d1_plus": 1.0,
+    "eval_valid_d2_ex": 1.0,
+    "eval_valid_d2_none": 1.0,
+    "eval_valid_d2_plus": 0.9961685823754789,
+    "eval_valid_frozen_base": 1.0,
+    "non_collapse_floor": 0.02,
+    "rate_d1_plus": 0.4942528735632184,
+    "rate_d2_plus": 0.4789272030651341
+  },
+  "guardrails_held": true,
+  "lock_digest": "4f42ee6d98dfefdf8aa722e9965605b9d835c8b602060a1113477585e57f97d2",
+  "model_digest": "08d37247787f8c0036c6dba9d86334df5406e351ea08a7346e09661f37d33d06",
+  "nonclaims": [
+    "no general intelligence claim",
+    "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+    "held-out membership is public by design; the lock fixes order only"
+  ],
+  "packet_digest": "d55611f54cc09b94583f340ca6fbfb29bc72a0d440519b3191c24a03b5e53f42",
+  "receipt_digest": "5bae620ee0ef136f9e3feec9bea28773a7ec1e02147ef9f498250b4d67207a66",
+  "schema_version": "hsi-receipt-v1",
+  "secondary_comparisons": [
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.17666827774319577,
+      "ci_low": 0.022565438731899992,
+      "paired_diff": 0.09961685823754789,
+      "pairs": [
+        {
+          "both": 26,
+          "family": "mbpp_a",
+          "n": 87,
+          "neither": 36,
+          "only_baseline": 9,
+          "only_treatment": 16
+        },
+        {
+          "both": 29,
+          "family": "mbpp_b",
+          "n": 87,
+          "neither": 39,
+          "only_baseline": 10,
+          "only_treatment": 9
+        },
+        {
+          "both": 22,
+          "family": "mbpp_c",
+          "n": 87,
+          "neither": 39,
+          "only_baseline": 3,
+          "only_treatment": 23
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.14825247428741078,
+      "ci_low": 0.012667065942474284,
+      "paired_diff": 0.08045977011494253,
+      "pairs": [
+        {
+          "both": 30,
+          "family": "mbpp_a",
+          "n": 87,
+          "neither": 37,
+          "only_baseline": 5,
+          "only_treatment": 15
+        },
+        {
+          "both": 31,
+          "family": "mbpp_b",
+          "n": 87,
+          "neither": 41,
+          "only_baseline": 8,
+          "only_treatment": 7
+        },
+        {
+          "both": 22,
+          "family": "mbpp_c",
+          "n": 87,
+          "neither": 47,
+          "only_baseline": 3,
+          "only_treatment": 15
+        }
+      ],
+      "treatment_arm": "d2_ex"
+    },
+    {
+      "baseline_arm": "frozen_base",
+      "ci_high": 0.029045528573240317,
+      "ci_low": -0.09801104581461963,
+      "paired_diff": -0.034482758620689655,
+      "pairs": [
+        {
+          "both": 40,
+          "family": "mbpp_a",
+          "n": 87,
+          "neither": 37,
+          "only_baseline": 8,
+          "only_treatment": 2
+        },
+        {
+          "both": 32,
+          "family": "mbpp_b",
+          "n": 87,
+          "neither": 37,
+          "only_baseline": 12,
+          "only_treatment": 6
+        },
+        {
+          "both": 35,
+          "family": "mbpp_c",
+          "n": 87,
+          "neither": 35,
+          "only_baseline": 7,
+          "only_treatment": 10
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d1_ex",
+      "ci_high": 0.08156533086246939,
+      "ci_low": -0.04325115461725866,
+      "paired_diff": 0.019157088122605363,
+      "pairs": [
+        {
+          "both": 39,
+          "family": "mbpp_a",
+          "n": 87,
+          "neither": 32,
+          "only_baseline": 9,
+          "only_treatment": 7
+        },
+        {
+          "both": 35,
+          "family": "mbpp_b",
+          "n": 87,
+          "neither": 38,
+          "only_baseline": 4,
+          "only_treatment": 10
+        },
+        {
+          "both": 31,
+          "family": "mbpp_c",
+          "n": 87,
+          "neither": 43,
+          "only_baseline": 6,
+          "only_treatment": 7
+        }
+      ],
+      "treatment_arm": "d1_plus"
+    }
+  ],
+  "secondary_z": 2.4977054744123737,
+  "seeds": [
+    0
+  ],
+  "source_commit": "039833d4b007cc10cc91815f6ec5108485621a41",
+  "threshold": 0.03
+}
