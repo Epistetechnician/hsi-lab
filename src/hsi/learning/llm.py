@@ -252,9 +252,7 @@ class LLM:
         msgs = [{"role": "user", "content": user}]
         return str(self.tok.apply_chat_template(msgs, tokenize=False, add_generation_prompt=True))
 
-    def complete(
-        self, prompt: str, max_tokens: int = 320, temp: float = 0.0, seed: int = 0
-    ) -> str:
+    def complete(self, prompt: str, max_tokens: int = 320, temp: float = 0.0, seed: int = 0) -> str:
         """Free-text completion; greedy at temp 0, else sampled with a fixed seed."""
         import mlx.core as mx
         from mlx_lm import generate
@@ -263,7 +261,10 @@ class LLM:
         mx.random.seed(seed)
         return str(
             generate(
-                self.model, self.tok, prompt=prompt, max_tokens=max_tokens,
+                self.model,
+                self.tok,
+                prompt=prompt,
+                max_tokens=max_tokens,
                 sampler=make_sampler(temp=temp),
             )
         )

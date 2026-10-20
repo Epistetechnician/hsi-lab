@@ -1,0 +1,139 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E8",
+  "version": 3,
+  "hypothesis": "On HumanEval+ (163 tasks no chain trained on or was tuned against), greedy pass@1 under the EvalPlus tests is higher at depth 2 for the plus-filtered replicate chains of e8-v2 than for the example-filtered ones.",
+  "null_hypothesis": "d2 plus-filtered does not beat d2 example-filtered by the threshold.",
+  "arms": [
+    "frozen_base",
+    "d1_none",
+    "d2_none",
+    "d1_ex",
+    "d2_ex",
+    "d1_plus",
+    "d2_plus"
+  ],
+  "primary_metric": "humanevalplus_pass_at_1_diff_d2_plus_minus_d2_ex",
+  "threshold": 0.03,
+  "guardrails": [
+    "d2_plus not below d1_plus beyond the floor",
+    "held-out tasks never used by any chain"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSmallModelCodeBenchmarkOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+    "held-out membership is public by design; the lock fixes order only"
+  ],
+  "params": {
+    "model": "qwen2.5-1.5b",
+    "families": [
+      "he_a",
+      "he_b",
+      "he_c"
+    ],
+    "tune_frac": 0.3,
+    "holdout_mod": 54,
+    "pilot_tasks": 3,
+    "min_n": 54,
+    "max_n": 54,
+    "depth": 2,
+    "k": 6,
+    "temp": 0.8,
+    "per_task": 2,
+    "quota": 100,
+    "max_tokens": 320,
+    "workers": 6,
+    "rank": 8,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "lr": 5e-05,
+    "steps": 100,
+    "batch": 8,
+    "non_collapse_floor": 0.02,
+    "guard_suffix": "plus",
+    "chains": [
+      {
+        "name": "none",
+        "tier": "none",
+        "seed_offset": 10,
+        "replicates": 2
+      },
+      {
+        "name": "ex",
+        "tier": "ex",
+        "seed_offset": 20,
+        "replicates": 4
+      },
+      {
+        "name": "plus",
+        "tier": "plus",
+        "seed_offset": 40,
+        "replicates": 4
+      }
+    ],
+    "treatment": "d2_plus",
+    "baselines": [
+      "d2_ex"
+    ],
+    "secondary": [
+      {
+        "treatment": "d2_plus",
+        "baseline": "d2_none"
+      },
+      {
+        "treatment": "d2_ex",
+        "baseline": "d2_none"
+      },
+      {
+        "treatment": "d2_plus",
+        "baseline": "frozen_base"
+      },
+      {
+        "treatment": "d1_plus",
+        "baseline": "d1_ex"
+      }
+    ],
+    "eval_pool": "humaneval",
+    "tune_families": [
+      "mbpp_a",
+      "mbpp_b",
+      "mbpp_c"
+    ],
+    "reuse_from": "d55611f54cc09b94",
+    "pinned_adapters": {
+      "d1_ex_r0": "8827426bf26f50515f40855a63739dc7e52920365f9ba85cdd26d451690e8d45",
+      "d1_ex_r1": "0f9c52a11203940fd84160343b911c52060cb370a174c23cf5427b7d2dc7c5fb",
+      "d1_ex_r2": "9671a0e32e055be2bbc2db989b7a41dce821f3e776a9f357f516329c4780e7ae",
+      "d1_ex_r3": "7cd0c227b8aa69bc6be3ba4bd77ae15485cf541b64d6eb2523f53d39abd96ca2",
+      "d1_none_r0": "5e90e3ca17a2a74a811750fa8c6be1c2b0758660c4c44b5a906de09c071838d3",
+      "d1_none_r1": "843b70dcfbd8b5adea162035543e9a7cd28c4f1cae614d06893325e449a3228d",
+      "d1_plus_r0": "f27fa6f1bec9a9f9dacaf6dc4d1e756a74d0bdf8baf5d5481d1df87797582f43",
+      "d1_plus_r1": "0f0ed8b2143d2dbc4ef1d102d5ed67b1c99f51a3c95737033fb691d9cfbe3a04",
+      "d1_plus_r2": "7ead67edb85d0844499bcb16b20e91daca3283fc496f7eb0ddad0856ea095a05",
+      "d1_plus_r3": "0fb86e55f54b5f9e812e135452a42ade534a8f8d5d7e0c1cb5865e5ea386ad9f",
+      "d2_ex_r0": "2c84e8c3bffaf0578be19772c5c055d9b91052e9255fd839561c97ae9fba9434",
+      "d2_ex_r1": "89865fdecf13115879bd7cdd96e9b819339406b9ee915fd245b6edd914e02964",
+      "d2_ex_r2": "e0c6b7bf74d3f6f4a76847a783c2c77765f07add8dba760e1f5572624cb41c59",
+      "d2_ex_r3": "918538417ab3e664e099e0738644931de5437ceca17cdd83acbd289290ba7a37",
+      "d2_none_r0": "2f5433acf57674de350a490e831d0cff2b70ad8850bd6b41e86adc3b09adeffa",
+      "d2_none_r1": "6446224965498d3efb5e2b5eb9897dbd1a37b86252b4b3eb7c4e300a3b72db26",
+      "d2_plus_r0": "1efb1bde281a3fe1ad607ab53f7615293ee13d4ffb50370f0e9cc82c13f7accc",
+      "d2_plus_r1": "2f1a1951f5453c3a56042c6714293b4c93f260573fa7366ab4b59c1490892752",
+      "d2_plus_r2": "95613b76df9cb1e48d96b58d887319920c0c78aa31650bf67b16b79f7ee45d78",
+      "d2_plus_r3": "1c489c29dff242933106b6f7193440d9169d2f9e46de669d2cdb58025f784e21"
+    }
+  }
+}

@@ -21,13 +21,13 @@ from hsi.contracts.io import load_json
 from hsi.contracts.packet import Packet, canonical_digest
 from hsi.contracts.records import Comparison, Split
 from hsi.environment import SEED_BASE
+from hsi.errors import PreconditionError
 from hsi.evaluation.base import TaskResult
 from hsi.evaluation.learned import _save
 from hsi.progress import Progress
 from hsi.verification import DecisionLog
 from hsi.verification.codetests import (
     TIERS,
-    Task,
     extract_code,
     passes,
     split_ids,
@@ -38,24 +38,44 @@ from hsi.verification.codetests import (
 _STATE: dict[str, Any] = {}
 
 
-def buckets(packet: Packet, pool: str) -> dict[str, list[int]]:
-    """family -> task ids for the tune or held-out pool: equal-sized, hash-assigned."""
-    tune, held = split_ids(float(packet.params["tune_frac"]))
-    ids = tune if pool == "tune" else held
-    ordered = sorted(ids, key=lambda i: hashlib.sha256(f"e8-bucket/{i}".encode()).hexdigest())
-    fams = list(packet.params["families"])
+def _equal_buckets(ids: list[Any], fams: list[str], key: str) -> dict[str, list[Any]]:
+    ordered = sorted(ids, key=lambda i: hashlib.sha256(f"{key}/{i}".encode()).hexdigest())
     size = len(ordered) // len(fams)
-    out = {f: sorted(ordered[k :: len(fams)][:size]) for k, f in enumerate(fams)}
-    return out
+    return {f: sorted(ordered[k :: len(fams)][:size]) for k, f in enumerate(fams)}
 
 
-def task_for(packet: Packet, family: str, split: Split, seed: int) -> Task:
-    pool = "held" if split is Split.HELDOUT else "tune"
-    ids = buckets(packet, pool)[family]
+def buckets(packet: Packet, pool: str) -> dict[str, list[Any]]:
+    """family -> task ids for the tune or held-out pool: equal-sized, hash-assigned. With
+    eval_pool="humaneval" the held-out pool is HumanEval+ and `tune_families` names the MBPP+ tune
+    buckets used only by the pilot/run stages."""
+    q = packet.params
+    tune, held = split_ids(float(q["tune_frac"]))
+    if pool == "tune":
+        fams = list(q.get("tune_families", q["families"]))
+        return _equal_buckets(tune, fams, "e8-bucket")
+    if q.get("eval_pool") == "humaneval":
+        from hsi.verification.humaneval import pool as he_pool
+
+        return _equal_buckets(he_pool(), list(q["families"]), "e8-he-bucket")
+    return _equal_buckets(held, list(q["families"]), "e8-bucket")
+
+
+def task_for(packet: Packet, family: str, split: Split, seed: int) -> Any:
+    """The Task (MBPP+) or HETask (HumanEval+) for a (family, split, seed)."""
+    held = split is Split.HELDOUT
+    fams = list(packet.params["families"])
+    if not held and "tune_families" in packet.params:  # pilot/run stages score MBPP+ tune tasks
+        family = packet.params["tune_families"][fams.index(family)]
+    ids = buckets(packet, "held" if held else "tune")[family]
     mod = int(packet.params["holdout_mod"])
-    if pool == "held" and len(ids) != mod:
+    if held and len(ids) != mod:
         raise ValueError("holdout_mod must equal the held-out bucket size")
-    return tasks()[ids[(seed - SEED_BASE[split]) % len(ids)]]
+    i = ids[(seed - SEED_BASE[split]) % len(ids)]
+    if held and packet.params.get("eval_pool") == "humaneval":
+        from hsi.verification.humaneval import tasks as he_tasks
+
+        return he_tasks()[i]
+    return tasks()[i]
 
 
 def expand(chains: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -74,7 +94,7 @@ def expand(chains: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return out
 
 
-def adapter_for(packet: Packet, arm: str, task_id: int) -> str:
+def adapter_for(packet: Packet, arm: str, task_id: int | str) -> str:
     """Adapter file stem for an arm. A replicated chain is a mixture: each task is answered by one
     replicate, chosen by a hash of (arm, task), so chain variation averages across tasks."""
     m = re.match(r"d(\d+)_(.+)$", arm)
@@ -127,7 +147,7 @@ def _chain(
         jobs = [(i, j) for i in tune_ids for j in range(k)]
         cache = ld / "proposals.d1.json"
         if g == 1 and cache.exists():  # generation 1 is chain-independent: shared proposals
-            texts = load_json(cache)["texts"]  # type: ignore[assignment,index]
+            texts: list[str] = list(load_json(cache)["texts"])  # type: ignore[call-overload]
             assert len(texts) == len(jobs)
         else:
             base_seed = int(packet.seeds[0]) if g == 1 else seed
@@ -218,6 +238,12 @@ class E8Spec:
         from hsi.learning.llm import MODELS, weights_digest
 
         q = packet.params
+        from hsi.evaluation.llm_stack import try_reuse_adapters
+
+        if try_reuse_adapters(packet, run_dir):
+            return
+        if q.get("reuse_from"):  # never silently retrain what the packet pins
+            raise PreconditionError(f"cannot reuse adapters from run {q['reuse_from']}")
         llm = _ensure(packet)
         ld = run_dir / "learning"
         ld.mkdir(parents=True, exist_ok=True)
@@ -275,12 +301,24 @@ class E8Spec:
             llm.load_adapter(S["run_dir"] / "learning" / f"{file}.safetensors")
             llm.set_adapter(True)
             _STATE["arm"] = file
-        text = llm.complete(llm.chat(user_prompt(t)), int(packet.params["max_tokens"]), 0.0, 0)
+        he = packet.params.get("eval_pool") == "humaneval" and split is Split.HELDOUT
+        if he:
+            from hsi.verification.humaneval import passes as he_passes
+            from hsi.verification.humaneval import user_prompt as he_prompt
+
+            prompt = he_prompt(t)
+        else:
+            prompt = user_prompt(t)
+        text = llm.complete(llm.chat(prompt), int(packet.params["max_tokens"]), 0.0, 0)
         code = extract_code(text)
-        res = {tier: passes(code, t, tier) for tier in TIERS[1:]}
+        if he:
+            res = {"plus": he_passes(code, t)}
+        else:
+            res = {tier: passes(code, t, tier) for tier in TIERS[1:]}
+        stats = {"calls": 1.0, "valid": float(code is not None)}
+        stats |= {f"pass_{k}": float(v) for k, v in res.items()}
         return TaskResult(
-            arm, family, seed, res["plus"], [],
-            {"calls": 1.0, "valid": float(code is not None), **{f"pass_{k}": float(v) for k, v in res.items()}},  # noqa: E501
+            arm, family, seed, res["plus"], [], stats,
             decisions=[
                 {
                     "task": t.task_id,
@@ -313,6 +351,8 @@ class E8Spec:
         for arm in sorted({r.arm for r in results}):
             rs = [r for r in results if r.arm == arm]
             for k in ("valid", "pass_ex", "pass_base"):
+                if k not in rs[0].stats:
+                    continue
                 gv[f"eval_{k}_{arm}"] = sum(r.stats[k] for r in rs) / len(rs)
         held = gv[f"rate_d{gens}_{suf}"] - gv[f"rate_d1_{suf}"] >= -gv["non_collapse_floor"]
         return gv, held

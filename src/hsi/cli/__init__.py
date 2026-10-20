@@ -159,6 +159,16 @@ E8R_PARAMS = {
 }
 
 
+E8_V2_RUN = "d55611f54cc09b94"  # the e8-v2 run whose 20 adapters v3 evaluates on HumanEval+
+
+
+def _e8_v2_pins() -> dict[str, str]:
+    from hsi.paths import run_root
+
+    man = json.loads((run_root() / E8_V2_RUN / "learning" / "manifest.json").read_text("utf-8"))
+    return {a: str(c["digest"]) for a, c in man["candidates"].items()}
+
+
 def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION,
@@ -262,16 +272,40 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             "under the strong tests is higher for the plus-filtered chain than for the "
             "example-filtered one (same sampling budget, same example quota).",
             null_hypothesis="d2 plus-filtered does not beat d2 example-filtered by the threshold.",
-            arms=E8R_ARMS if variant == "e8-rep" else E8_ARMS,
+            arms=E8R_ARMS if variant in ("e8-rep", "e8-he") else E8_ARMS,
             primary_metric="mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
             threshold=0.03,
             guardrails=[
                 "d2_plus not below d1_plus beyond the floor",
                 "held-out tasks never used by any chain",
             ],
-            params=E8R_PARAMS if variant == "e8-rep" else E8_PARAMS,
-            version=2 if variant == "e8-rep" else 1,
+            params=E8R_PARAMS if variant in ("e8-rep", "e8-he") else E8_PARAMS,
+            version={"e8-rep": 2, "e8-he": 3}.get(variant, 1),
         )
+        if variant == "e8-he":  # v3: the v2 adapters, scored on a benchmark they never saw
+            t["hypothesis"] = (
+                "On HumanEval+ (163 tasks no chain trained on or was tuned against), greedy pass@1 "
+                "under the EvalPlus tests is higher at depth 2 for the plus-filtered replicate "
+                "chains of e8-v2 than for the example-filtered ones."
+            )
+            t["primary_metric"] = "humanevalplus_pass_at_1_diff_d2_plus_minus_d2_ex"
+            t["params"] = {  # type: ignore[assignment]
+                **E8R_PARAMS,
+                "eval_pool": "humaneval",
+                "families": ["he_a", "he_b", "he_c"],
+                "tune_families": ["mbpp_a", "mbpp_b", "mbpp_c"],
+                "holdout_mod": 54,
+                "min_n": 54,
+                "max_n": 54,
+                "reuse_from": E8_V2_RUN,
+                "pinned_adapters": _e8_v2_pins(),
+                "secondary": E8R_SECONDARY,
+            }
+            t["nonclaims"] = [
+                "no general intelligence claim",
+                "one 1.5B model; adapters trained on MBPP+ only, scored on HumanEval+",
+                "HumanEval+ may have been seen in pretraining; the held-out pool is public",
+            ]
         t["claim_ceiling"] = "LocalSmallModelCodeBenchmarkOnly"
         t["nonclaims"] = [
             "no general intelligence claim",
@@ -705,7 +739,7 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument(
         "--variant",
         default="",
-        choices=["", "llm", "e8-rep", *sorted(GEN_VARIANTS)],
+        choices=["", "llm", "e8-rep", "e8-he", *sorted(GEN_VARIANTS)],
     )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)

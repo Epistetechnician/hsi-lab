@@ -149,3 +149,57 @@ def test_chain_keeps_only_tier_passing_solutions_and_fills_the_quota(tmp_path: A
     assert cands["d1_plus"]["kept_precision"] == 1.0 and cands["d1_plus"]["shortfall"] == 0
     assert cands["d1_none"]["kept_precision"] < 1.0  # unfiltered keeps the wrong stubs too
     assert cands["d1_none"]["n_synthetic"] == cands["d1_plus"]["n_synthetic"]  # pool-matched
+
+
+def _v3(monkeypatch: pytest.MonkeyPatch, pins: dict[str, str]) -> Packet:
+    import hsi.cli as cli
+
+    monkeypatch.setattr(cli, "_e8_v2_pins", lambda: pins)
+    return Packet.model_validate(template("E8", "e8-he"))
+
+
+def test_v3_scores_humaneval_and_pins_the_v2_adapters(monkeypatch: pytest.MonkeyPatch) -> None:
+    pins = {"d1_plus_r0": "x"}
+    pk = _v3(monkeypatch, pins)
+    assert pk.version == 3 and pk.params["eval_pool"] == "humaneval"
+    assert pk.params["pinned_adapters"] == pins and pk.params["reuse_from"] == "d55611f54cc09b94"
+    held, tune = buckets(pk, "held"), buckets(pk, "tune")
+    assert {len(v) for v in held.values()} == {54} and all(
+        isinstance(i, str) and i.startswith("HumanEval/") for v in held.values() for i in v
+    )
+    assert all(isinstance(i, int) for v in tune.values() for i in v)  # pilot/run use MBPP+ tune
+    offs = holdout_offsets("s", 54, 54)
+    seen = {task_for(pk, "he_b", Split.HELDOUT, SEED_BASE[Split.HELDOUT] + o).task_id for o in offs}
+    assert len(seen) == 54
+
+
+def test_reuse_refuses_adapters_that_differ_from_the_pins(
+    tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import json
+
+    from hsi.errors import DigestError
+    from hsi.evaluation.llm_stack import try_reuse_adapters
+
+    monkeypatch.setenv("HSI_RUN_ROOT", str(tmp_path))
+    src = tmp_path / "d55611f54cc09b94"
+    (src / "learning").mkdir(parents=True)
+    (src / "learning" / "d1_plus_r0.safetensors").write_bytes(b"w")
+    (src / "learning" / "training.jsonl").write_text("")
+    from hsi.contracts.packet import canonical_digest
+
+    body = {"candidates": {"d1_plus_r0": {"digest": "real"}}}
+    man = {**body, "manifest_digest": canonical_digest(body)}
+    (src / "learning" / "manifest.json").write_text(json.dumps(man))
+    from hsi.evaluation.llm_stack import TRAIN_KEYS
+
+    pk = _v3(monkeypatch, {"d1_plus_r0": "tampered"})
+    train = {k: pk.params.get(k) for k in TRAIN_KEYS}
+    (src / "packet.frozen.json").write_text(
+        json.dumps({"packet": {"seeds": pk.seeds, "params": train}})
+    )
+    with pytest.raises(DigestError):
+        try_reuse_adapters(pk, tmp_path / "new")
+    pk = _v3(monkeypatch, {"d1_plus_r0": "real"})
+    assert try_reuse_adapters(pk, tmp_path / "new")
+    assert (tmp_path / "new" / "learning" / "d1_plus_r0.safetensors").exists()
