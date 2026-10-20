@@ -132,6 +132,33 @@ E8_PARAMS = {
 }
 
 
+E8R_CHAINS = [
+    {"name": "none", "tier": "none", "seed_offset": 10, "replicates": 2},
+    {"name": "ex", "tier": "ex", "seed_offset": 20, "replicates": 4},
+    {"name": "plus", "tier": "plus", "seed_offset": 40, "replicates": 4},
+]
+E8R_ARMS = ["frozen_base", *[f"d{g}_{c['name']}" for c in E8R_CHAINS for g in (1, 2)]]
+E8R_SECONDARY = [  # exploratory; Bonferroni over 4; never decide the packet
+    {"treatment": "d2_plus", "baseline": "d2_none"},
+    {"treatment": "d2_ex", "baseline": "d2_none"},
+    {"treatment": "d2_plus", "baseline": "frozen_base"},
+    {"treatment": "d1_plus", "baseline": "d1_ex"},
+]
+E8R_PARAMS = {
+    **E8_PARAMS,
+    "tune_frac": 0.3,
+    "holdout_mod": 87,
+    "min_n": 87,
+    "max_n": 87,
+    "k": 6,
+    "quota": 100,
+    "steps": 100,
+    "lr": 5e-5,
+    "chains": E8R_CHAINS,
+    "secondary": E8R_SECONDARY,
+}
+
+
 def template(exp: str, variant: str = "") -> dict[str, object]:
     t: dict[str, object] = {
         "schema_version": SCHEMA_VERSION,
@@ -230,19 +257,20 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
     if exp == "E8":
         t.update(
             hypothesis="When a code model trains on its own sampled solutions, filtering them with "
-            "the strong EvalPlus tests beats filtering with only the single example assertion shown "
-            "in the prompt: at recursion depth 2, greedy pass@1 on held-out MBPP+ tasks under the "
-            "strong tests is higher for the plus-filtered chain than for the example-filtered one "
-            "(same sampling budget, same example quota).",
+            "the strong EvalPlus tests beats filtering with only the single example assertion "
+            "shown in the prompt: at recursion depth 2, greedy pass@1 on held-out MBPP+ tasks "
+            "under the strong tests is higher for the plus-filtered chain than for the "
+            "example-filtered one (same sampling budget, same example quota).",
             null_hypothesis="d2 plus-filtered does not beat d2 example-filtered by the threshold.",
-            arms=E8_ARMS,
+            arms=E8R_ARMS if variant == "e8-rep" else E8_ARMS,
             primary_metric="mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
             threshold=0.03,
             guardrails=[
                 "d2_plus not below d1_plus beyond the floor",
                 "held-out tasks never used by any chain",
             ],
-            params=E8_PARAMS,
+            params=E8R_PARAMS if variant == "e8-rep" else E8_PARAMS,
+            version=2 if variant == "e8-rep" else 1,
         )
         t["claim_ceiling"] = "LocalSmallModelCodeBenchmarkOnly"
         t["nonclaims"] = [
@@ -677,7 +705,7 @@ def main(argv: list[str] | None = None) -> int:
     n.add_argument(
         "--variant",
         default="",
-        choices=["", "llm", *sorted(GEN_VARIANTS)],
+        choices=["", "llm", "e8-rep", *sorted(GEN_VARIANTS)],
     )
     pk.add_parser("freeze").add_argument("file", type=Path)
     pk.add_parser("check").add_argument("file", type=Path)

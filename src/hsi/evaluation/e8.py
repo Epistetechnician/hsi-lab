@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import random
+import re
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -55,6 +56,36 @@ def task_for(packet: Packet, family: str, split: Split, seed: int) -> Task:
     if pool == "held" and len(ids) != mod:
         raise ValueError("holdout_mod must equal the held-out bucket size")
     return tasks()[ids[(seed - SEED_BASE[split]) % len(ids)]]
+
+
+def expand(chains: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """One spec per replicate chain: name_r{i} when a chain has replicates > 1."""
+    out = []
+    for c in chains:
+        reps = int(c.get("replicates", 1))
+        for r in range(reps):
+            out.append(
+                {
+                    "name": f"{c['name']}_r{r}" if reps > 1 else c["name"],
+                    "tier": c["tier"],
+                    "seed_offset": int(c["seed_offset"]) + 7 * r,
+                }
+            )
+    return out
+
+
+def adapter_for(packet: Packet, arm: str, task_id: int) -> str:
+    """Adapter file stem for an arm. A replicated chain is a mixture: each task is answered by one
+    replicate, chosen by a hash of (arm, task), so chain variation averages across tasks."""
+    m = re.match(r"d(\d+)_(.+)$", arm)
+    if m:
+        reps = next(
+            (int(c.get("replicates", 1)) for c in packet.params["chains"] if c["name"] == m[2]), 1
+        )
+        if reps > 1:
+            h = int(hashlib.sha256(f"{arm}/{task_id}".encode()).hexdigest()[:8], 16)
+            return f"{arm}_r{h % reps}"
+    return arm
 
 
 def _llm(packet: Packet) -> Any:
@@ -194,13 +225,13 @@ class E8Spec:
         prog = Progress(run_dir, "pilot:prepare")
         pm = ld / "manifest.partial.json"
         cands: dict[str, Any] = load_json(pm)["candidates"] if pm.exists() else {}  # type: ignore[assignment]
-        q = {**q, "n_adapters": len(q["chains"]) * int(q["depth"])}
+        q = {**q, "n_adapters": len(expand(q["chains"])) * int(q["depth"])}
         packet2 = packet.model_copy(update={"params": q})
 
         def persist() -> None:
             _save(pm, {"candidates": cands})
 
-        for spec in q["chains"]:
+        for spec in expand(q["chains"]):
             _chain(packet2, run_dir, llm, log, cands, spec, prog, persist)
         prog.finish()
         man: dict[str, object] = {
@@ -235,21 +266,29 @@ class E8Spec:
         from hsi.evaluation.llm_stack import _STATE as S
 
         llm = _llm(packet)
-        if arm == "frozen_base":
+        t = task_for(packet, family, split, seed)
+        file = "frozen_base" if arm == "frozen_base" else adapter_for(packet, arm, t.task_id)
+        if file == "frozen_base":
             llm.set_adapter(False)
             _STATE["arm"] = None
-        elif _STATE.get("arm") != arm:
-            llm.load_adapter(S["run_dir"] / "learning" / f"{arm}.safetensors")
+        elif _STATE.get("arm") != file:
+            llm.load_adapter(S["run_dir"] / "learning" / f"{file}.safetensors")
             llm.set_adapter(True)
-            _STATE["arm"] = arm
-        t = task_for(packet, family, split, seed)
+            _STATE["arm"] = file
         text = llm.complete(llm.chat(user_prompt(t)), int(packet.params["max_tokens"]), 0.0, 0)
         code = extract_code(text)
         res = {tier: passes(code, t, tier) for tier in TIERS[1:]}
         return TaskResult(
             arm, family, seed, res["plus"], [],
             {"calls": 1.0, "valid": float(code is not None), **{f"pass_{k}": float(v) for k, v in res.items()}},  # noqa: E501
-            decisions=[{"task": t.task_id, "sig": _sig(code or ""), "valid": code is not None}],
+            decisions=[
+                {
+                    "task": t.task_id,
+                    "sig": _sig(code or ""),
+                    "valid": code is not None,
+                    "adapter": file,
+                }
+            ],
         )  # fmt: skip
 
     def check_budget(self, r: TaskResult, packet: Packet) -> None:

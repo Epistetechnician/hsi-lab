@@ -1,0 +1,110 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E8",
+  "version": 2,
+  "hypothesis": "When a code model trains on its own sampled solutions, filtering them with the strong EvalPlus tests beats filtering with only the single example assertion shown in the prompt: at recursion depth 2, greedy pass@1 on held-out MBPP+ tasks under the strong tests is higher for the plus-filtered chain than for the example-filtered one (same sampling budget, same example quota).",
+  "null_hypothesis": "d2 plus-filtered does not beat d2 example-filtered by the threshold.",
+  "arms": [
+    "frozen_base",
+    "d1_none",
+    "d2_none",
+    "d1_ex",
+    "d2_ex",
+    "d1_plus",
+    "d2_plus"
+  ],
+  "primary_metric": "mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
+  "threshold": 0.03,
+  "guardrails": [
+    "d2_plus not below d1_plus beyond the floor",
+    "held-out tasks never used by any chain"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSmallModelCodeBenchmarkOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+    "held-out membership is public by design; the lock fixes order only"
+  ],
+  "params": {
+    "model": "qwen2.5-1.5b",
+    "families": [
+      "mbpp_a",
+      "mbpp_b",
+      "mbpp_c"
+    ],
+    "tune_frac": 0.3,
+    "holdout_mod": 87,
+    "pilot_tasks": 3,
+    "min_n": 87,
+    "max_n": 87,
+    "depth": 2,
+    "k": 6,
+    "temp": 0.8,
+    "per_task": 2,
+    "quota": 100,
+    "max_tokens": 320,
+    "workers": 6,
+    "rank": 8,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "lr": 5e-05,
+    "steps": 100,
+    "batch": 8,
+    "non_collapse_floor": 0.02,
+    "guard_suffix": "plus",
+    "chains": [
+      {
+        "name": "none",
+        "tier": "none",
+        "seed_offset": 10,
+        "replicates": 2
+      },
+      {
+        "name": "ex",
+        "tier": "ex",
+        "seed_offset": 20,
+        "replicates": 4
+      },
+      {
+        "name": "plus",
+        "tier": "plus",
+        "seed_offset": 40,
+        "replicates": 4
+      }
+    ],
+    "treatment": "d2_plus",
+    "baselines": [
+      "d2_ex"
+    ],
+    "secondary": [
+      {
+        "treatment": "d2_plus",
+        "baseline": "d2_none"
+      },
+      {
+        "treatment": "d2_ex",
+        "baseline": "d2_none"
+      },
+      {
+        "treatment": "d2_plus",
+        "baseline": "frozen_base"
+      },
+      {
+        "treatment": "d1_plus",
+        "baseline": "d1_ex"
+      }
+    ]
+  }
+}

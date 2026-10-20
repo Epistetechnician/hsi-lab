@@ -1,0 +1,113 @@
+{
+  "packet": {
+    "arms": [
+      "frozen_base",
+      "d1_none",
+      "d2_none",
+      "d1_ex",
+      "d2_ex",
+      "d1_plus",
+      "d2_plus"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSmallModelCodeBenchmarkOnly",
+    "experiment": "E8",
+    "guardrails": [
+      "d2_plus not below d1_plus beyond the floor",
+      "held-out tasks never used by any chain"
+    ],
+    "hypothesis": "When a code model trains on its own sampled solutions, filtering them with the strong EvalPlus tests beats filtering with only the single example assertion shown in the prompt: at recursion depth 2, greedy pass@1 on held-out MBPP+ tasks under the strong tests is higher for the plus-filtered chain than for the example-filtered one (same sampling budget, same example quota).",
+    "nonclaims": [
+      "no general intelligence claim",
+      "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+      "held-out membership is public by design; the lock fixes order only"
+    ],
+    "null_hypothesis": "d2 plus-filtered does not beat d2 example-filtered by the threshold.",
+    "params": {
+      "baselines": [
+        "d2_ex"
+      ],
+      "batch": 8,
+      "chains": [
+        {
+          "name": "none",
+          "replicates": 2,
+          "seed_offset": 10,
+          "tier": "none"
+        },
+        {
+          "name": "ex",
+          "replicates": 4,
+          "seed_offset": 20,
+          "tier": "ex"
+        },
+        {
+          "name": "plus",
+          "replicates": 4,
+          "seed_offset": 40,
+          "tier": "plus"
+        }
+      ],
+      "depth": 2,
+      "families": [
+        "mbpp_a",
+        "mbpp_b",
+        "mbpp_c"
+      ],
+      "guard_suffix": "plus",
+      "holdout_mod": 87,
+      "k": 6,
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "lr": 5e-05,
+      "max_n": 87,
+      "max_tokens": 320,
+      "min_n": 87,
+      "model": "qwen2.5-1.5b",
+      "non_collapse_floor": 0.02,
+      "per_task": 2,
+      "pilot_tasks": 3,
+      "quota": 100,
+      "rank": 8,
+      "secondary": [
+        {
+          "baseline": "d2_none",
+          "treatment": "d2_plus"
+        },
+        {
+          "baseline": "d2_none",
+          "treatment": "d2_ex"
+        },
+        {
+          "baseline": "frozen_base",
+          "treatment": "d2_plus"
+        },
+        {
+          "baseline": "d1_ex",
+          "treatment": "d1_plus"
+        }
+      ],
+      "steps": 100,
+      "temp": 0.8,
+      "treatment": "d2_plus",
+      "tune_frac": 0.3,
+      "workers": 6
+    },
+    "primary_metric": "mbppplus_pass_at_1_diff_d2_plus_minus_d2_ex",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.03,
+    "version": 2
+  },
+  "packet_digest": "d55611f54cc09b94583f340ca6fbfb29bc72a0d440519b3191c24a03b5e53f42"
+}
