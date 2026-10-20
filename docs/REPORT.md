@@ -32,6 +32,10 @@ kept. The cost of this rigor is that most packets did not promote.
   Exploratory (Bonferroni): filtering with any execution test beats no filter at depth 2 (ex-none +0.081
   [0.013, 0.148], plus-none +0.100 [0.023, 0.177]); a strong test is not distinguishable from the one shown
   example. The gentler recipe no longer collapses (d2 plus 0.479 vs base 0.513, CI includes 0).
+  **E8-he (the same 20 adapters on HumanEval+, 162 fresh tasks): INCONCLUSIVE**, plus minus ex -0.019
+  [-0.089, 0.052]. Pooled over both benchmarks (423 tasks, exploratory): plus-ex +0.000 [-0.043, 0.043]; any
+  execution filter over none +0.062 [0.013, 0.111]. Net: running the tests matters, test strength beyond the
+  shown example does not measurably.
 - E7 (relations): INCONCLUSIVE. E6-llm7b: INCONCLUSIVE.
 
 ## Corrections of our own claims

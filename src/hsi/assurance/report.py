@@ -45,6 +45,7 @@ ALL = [
     "E7",
     "E8",
     "E8-rep",
+    "E8-he",
 ]  # *-llm: MLX-backbone variants
 
 

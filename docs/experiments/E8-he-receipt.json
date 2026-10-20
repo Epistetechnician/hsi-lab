@@ -1,0 +1,339 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 1134.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 974.1875,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 3001.8410815829993
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d2_ex",
+      "ci_high": 0.052278119177560436,
+      "ci_low": -0.08931515621459747,
+      "paired_diff": -0.018518518518518517,
+      "pairs": [
+        {
+          "both": 13,
+          "family": "he_a",
+          "n": 54,
+          "neither": 26,
+          "only_baseline": 7,
+          "only_treatment": 8
+        },
+        {
+          "both": 19,
+          "family": "he_b",
+          "n": 54,
+          "neither": 21,
+          "only_baseline": 10,
+          "only_treatment": 4
+        },
+        {
+          "both": 19,
+          "family": "he_c",
+          "n": 54,
+          "neither": 29,
+          "only_baseline": 2,
+          "only_treatment": 4
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    }
+  ],
+  "data_digest": "b85c1bdf68cd7a5190f5691a13bf49aa3eb6e6c3472a0c7f4d7ad487270af43a",
+  "decision": "INCONCLUSIVE",
+  "family_results": [
+    {
+      "arm": "frozen_base",
+      "family": "he_a",
+      "n": 54,
+      "successes": 25
+    },
+    {
+      "arm": "d1_none",
+      "family": "he_a",
+      "n": 54,
+      "successes": 23
+    },
+    {
+      "arm": "d2_none",
+      "family": "he_a",
+      "n": 54,
+      "successes": 18
+    },
+    {
+      "arm": "d1_ex",
+      "family": "he_a",
+      "n": 54,
+      "successes": 21
+    },
+    {
+      "arm": "d2_ex",
+      "family": "he_a",
+      "n": 54,
+      "successes": 20
+    },
+    {
+      "arm": "d1_plus",
+      "family": "he_a",
+      "n": 54,
+      "successes": 26
+    },
+    {
+      "arm": "d2_plus",
+      "family": "he_a",
+      "n": 54,
+      "successes": 21
+    },
+    {
+      "arm": "frozen_base",
+      "family": "he_b",
+      "n": 54,
+      "successes": 24
+    },
+    {
+      "arm": "d1_none",
+      "family": "he_b",
+      "n": 54,
+      "successes": 20
+    },
+    {
+      "arm": "d2_none",
+      "family": "he_b",
+      "n": 54,
+      "successes": 24
+    },
+    {
+      "arm": "d1_ex",
+      "family": "he_b",
+      "n": 54,
+      "successes": 23
+    },
+    {
+      "arm": "d2_ex",
+      "family": "he_b",
+      "n": 54,
+      "successes": 29
+    },
+    {
+      "arm": "d1_plus",
+      "family": "he_b",
+      "n": 54,
+      "successes": 24
+    },
+    {
+      "arm": "d2_plus",
+      "family": "he_b",
+      "n": 54,
+      "successes": 23
+    },
+    {
+      "arm": "frozen_base",
+      "family": "he_c",
+      "n": 54,
+      "successes": 24
+    },
+    {
+      "arm": "d1_none",
+      "family": "he_c",
+      "n": 54,
+      "successes": 20
+    },
+    {
+      "arm": "d2_none",
+      "family": "he_c",
+      "n": 54,
+      "successes": 21
+    },
+    {
+      "arm": "d1_ex",
+      "family": "he_c",
+      "n": 54,
+      "successes": 22
+    },
+    {
+      "arm": "d2_ex",
+      "family": "he_c",
+      "n": 54,
+      "successes": 21
+    },
+    {
+      "arm": "d1_plus",
+      "family": "he_c",
+      "n": 54,
+      "successes": 20
+    },
+    {
+      "arm": "d2_plus",
+      "family": "he_c",
+      "n": 54,
+      "successes": 23
+    }
+  ],
+  "guardrail_values": {
+    "eval_valid_d1_ex": 1.0,
+    "eval_valid_d1_none": 1.0,
+    "eval_valid_d1_plus": 1.0,
+    "eval_valid_d2_ex": 1.0,
+    "eval_valid_d2_none": 1.0,
+    "eval_valid_d2_plus": 1.0,
+    "eval_valid_frozen_base": 1.0,
+    "non_collapse_floor": 0.02,
+    "rate_d1_plus": 0.43209876543209874,
+    "rate_d2_plus": 0.41358024691358025
+  },
+  "guardrails_held": true,
+  "lock_digest": "679308feb7cfc7ee0c3ef0d198999f0f745b5e53c97af76e19d8cfc2ecbdd7ef",
+  "model_digest": "08d37247787f8c0036c6dba9d86334df5406e351ea08a7346e09661f37d33d06",
+  "nonclaims": [
+    "no general intelligence claim",
+    "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+    "held-out membership is public by design; the lock fixes order only"
+  ],
+  "packet_digest": "1e9b39c41cf4b59c2562ed3583496dc80128f141f6bd98d63f3f32557ca61cb0",
+  "receipt_digest": "3fc0c44315e4ea8d34636e78e6e90d6157ea4981d0b80b97366156e933f24302",
+  "schema_version": "hsi-receipt-v1",
+  "secondary_comparisons": [
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.12188641755103514,
+      "ci_low": -0.07250370150165243,
+      "paired_diff": 0.024691358024691357,
+      "pairs": [
+        {
+          "both": 15,
+          "family": "he_a",
+          "n": 54,
+          "neither": 30,
+          "only_baseline": 3,
+          "only_treatment": 6
+        },
+        {
+          "both": 15,
+          "family": "he_b",
+          "n": 54,
+          "neither": 22,
+          "only_baseline": 9,
+          "only_treatment": 8
+        },
+        {
+          "both": 15,
+          "family": "he_c",
+          "n": 54,
+          "neither": 25,
+          "only_baseline": 6,
+          "only_treatment": 8
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.13631041426220525,
+      "ci_low": -0.049890661175785514,
+      "paired_diff": 0.043209876543209874,
+      "pairs": [
+        {
+          "both": 14,
+          "family": "he_a",
+          "n": 54,
+          "neither": 30,
+          "only_baseline": 4,
+          "only_treatment": 6
+        },
+        {
+          "both": 20,
+          "family": "he_b",
+          "n": 54,
+          "neither": 21,
+          "only_baseline": 4,
+          "only_treatment": 9
+        },
+        {
+          "both": 14,
+          "family": "he_c",
+          "n": 54,
+          "neither": 26,
+          "only_baseline": 7,
+          "only_treatment": 7
+        }
+      ],
+      "treatment_arm": "d2_ex"
+    },
+    {
+      "baseline_arm": "frozen_base",
+      "ci_high": 0.055041301157383885,
+      "ci_low": -0.12911537523145794,
+      "paired_diff": -0.037037037037037035,
+      "pairs": [
+        {
+          "both": 18,
+          "family": "he_a",
+          "n": 54,
+          "neither": 26,
+          "only_baseline": 7,
+          "only_treatment": 3
+        },
+        {
+          "both": 15,
+          "family": "he_b",
+          "n": 54,
+          "neither": 22,
+          "only_baseline": 9,
+          "only_treatment": 8
+        },
+        {
+          "both": 19,
+          "family": "he_c",
+          "n": 54,
+          "neither": 26,
+          "only_baseline": 5,
+          "only_treatment": 4
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d1_ex",
+      "ci_high": 0.1215234095245002,
+      "ci_low": -0.07214069347511749,
+      "paired_diff": 0.024691358024691357,
+      "pairs": [
+        {
+          "both": 15,
+          "family": "he_a",
+          "n": 54,
+          "neither": 22,
+          "only_baseline": 6,
+          "only_treatment": 11
+        },
+        {
+          "both": 17,
+          "family": "he_b",
+          "n": 54,
+          "neither": 24,
+          "only_baseline": 6,
+          "only_treatment": 7
+        },
+        {
+          "both": 16,
+          "family": "he_c",
+          "n": 54,
+          "neither": 28,
+          "only_baseline": 6,
+          "only_treatment": 4
+        }
+      ],
+      "treatment_arm": "d1_plus"
+    }
+  ],
+  "secondary_z": 2.4977054744123737,
+  "seeds": [
+    0
+  ],
+  "source_commit": "beac68ae02853a51aa259cd02572f17cd045e5d8",
+  "threshold": 0.03
+}
