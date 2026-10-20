@@ -7,9 +7,9 @@ dest="${1:?usage: backup.sh /Volumes/<drive>}"
 out="$dest/hsi-lab-backup"
 mkdir -p "$out"
 for d in hsi-runs hsi-custody hsi-models; do
-  rsync -a --delete "$HOME/$d/" "$out/$d/"
-  diff <(cd "$HOME/$d" && find . -type f -exec shasum -a 256 {} + | sort -k2) \
-       <(cd "$out/$d" && find . -type f -exec shasum -a 256 {} + | sort -k2) >/dev/null \
+  rsync -a --delete --exclude "*.log" "$HOME/$d/" "$out/$d/"
+  diff <(cd "$HOME/$d" && find . -type f ! -name "*.log" -exec shasum -a 256 {} + | sort -k2) \
+       <(cd "$out/$d" && find . -type f ! -name "*.log" -exec shasum -a 256 {} + | sort -k2) >/dev/null \
     && echo "OK $d" || { echo "MISMATCH $d" >&2; exit 1; }
 done
 chmod -R go-rwx "$out/hsi-custody"
