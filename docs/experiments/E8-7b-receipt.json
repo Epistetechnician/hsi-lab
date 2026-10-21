@@ -1,0 +1,517 @@
+{
+  "budget_used": {
+    "bytes": 0.0,
+    "calls": 2835.0,
+    "failed_proposals": 0.0,
+    "peak_mem_mb": 13728.7421875,
+    "retries": 0.0,
+    "tokens": 0.0,
+    "wall_seconds": 2829.9371621829923
+  },
+  "comparisons": [
+    {
+      "baseline_arm": "d2_ex",
+      "ci_high": 0.01966258799968345,
+      "ci_low": -0.024600859604621723,
+      "paired_diff": -0.0024691358024691358,
+      "pairs": [
+        {
+          "both": 52,
+          "family": "mbpp_a",
+          "n": 81,
+          "neither": 25,
+          "only_baseline": 2,
+          "only_treatment": 2
+        },
+        {
+          "both": 54,
+          "family": "mbpp_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 1,
+          "only_treatment": 2
+        },
+        {
+          "both": 48,
+          "family": "mbpp_c",
+          "n": 81,
+          "neither": 28,
+          "only_baseline": 2,
+          "only_treatment": 3
+        },
+        {
+          "both": 56,
+          "family": "he_a",
+          "n": 81,
+          "neither": 20,
+          "only_baseline": 3,
+          "only_treatment": 2
+        },
+        {
+          "both": 53,
+          "family": "he_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 3,
+          "only_treatment": 1
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    }
+  ],
+  "data_digest": "b7849ca80c6748c50607e86afbbd513641acf8411e970d64324bea3a7b3d53e4",
+  "decision": "NO_CANDIDATE",
+  "family_results": [
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 53
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_a",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 53
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 53
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 53
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 52
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_b",
+      "n": 81,
+      "successes": 56
+    },
+    {
+      "arm": "frozen_base",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 51
+    },
+    {
+      "arm": "d1_none",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 48
+    },
+    {
+      "arm": "d2_none",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 48
+    },
+    {
+      "arm": "d1_ex",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 53
+    },
+    {
+      "arm": "d2_ex",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 50
+    },
+    {
+      "arm": "d1_plus",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 51
+    },
+    {
+      "arm": "d2_plus",
+      "family": "mbpp_c",
+      "n": 81,
+      "successes": 51
+    },
+    {
+      "arm": "frozen_base",
+      "family": "he_a",
+      "n": 81,
+      "successes": 60
+    },
+    {
+      "arm": "d1_none",
+      "family": "he_a",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d2_none",
+      "family": "he_a",
+      "n": 81,
+      "successes": 58
+    },
+    {
+      "arm": "d1_ex",
+      "family": "he_a",
+      "n": 81,
+      "successes": 58
+    },
+    {
+      "arm": "d2_ex",
+      "family": "he_a",
+      "n": 81,
+      "successes": 59
+    },
+    {
+      "arm": "d1_plus",
+      "family": "he_a",
+      "n": 81,
+      "successes": 61
+    },
+    {
+      "arm": "d2_plus",
+      "family": "he_a",
+      "n": 81,
+      "successes": 58
+    },
+    {
+      "arm": "frozen_base",
+      "family": "he_b",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d1_none",
+      "family": "he_b",
+      "n": 81,
+      "successes": 46
+    },
+    {
+      "arm": "d2_none",
+      "family": "he_b",
+      "n": 81,
+      "successes": 55
+    },
+    {
+      "arm": "d1_ex",
+      "family": "he_b",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "d2_ex",
+      "family": "he_b",
+      "n": 81,
+      "successes": 56
+    },
+    {
+      "arm": "d1_plus",
+      "family": "he_b",
+      "n": 81,
+      "successes": 54
+    },
+    {
+      "arm": "d2_plus",
+      "family": "he_b",
+      "n": 81,
+      "successes": 54
+    }
+  ],
+  "guardrail_values": {
+    "eval_pass_base_d1_ex": 0.7942386831275721,
+    "eval_pass_base_d1_none": 0.7860082304526749,
+    "eval_pass_base_d1_plus": 0.7818930041152263,
+    "eval_pass_base_d2_ex": 0.7942386831275721,
+    "eval_pass_base_d2_none": 0.7860082304526749,
+    "eval_pass_base_d2_plus": 0.7983539094650206,
+    "eval_pass_base_frozen_base": 0.8024691358024691,
+    "eval_pass_ex_d1_ex": 0.8353909465020576,
+    "eval_pass_ex_d1_none": 0.8271604938271605,
+    "eval_pass_ex_d1_plus": 0.8148148148148148,
+    "eval_pass_ex_d2_ex": 0.8271604938271605,
+    "eval_pass_ex_d2_none": 0.823045267489712,
+    "eval_pass_ex_d2_plus": 0.831275720164609,
+    "eval_pass_ex_frozen_base": 0.8353909465020576,
+    "eval_valid_d1_ex": 1.0,
+    "eval_valid_d1_none": 0.9777777777777777,
+    "eval_valid_d1_plus": 1.0,
+    "eval_valid_d2_ex": 1.0,
+    "eval_valid_d2_none": 1.0,
+    "eval_valid_d2_plus": 1.0,
+    "eval_valid_frozen_base": 1.0,
+    "non_collapse_floor": 0.02,
+    "rate_d1_plus": 0.6691358024691358,
+    "rate_d2_plus": 0.674074074074074
+  },
+  "guardrails_held": true,
+  "lock_digest": "c19508037135bba83f8baa3c5c8f6132f80eb0468a76325b2d5907f35df86caa",
+  "model_digest": "d74bdb9e69e48f78aff737afef3c88c19df6a1002b4686e53bd4af9b58838bd8",
+  "nonclaims": [
+    "no general intelligence claim",
+    "one 1.5B model, one benchmark (MBPP+), possibly contaminated in pretraining",
+    "held-out membership is public by design; the lock fixes order only"
+  ],
+  "packet_digest": "5cf8ef68765be9c21f40df9104f664e573839f6f9185697ee1490b775b6f0b5d",
+  "receipt_digest": "1452688fb440e056259c804a3b36a9d4be65fc34e7cddb6810cf2eda2df1b0cc",
+  "schema_version": "hsi-receipt-v1",
+  "secondary_comparisons": [
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.03993358443008568,
+      "ci_low": -0.020180498010332594,
+      "paired_diff": 0.009876543209876543,
+      "pairs": [
+        {
+          "both": 52,
+          "family": "mbpp_a",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 3,
+          "only_treatment": 2
+        },
+        {
+          "both": 52,
+          "family": "mbpp_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 1,
+          "only_treatment": 4
+        },
+        {
+          "both": 47,
+          "family": "mbpp_c",
+          "n": 81,
+          "neither": 29,
+          "only_baseline": 1,
+          "only_treatment": 4
+        },
+        {
+          "both": 56,
+          "family": "he_a",
+          "n": 81,
+          "neither": 21,
+          "only_baseline": 2,
+          "only_treatment": 2
+        },
+        {
+          "both": 52,
+          "family": "he_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 3,
+          "only_treatment": 2
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d2_none",
+      "ci_high": 0.04183496004042041,
+      "ci_low": -0.017143602015729054,
+      "paired_diff": 0.012345679012345678,
+      "pairs": [
+        {
+          "both": 53,
+          "family": "mbpp_a",
+          "n": 81,
+          "neither": 25,
+          "only_baseline": 2,
+          "only_treatment": 1
+        },
+        {
+          "both": 53,
+          "family": "mbpp_b",
+          "n": 81,
+          "neither": 26,
+          "only_baseline": 0,
+          "only_treatment": 2
+        },
+        {
+          "both": 46,
+          "family": "mbpp_c",
+          "n": 81,
+          "neither": 29,
+          "only_baseline": 2,
+          "only_treatment": 4
+        },
+        {
+          "both": 55,
+          "family": "he_a",
+          "n": 81,
+          "neither": 19,
+          "only_baseline": 3,
+          "only_treatment": 4
+        },
+        {
+          "both": 53,
+          "family": "he_b",
+          "n": 81,
+          "neither": 23,
+          "only_baseline": 2,
+          "only_treatment": 3
+        }
+      ],
+      "treatment_arm": "d2_ex"
+    },
+    {
+      "baseline_arm": "frozen_base",
+      "ci_high": 0.030103871227137324,
+      "ci_low": -0.030103871227137324,
+      "paired_diff": 0.0,
+      "pairs": [
+        {
+          "both": 52,
+          "family": "mbpp_a",
+          "n": 81,
+          "neither": 25,
+          "only_baseline": 2,
+          "only_treatment": 2
+        },
+        {
+          "both": 52,
+          "family": "mbpp_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 1,
+          "only_treatment": 4
+        },
+        {
+          "both": 48,
+          "family": "mbpp_c",
+          "n": 81,
+          "neither": 27,
+          "only_baseline": 3,
+          "only_treatment": 3
+        },
+        {
+          "both": 56,
+          "family": "he_a",
+          "n": 81,
+          "neither": 19,
+          "only_baseline": 4,
+          "only_treatment": 2
+        },
+        {
+          "both": 53,
+          "family": "he_b",
+          "n": 81,
+          "neither": 25,
+          "only_baseline": 2,
+          "only_treatment": 1
+        }
+      ],
+      "treatment_arm": "d2_plus"
+    },
+    {
+      "baseline_arm": "d1_ex",
+      "ci_high": 0.019273051406801828,
+      "ci_low": -0.03408786622161664,
+      "paired_diff": -0.007407407407407407,
+      "pairs": [
+        {
+          "both": 53,
+          "family": "mbpp_a",
+          "n": 81,
+          "neither": 27,
+          "only_baseline": 1,
+          "only_treatment": 0
+        },
+        {
+          "both": 51,
+          "family": "mbpp_b",
+          "n": 81,
+          "neither": 25,
+          "only_baseline": 4,
+          "only_treatment": 1
+        },
+        {
+          "both": 50,
+          "family": "mbpp_c",
+          "n": 81,
+          "neither": 27,
+          "only_baseline": 3,
+          "only_treatment": 1
+        },
+        {
+          "both": 58,
+          "family": "he_a",
+          "n": 81,
+          "neither": 20,
+          "only_baseline": 0,
+          "only_treatment": 3
+        },
+        {
+          "both": 51,
+          "family": "he_b",
+          "n": 81,
+          "neither": 24,
+          "only_baseline": 3,
+          "only_treatment": 3
+        }
+      ],
+      "treatment_arm": "d1_plus"
+    }
+  ],
+  "secondary_z": 2.4977054744123737,
+  "seeds": [
+    0
+  ],
+  "source_commit": "c9da714134c0ce3ddc860a9b47de56ac737b31d0",
+  "threshold": 0.03
+}

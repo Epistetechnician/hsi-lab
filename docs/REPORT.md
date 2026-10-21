@@ -36,6 +36,9 @@ kept. The cost of this rigor is that most packets did not promote.
   [-0.089, 0.052]. Pooled over both benchmarks (423 tasks, exploratory): plus-ex +0.000 [-0.043, 0.043]; any
   execution filter over none +0.062 [0.013, 0.111]. Net: running the tests matters, test strength beyond the
   shown example does not measurably.
+  **E8-7b (Qwen2.5-7B, PyTorch/CUDA, 405 tasks over MBPP+ and HumanEval+): NO_CANDIDATE with a tight null.**
+  plus minus ex -0.0025 [-0.025, 0.020], below the +0.03 bar. All 7B arms land within about 0.04 of the
+  untouched base (0.674); a competent generator gains nothing from this self-training recipe, filtered or not.
 - E7 (relations): INCONCLUSIVE. E6-llm7b: INCONCLUSIVE.
 
 ## Corrections of our own claims

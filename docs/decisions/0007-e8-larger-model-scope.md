@@ -1,6 +1,6 @@
 # ADR 0007: scoping the larger-model code study (E8-7B). Nothing built or provisioned.
 
-Status: **proposed**. Needs the owner's go on spend (below). Builds on ADR 0002 (remote GPU, USD 50 total,
+Status: **executed 2026-10-21** (owner said go; lean design). Outcome at the end. Builds on ADR 0002 (remote GPU, USD 50 total,
 USD 15 per run, USD 24.61 already spent, so **USD 25.39 remain**).
 
 ## Question
@@ -60,3 +60,11 @@ design above is therefore the lean one; a hard stop at USD 14 on `gman usage`, p
 ## Decision needed from the owner
 Go / no-go on USD <=15 of the remaining USD 25.39, for the lean design above (or say "full" for 10 chains at a
 projected USD 12-20, which can exceed the per-run cap).
+
+## Outcome (2026-10-21)
+Ran as packet e8-v4 on one H100 (`hsi-lab-7b`, created, used and deleted; USD 10.77 including 20 idle minutes after
+a failed first launch, a `~` expanded locally instead of on the node). Cumulative remote spend is now about USD 35.3
+of the 50 ceiling; the per-run cap held. Result: NO_CANDIDATE with a tight interval (`docs/experiments/E8-7b.md`).
+The build list was completed (batched torch generation, eval prefetch, multi-benchmark pools) and is exercised
+by CPU tests. The fresh lock was created on the node and its secret was deleted with the node, so an A3 rerun of
+this packet is not possible; the held-out tasks are public, so nothing secret is lost.
