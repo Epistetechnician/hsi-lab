@@ -310,7 +310,13 @@ def train_chain(
     audit of the kept set. Writes adapters and fills `cands`."""
     from hsi.agents.learner import HYPOTHESES
     from hsi.learning.llm import describe, few_shot_prompt, parse_hypothesis, render_prompt
-    from hsi.verification.verifiers import accepts, probe_correct, probes_agree, true_rule
+    from hsi.verification.verifiers import (
+        DoseSelector,
+        accepts,
+        probe_correct,
+        probes_agree,
+        true_rule,
+    )
 
     q = packet.params
     fams, sup, seed = list(q["pretrain_families"]), int(q["support"]), int(packet.seeds[0])
@@ -322,6 +328,9 @@ def train_chain(
     real_pool = _real_pool(packet)
     n_total = len(build_samples(fams, Split.TUNE, range(int(q["n_adapt"])), sup, False)[0])
     quota = n_total // 2  # same synthetic quota as the replay arms
+    dose = spec is not None and spec.kind == "dose"
+    if dose:
+        quota = spec.k  # E9: fixed kept-set size, identical across every dose level
     rng = random.Random(f"e6llm-{name}/{seed}")
     demos, term = _demos(packet), str(q.get("target_terminator", ""))
     gens = int(gens if gens is not None else q["generations"])
@@ -333,6 +342,7 @@ def train_chain(
         rng.shuffle(order)
         kept: list[tuple[Any, str]] = []
         proposed = n_consistent = n_correct = 0
+        sel = DoseSelector(spec) if dose else None
         for i in range(0, len(order), 8):  # proposals in small blocks; stop at the quota
             block = order[i : i + 8]
             prompts = [few_shot_prompt(s.pairs, demos) for s in block]
@@ -361,13 +371,15 @@ def train_chain(
                     for s, t, ok, lp in zip(block, texts, cons, lps, strict=True)
                 ]  # fmt: skip
             for take_it, ok, s, t in zip(take, cons, block, texts, strict=True):
+                if take_it and sel is not None:  # E9: truth picks which consistent proposals enter
+                    take_it = sel.offer(probe_correct(parse_hypothesis(t), true_rule(s.key), s.key))
                 if take_it and len(kept) < quota:
                     kept.append((s, t))
                     n_consistent += ok
                     if spec is not None:  # audit only: truth never decides a verdict
                         n_correct += probe_correct(parse_hypothesis(t), true_rule(s.key), s.key)
             prog.update(g - 1, gens, f"d{g}_{name}: {len(kept)}/{quota} kept of {proposed}")
-            if len(kept) >= quota:
+            if len(kept) >= quota or (sel is not None and sel.full):
                 break
         short = quota - len(kept)
         real = rng.sample(real_pool, n_total - len(kept))  # top up with original data if short
@@ -427,6 +439,11 @@ def train_chain(
                 precision=n_correct / max(1, len(kept)), accept_rate=len(kept) / max(1, proposed),
                 verifier=spec.name,
             )  # fmt: skip
+            if sel is not None:  # a chain whose quotas did not fill is reported invalid, not kept
+                cands[arm].update(
+                    dose_target=spec.p, dose_realised=sel.realised_p,
+                    dose_valid=sel.full and abs(sel.realised_p - float(spec.p)) <= 0.05,
+                )  # fmt: skip
         # live weights now equal adapter g: the next generation is produced by it
     prog.finish()
 

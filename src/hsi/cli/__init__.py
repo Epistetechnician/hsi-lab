@@ -37,7 +37,7 @@ E1_PARAMS = {
 
 GEN_VARIANTS = {
     "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
-    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver",
+    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver", "llm-dose",
 }  # fmt: skip
 TERMINATED = GEN_VARIANTS - {"llm-gen"}
 SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
@@ -53,6 +53,7 @@ VERSIONS = {
     "llm-ood": 10,
     "llm-torch": 11,
     "llm-noisyver": 12,
+    "llm-dose": 13,
 }
 
 
@@ -80,6 +81,36 @@ NOISYVER_SECONDARY = [  # exploratory; Bonferroni over 7; never decide the packe
     {"treatment": "d2_conf", "baseline": "d2_poolctl"},
     {"treatment": "d2_verified", "baseline": "d2_noisy10"},
     {"treatment": "d2_noisy10b", "baseline": "d2_noisy10"},
+]
+
+
+# ADR 0008 (v13, E9). Precision dose-response at fixed kept-set size. `dose` chains use ground truth
+# to set the probe-correct share p of the K visible-consistent proposals (an intervention, not a
+# deployable verifier). K is fixed from docs/experiments/E9-supply-audit.json before the freeze.
+DOSE_K = 40
+DOSE_LEVELS = (0.0, 0.25, 0.5, 0.75, 1.0)
+DOSE_CHAINS = [
+    {
+        "name": f"dose{round(p * 100):03d}{rep}", "kind": "dose", "p": p, "k": DOSE_K,
+        "salt": rep, "train_seed_offset": 800 + 100 * i + (50 if rep == "b" else 0),
+    }
+    for i, p in enumerate(DOSE_LEVELS)
+    for rep in ("a", "b")
+]  # fmt: skip
+DOSE_ARMS = [
+    "frozen_base", "real_only", "d2_verified", "d2_poolctl",
+    "d1_dose100a", "d2_dose100a",  # d1 is listed for the guardrail on the guarded chain
+    *[f"d2_{c['name']}" for c in DOSE_CHAINS if c["name"] != "dose100a"],
+]  # fmt: skip
+DOSE_SECONDARY = [  # exploratory; Bonferroni over 8; never decide the packet
+    {"treatment": "d2_dose100b", "baseline": "d2_dose000b"},  # replication of the primary
+    {"treatment": "d2_dose050a", "baseline": "d2_dose000a"},
+    {"treatment": "d2_dose050b", "baseline": "d2_dose000b"},
+    {"treatment": "d2_dose025a", "baseline": "d2_dose000a"},
+    {"treatment": "d2_dose075a", "baseline": "d2_dose000a"},
+    {"treatment": "d2_dose100a", "baseline": "d2_dose050a"},
+    {"treatment": "d2_dose000a", "baseline": "d2_poolctl"},  # wrong-but-consistent vs unverified
+    {"treatment": "d2_dose100a", "baseline": "d2_verified"},  # purely correct vs visible-verified
 ]
 
 
@@ -696,6 +727,41 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             t["null_hypothesis"] = (
                 "d2 with a 10%-false-accept verifier does not beat the pool-matched unverified "
                 "control by the threshold."
+            )
+        if (
+            variant == "llm-dose"
+        ):  # v13: ADR 0008, fixed-size kept set, precision set by intervention
+            from hsi.paths import run_root
+
+            v9 = "fda4e460ea88bf7b"
+            m9 = json.loads((run_root() / v9 / "learning" / "manifest.json").read_text())
+            p.update(
+                eval_mode="probe", reuse_from=v9, depth=2, verifier_depth=2,
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                verified_chain=True, control_chain=True,
+                verify_pool_base=1000, verify_pool_worlds=600,
+                audit_base=1600, audit_worlds=300, avoid=[[1000, 1600], [1600, 1900]],
+                min_n=100, max_n=400, pilot_tasks=30, diversity_floor_frac=0.5,
+                guard_suffix="dose100a",
+                pinned_adapters={a: c["digest"] for a, c in m9["candidates"].items()},
+                verifier_chains=DOSE_CHAINS,
+                treatment="d2_dose100a", baselines=["d2_dose000a"],
+                secondary=DOSE_SECONDARY,
+            )  # fmt: skip
+            t["arms"] = DOSE_ARMS
+            t["threshold"] = 0.10
+            t["primary_metric"] = "probe_success_rate_diff_d2_dose100a_minus_d2_dose000a"
+            t["hypothesis"] = (
+                "Verifier precision pays at constant kept-set size: with the number of synthetic "
+                f"examples fixed at {DOSE_K} and the same original-data top-up, a generator "
+                "trained at depth 2 on a kept set that is entirely probe-correct beats one "
+                "trained on a kept "
+                "set of equally consistent proposals that are all wrong, on fresh probe states in "
+                "unseen in-distribution worlds."
+            )
+            t["null_hypothesis"] = (
+                "d2 trained on an all-correct kept set does not beat d2 trained on an all-wrong "
+                "(visible-consistent) kept set of the same size by the threshold."
             )
     if exp in ("E4", "E6"):
         t["budget"] = {

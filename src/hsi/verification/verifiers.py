@@ -10,6 +10,10 @@ A verifier decides which proposals of generation g enter the next training set. 
 - ``tested``     the visible check AND agreement with the true rule on ``extra_probes`` fresh
                  oracle probe states (a test suite strengthened beyond the visible evidence, as
                  EvalPlus strengthens HumanEval).
+- ``dose``       NOT a deployable verifier (ADR 0008, E9). Sets the probe-correct
+                 share ``p`` of a fixed-size kept set of ``k`` visible-consistent proposals, using
+                 ground truth to choose WHICH consistent proposals enter. It exists to identify the
+                 precision dose-response with kept-set size held constant.
 - ``confidence`` no check against the world at all: keep a parseable proposal whose mean token
                  log-probability under the generating model is at least ``tau`` (self-certainty).
 
@@ -33,7 +37,7 @@ from hsi.contracts.records import Split
 from hsi.environment import RuleWorld
 from hsi.environment.world import MOD, N_CELLS, Prim
 
-KINDS = ("visible", "noisy", "tested", "confidence")
+KINDS = ("visible", "noisy", "tested", "confidence", "dose")
 N_PROBES = 16
 
 
@@ -44,6 +48,8 @@ class VerifierSpec:
     fpr: float = 0.0
     tau: float | None = None
     extra_probes: int = 0  # tested: oracle probe states a proposal must also pass
+    p: float | None = None  # dose: target probe-correct share of the kept set
+    k: int = 0  # dose: kept-set size (the synthetic quota)
     salt: str = ""  # decorrelates the noise of replicate chains
     train_seed_offset: int = 0  # adapter-training seed = packet seed + offset + generation
 
@@ -56,6 +62,11 @@ class VerifierSpec:
             raise ValueError("a confidence verifier needs tau")
         if self.kind != "noisy" and self.fpr:
             raise ValueError("fpr applies to noisy verifiers only")
+        if self.kind == "dose":
+            if self.p is None or not 0.0 <= self.p <= 1.0 or self.k <= 0:
+                raise ValueError("a dose verifier needs p in [0, 1] and k > 0")
+        elif self.p is not None or self.k:
+            raise ValueError("p and k apply to dose verifiers only")
         if (self.kind == "tested") != (self.extra_probes > 0):
             raise ValueError("extra_probes > 0 exactly for tested verifiers")
 
@@ -67,6 +78,8 @@ class VerifierSpec:
             fpr=float(d.get("fpr", 0.0)),
             tau=None if d.get("tau") is None else float(d["tau"]),
             extra_probes=int(d.get("extra_probes", 0)),
+            p=None if d.get("p") is None else float(d["p"]),
+            k=int(d.get("k", 0)),
             salt=str(d.get("salt", "")),
             train_seed_offset=int(d["train_seed_offset"]),
         )
@@ -101,7 +114,7 @@ def accepts(
 ) -> bool:
     if not parses:
         return False
-    if spec.kind == "visible":
+    if spec.kind in ("visible", "dose"):  # dose: bucket quotas are applied by DoseSelector
         return consistent
     if spec.kind == "tested":
         return consistent and bool(extra_ok)  # extra_ok is only computed for consistent text
@@ -143,3 +156,47 @@ def probe_correct(h: Sequence[Prim] | None, truth: Sequence[Prim], tag: str) -> 
     if h is None:
         return False
     return all(_run(tuple(h), s) == _run(tuple(truth), s) for s in probe_states(tag))
+
+
+# -- dose-response selection (E9) ------------------------------------------------------------------
+
+
+def dose_plan(k: int, p: float) -> tuple[int, int]:
+    """(n probe-correct, n consistent-but-wrong) for a kept set of k at target share p."""
+    n_correct = round(p * k)
+    return n_correct, k - n_correct
+
+
+class DoseSelector:
+    """Fills two quotas from a stream of visible-consistent proposals, in stream order.
+
+    ``offer(correct)`` returns True if the proposal enters the kept set. Deterministic in the
+    order of offers; the caller supplies a seeded order. Stops being needed once ``full``.
+    """
+
+    def __init__(self, spec: VerifierSpec) -> None:
+        assert spec.kind == "dose" and spec.p is not None
+        self.want_correct, self.want_wrong = dose_plan(spec.k, spec.p)
+        self.n_correct = 0
+        self.n_wrong = 0
+
+    def offer(self, correct: bool) -> bool:
+        if correct and self.n_correct < self.want_correct:
+            self.n_correct += 1
+            return True
+        if not correct and self.n_wrong < self.want_wrong:
+            self.n_wrong += 1
+            return True
+        return False
+
+    @property
+    def size(self) -> int:
+        return self.n_correct + self.n_wrong
+
+    @property
+    def full(self) -> bool:
+        return self.n_correct == self.want_correct and self.n_wrong == self.want_wrong
+
+    @property
+    def realised_p(self) -> float:
+        return self.n_correct / max(1, self.size)

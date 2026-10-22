@@ -1,0 +1,239 @@
+{
+  "packet": {
+    "arms": [
+      "frozen_base",
+      "real_only",
+      "d2_verified",
+      "d2_poolctl",
+      "d1_dose100a",
+      "d2_dose100a",
+      "d2_dose000a",
+      "d2_dose000b",
+      "d2_dose025a",
+      "d2_dose025b",
+      "d2_dose050a",
+      "d2_dose050b",
+      "d2_dose075a",
+      "d2_dose075b",
+      "d2_dose100b"
+    ],
+    "budget": {
+      "max_calls": 10000000,
+      "max_message_bytes": 0,
+      "max_tokens": 0,
+      "max_wall_seconds": 3600
+    },
+    "claim_ceiling": "LocalSyntheticExperimentOnly",
+    "experiment": "E6",
+    "guardrails": [
+      "generated-task diversity above pilot floor at every depth",
+      "d3_replay not below d1_replay beyond floor"
+    ],
+    "hypothesis": "Verifier precision pays at constant kept-set size: with the number of synthetic examples fixed at 40 and the same original-data top-up, a generator trained at depth 2 on a kept set that is entirely probe-correct beats one trained on a kept set of equally consistent proposals that are all wrong, on fresh probe states in unseen in-distribution worlds.",
+    "nonclaims": [
+      "no general intelligence claim",
+      "not a proof"
+    ],
+    "null_hypothesis": "d2 trained on an all-correct kept set does not beat d2 trained on an all-wrong (visible-consistent) kept set of the same size by the threshold.",
+    "params": {
+      "adapt_batch": 8,
+      "adapt_lr": 0.0001,
+      "adapt_steps": 300,
+      "audit_base": 1600,
+      "audit_worlds": 300,
+      "avoid": [
+        [
+          1000,
+          1600
+        ],
+        [
+          1600,
+          1900
+        ]
+      ],
+      "backbone": "llm",
+      "baselines": [
+        "d2_dose000a"
+      ],
+      "control_chain": true,
+      "depth": 2,
+      "diversity_floor_frac": 0.5,
+      "eval_mode": "probe",
+      "extra_arms": true,
+      "families": [
+        "rule_induction@tune",
+        "compositional_transfer@tune"
+      ],
+      "gen_max_tokens": 20,
+      "generations": 3,
+      "guard_suffix": "dose100a",
+      "lora_layers": 8,
+      "lora_scale": 20.0,
+      "max_n": 400,
+      "min_n": 100,
+      "model": "qwen2.5-7b",
+      "n_adapt": 50,
+      "n_demos": 2,
+      "n_replay": 50,
+      "n_replay_tune": 50,
+      "non_collapse_floor": 0.02,
+      "pilot_tasks": 30,
+      "pinned_adapters": {
+        "d1_no_replay": "350c253ef058b2389949f73f298f1b777340f437cf2e2d11e35668e8ee75ba15",
+        "d1_poolctl": "ef8f5c3860f53fcc6c962a0295dd6d54728a0a9ba7a3da094e5ea2824274b66b",
+        "d1_replay": "84ae1b1cd4bf10429ab3b261b67f36ee185b000935f6273e1deaa31e6e8058c2",
+        "d1_verified": "14aae8a7f30d121d4fb08f39dc8eb8ada66aa0a6a381e5c2c3e399d1fabe2a39",
+        "d2_no_replay": "d6ac1d16f2313710dc412a4faa7378059f25787b4547ab7fb202d90872c49356",
+        "d2_poolctl": "43c49eba780142e3abcc0861fd07555cbb7ec34ad591a5dbd6e5117da73ec5c2",
+        "d2_replay": "ff761cc5675d4d22c06e3bc396534d75785df95ee08cf180a6d7bcd8a61063f8",
+        "d2_verified": "9f3c2fd67d6c641966e3fa1f5321b1f7d981f2b11aeef6a2d5190bccb9bdb7a9",
+        "d3_no_replay": "adc92408c7a56b25489c75286efc2612270908a5c84eac612baa1c60b4080ed7",
+        "d3_poolctl": "58aacb33a5841e3f67a1b07736e352ac0854123e3997015c3bdd8616f9d79cf6",
+        "d3_replay": "be1fe78c6d0b4e44bc6fbe63df25839ecba10776dc50d37f5a9e567010d3762b",
+        "d3_verified": "7bf90a16040fc5ef46d98fa478300f2e66661f601281121c228bf21a8fa4694f",
+        "real_only": "d636a25610d64bd29a040e3f3c3a7b93920ec8a20afbc11a41bc2f64e94d75e6"
+      },
+      "pretrain_families": [
+        "rule_induction",
+        "compositional_transfer"
+      ],
+      "rank": 8,
+      "reuse_from": "fda4e460ea88bf7b",
+      "secondary": [
+        {
+          "baseline": "d2_dose000b",
+          "treatment": "d2_dose100b"
+        },
+        {
+          "baseline": "d2_dose000a",
+          "treatment": "d2_dose050a"
+        },
+        {
+          "baseline": "d2_dose000b",
+          "treatment": "d2_dose050b"
+        },
+        {
+          "baseline": "d2_dose000a",
+          "treatment": "d2_dose025a"
+        },
+        {
+          "baseline": "d2_dose000a",
+          "treatment": "d2_dose075a"
+        },
+        {
+          "baseline": "d2_dose050a",
+          "treatment": "d2_dose100a"
+        },
+        {
+          "baseline": "d2_poolctl",
+          "treatment": "d2_dose000a"
+        },
+        {
+          "baseline": "d2_verified",
+          "treatment": "d2_dose100a"
+        }
+      ],
+      "support": 8,
+      "target_terminator": "\n",
+      "treatment": "d2_dose100a",
+      "tune_offset": 500000,
+      "verified_chain": true,
+      "verifier_chains": [
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose000a",
+          "p": 0.0,
+          "salt": "a",
+          "train_seed_offset": 800
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose000b",
+          "p": 0.0,
+          "salt": "b",
+          "train_seed_offset": 850
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose025a",
+          "p": 0.25,
+          "salt": "a",
+          "train_seed_offset": 900
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose025b",
+          "p": 0.25,
+          "salt": "b",
+          "train_seed_offset": 950
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose050a",
+          "p": 0.5,
+          "salt": "a",
+          "train_seed_offset": 1000
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose050b",
+          "p": 0.5,
+          "salt": "b",
+          "train_seed_offset": 1050
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose075a",
+          "p": 0.75,
+          "salt": "a",
+          "train_seed_offset": 1100
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose075b",
+          "p": 0.75,
+          "salt": "b",
+          "train_seed_offset": 1150
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose100a",
+          "p": 1.0,
+          "salt": "a",
+          "train_seed_offset": 1200
+        },
+        {
+          "k": 40,
+          "kind": "dose",
+          "name": "dose100b",
+          "p": 1.0,
+          "salt": "b",
+          "train_seed_offset": 1250
+        }
+      ],
+      "verifier_depth": 2,
+      "verify_pool_base": 1000,
+      "verify_pool_worlds": 600
+    },
+    "primary_metric": "probe_success_rate_diff_d2_dose100a_minus_d2_dose000a",
+    "schema_version": "hsi-packet-v1",
+    "seeds": [
+      0
+    ],
+    "stop_rules": [
+      "any digest, schema, split, or budget mismatch"
+    ],
+    "threshold": 0.1,
+    "version": 13
+  },
+  "packet_digest": "1e30f82df05f3b2cfae7ba042e6b622740449003b6864e15722c9563f0812a8a"
+}

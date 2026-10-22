@@ -1,0 +1,47 @@
+{
+ "base:1000": {
+  "by_family": {
+   "rule_induction": {
+    "consistent": 120,
+    "correct": 34,
+    "n": 1000
+   }
+  },
+  "consistent": 120,
+  "consistent_wrong": 86,
+  "correct": 34,
+  "full_pool": 4307,
+  "pool": 1000,
+  "valid": 709
+ },
+ "d1_poolctl:1000": {
+  "by_family": {
+   "rule_induction": {
+    "consistent": 187,
+    "correct": 88,
+    "n": 1000
+   }
+  },
+  "consistent": 187,
+  "consistent_wrong": 99,
+  "correct": 88,
+  "full_pool": 4307,
+  "pool": 1000,
+  "valid": 650
+ },
+ "d1_verified:1000": {
+  "by_family": {
+   "rule_induction": {
+    "consistent": 325,
+    "correct": 119,
+    "n": 1000
+   }
+  },
+  "consistent": 325,
+  "consistent_wrong": 206,
+  "correct": 119,
+  "full_pool": 4307,
+  "pool": 1000,
+  "valid": 970
+ }
+}

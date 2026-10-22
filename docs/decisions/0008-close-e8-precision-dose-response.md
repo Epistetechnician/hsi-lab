@@ -1,6 +1,6 @@
 # ADR 0008: close the code line (E8); next study is a controlled precision dose-response (E9)
 
-Status: proposed. Nothing built, frozen or run for E9. Owner go/no-go needed on the compute below.
+Status: accepted. E9 built and frozen as packet e9-v1 (template variant `llm-dose`, version 13); not yet run.
 
 ## Decision 1: E8 is closed
 Five packets (v1, rep, he, v4 / 7b) asked whether execution-test strength changes code self-training.
@@ -51,3 +51,13 @@ worlds (claim ceiling unchanged). A null (flat slope) is a valid, publishable ou
 ## Outstanding, independent of E9
 A4 (an external party recomputes from the held-out lock) is still open and is the only step that upgrades
 any existing claim. Hand `docs/A4-handoff.md` to a reviewer in parallel.
+
+## Amendments at build time (2026-10-22)
+- **Primary is pairwise, not a slope.** The evaluator and the stdlib validator support paired contrasts only.
+  Primary: `d2_dose100a` minus `d2_dose000a`, probe metric, threshold +0.10. Replication (`dose100b` minus
+  `dose000b`), intermediate levels and two anchor contrasts are exploratory secondaries (Bonferroni over 8).
+  Monotonicity across levels is read from the receipt's per-arm rates, not decided.
+- **Supply audit** (`E9-supply-audit.json`, first 1,000 of 4,307 pool proposals per stage, depth-1 proxies):
+  base 34 correct / 86 consistent-wrong; d1_verified 119 / 206; d1_poolctl 88 / 99. Full-pool supply is ~4x,
+  so K=40 stays. Depth-2 dose chains generate from their own d1 adapter; any chain that cannot fill both
+  quotas is flagged `dose_valid=false` in its manifest entry and must be reported, not silently used.

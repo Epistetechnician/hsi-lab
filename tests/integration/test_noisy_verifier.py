@@ -264,3 +264,130 @@ def test_tested_chain_requires_extra_probes_on_top_of_the_visible_check(
     train_chain(pk, tmp_path, llm, DecisionLog(tmp_path / "learning" / "t2.jsonl"), cands,
                 name="tested2", verify=True, spec=sp, gens=1)  # fmt: skip
     assert cands["d1_tested2"]["shortfall"] == 0  # passes every probe: the visible check decides
+
+
+# -- E9 dose selector (ADR 0008) ---------------------------------------------------------------
+
+
+def dose(**kw: Any) -> VerifierSpec:
+    base: dict[str, Any] = {
+        "name": "dose50", "kind": "dose", "p": 0.5, "k": 40, "train_seed_offset": 800,
+    }  # fmt: skip
+    return VerifierSpec(**{**base, **kw})
+
+
+def test_dose_spec_validation() -> None:
+    from hsi.verification.verifiers import dose_plan
+
+    for bad in ({"p": None}, {"p": 1.5}, {"k": 0}):
+        with pytest.raises(ValueError):
+            dose(**bad)
+    with pytest.raises(ValueError):
+        spec(p=0.5)  # p belongs to dose verifiers only
+    with pytest.raises(ValueError):
+        spec(k=10)
+    assert dose_plan(40, 0.25) == (10, 30)
+    assert dose_plan(40, 0.0) == (0, 40) and dose_plan(40, 1.0) == (40, 0)
+    assert VerifierSpec.from_dict(
+        {"name": "d", "kind": "dose", "p": 0.75, "k": 20, "train_seed_offset": 1}
+    ) == dose(name="d", p=0.75, k=20, train_seed_offset=1)
+
+
+def test_dose_selector_fills_exact_quotas_and_is_order_deterministic() -> None:
+    import random
+
+    from hsi.verification.verifiers import DoseSelector
+
+    for p in (0.0, 0.25, 0.5, 0.75, 1.0):
+        stream = [i % 3 == 0 for i in range(400)]  # a third correct
+        random.Random(p).shuffle(stream)
+        sel = DoseSelector(dose(p=p, k=40))
+        taken = [c for c in stream if not sel.full and sel.offer(c)]
+        assert sel.full and sel.size == len(taken) == 40
+        assert sel.n_correct == round(40 * p) and sel.realised_p == pytest.approx(p)
+        sel2 = DoseSelector(dose(p=p, k=40))
+        assert [c for c in stream if not sel2.full and sel2.offer(c)] == taken
+
+
+def test_dose_selector_reports_shortfall() -> None:
+    from hsi.verification.verifiers import DoseSelector
+
+    sel = DoseSelector(dose(p=1.0, k=10))
+    for _ in range(50):
+        sel.offer(False)  # no correct proposals ever arrive
+    for _ in range(4):
+        sel.offer(True)
+    assert not sel.full and sel.size == 4 and sel.realised_p == 1.0
+
+
+def test_dose_accepts_only_consistent_parseable() -> None:
+    s = dose()
+    assert accepts(s, 0, 1, "k", "t", parses=True, consistent=True)
+    assert not accepts(s, 0, 1, "k", "t", parses=True, consistent=False)
+    assert not accepts(s, 0, 1, "k", "t", parses=False, consistent=True)
+
+
+def _run_dose(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, sp: VerifierSpec, correct: Any
+) -> Any:
+    import hsi.verification.verifiers as vv
+
+    monkeypatch.setattr(ls, "verify_texts", lambda texts, block: [True] * len(texts))
+    monkeypatch.setattr(vv, "probe_correct", lambda h, truth, tag: correct(tag))
+    pk = small_packet()
+    llm = FakeLLM()
+    llm.seeds = []
+    (tmp_path / "learning").mkdir()
+    cands: dict[str, Any] = {}
+    log = DecisionLog(tmp_path / "learning" / "t.jsonl")
+    train_chain(pk, tmp_path, llm, log, cands, name=sp.name, verify=True, spec=sp, gens=1)
+    return cands[f"d1_{sp.name}"], llm
+
+
+def test_dose_chain_holds_size_and_hits_target_precision(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sp = dose(name="d50", p=0.5, k=6)
+    c, llm = _run_dose(tmp_path, monkeypatch, sp, lambda tag: sum(map(ord, tag)) % 2 == 0)
+    assert c["n_synthetic"] == 6 and c["shortfall"] == 0 and c["precision"] == 0.5
+    assert c["dose_valid"] and c["dose_target"] == 0.5 and c["dose_realised"] == 0.5
+    assert llm.trained == [c["n_synthetic"] + c["n_real"]]  # total examples independent of p
+    assert llm.seeds == [0 + sp.train_seed_offset + 1]
+
+
+def test_dose_chain_total_size_is_the_same_for_every_p(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    sizes = set()
+    for i, p in enumerate((0.0, 0.5, 1.0)):
+        sub = tmp_path / f"p{i}"
+        sub.mkdir()
+        c, _ = _run_dose(sub, monkeypatch, dose(name=f"d{i}", p=p, k=6),
+                         lambda tag: sum(map(ord, tag)) % 2 == 0)  # fmt: skip
+        sizes.add(c["n_synthetic"] + c["n_real"])
+    assert len(sizes) == 1
+
+
+def test_dose_chain_flags_a_shortfall_invalid(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    c, _ = _run_dose(tmp_path, monkeypatch, dose(name="short", p=1.0, k=6), lambda tag: False)
+    assert c["shortfall"] == 6 and not c["dose_valid"]
+
+
+def test_v13_template_preregisters_the_dose_response() -> None:
+    from hsi.cli import DOSE_K, DOSE_LEVELS
+
+    pk = Packet.model_validate(template("E6", "llm-dose"), strict=False)
+    q = pk.params
+    assert pk.version == 13 and pk.threshold == 0.10 and q["eval_mode"] == "probe"
+    specs = specs_of(q)
+    assert len(specs) == 2 * len(DOSE_LEVELS) and {s.k for s in specs} == {DOSE_K}
+    assert {s.p for s in specs} == set(DOSE_LEVELS)
+    arms = set(pk.arms)
+    assert {f"d2_{s.name}" for s in specs} <= arms  # every dose chain is evaluated
+    for sec in q["secondary"]:
+        assert {sec["treatment"], sec["baseline"]} <= arms
+    assert q["treatment"] == "d2_dose100a" and q["baselines"] == ["d2_dose000a"]
+    assert q["guard_suffix"] == "dose100a" and {"d1_dose100a", "d2_dose100a"} <= arms
+    assert len(q["pinned_adapters"]) == 13
