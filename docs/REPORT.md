@@ -41,6 +41,11 @@ kept. The cost of this rigor is that most packets did not promote.
   untouched base (0.674); a competent generator gains nothing from this self-training recipe, filtered or not.
 - E7 (relations): INCONCLUSIVE. E6-llm7b: INCONCLUSIVE.
 
+## Where this goes next (ADR 0008)
+The code line (E8) is closed: a competent 7B generator has no headroom for this recipe, filtered or not. The
+next study (E9, proposed, unbuilt) isolates verifier precision at fixed kept-set size to give the one durable
+finding, "precision is what pays", a clean dose-response instead of the confounded one in E6-noisyver.
+
 ## Corrections of our own claims
 - We described the visible-evidence verifier as an "exact oracle". It is not: only 19-43% of its kept samples are
   truly correct (probe metric). The earlier "grounded" metric was circular with it; the probe metric is not.
