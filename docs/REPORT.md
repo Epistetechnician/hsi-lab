@@ -52,7 +52,8 @@ Not a general result about intelligence or self-improvement. Synthetic worlds pl
 The strongest finding (verifier precision matters) is demonstrated in synthetic worlds and not yet in code.
 
 ## How to check it in about 30 minutes
-1. `uv run pytest -q` (192 tests).
+0. `python3 scripts/verify_all.py` recomputes all 24 receipts (stdlib only, about a minute).
+1. `uv run pytest -q` (200 tests).
 2. For any row: `python -I validator/recompute.py docs/experiments/<X>-receipt.json <packet.frozen.json>`
    (or `hsi bundle <receipt> <outdir>` to get a self-contained folder).
 3. Hand-recompute one receipt with `docs/spot-check.md` and tick the box.
