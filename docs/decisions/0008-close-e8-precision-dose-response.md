@@ -1,6 +1,6 @@
 # ADR 0008: close the code line (E8); next study is a controlled precision dose-response (E9)
 
-Status: accepted. E9 built and frozen as packet e9-v1 (template variant `llm-dose`, version 13); not yet run.
+Status: accepted. E9 built and frozen as packet e9-v1 (template variant `llm-dose`, version 13); run; NO_CANDIDATE (docs/experiments/E9.md).
 
 ## Decision 1: E8 is closed
 Five packets (v1, rep, he, v4 / 7b) asked whether execution-test strength changes code self-training.

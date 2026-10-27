@@ -18,7 +18,7 @@ kept. The cost of this rigor is that most packets did not promote.
 | A fixed agent graph beats single / independent agents (E3); adaptive beats fixed under a cap (E5) | +0.352; +0.421 | A3, toy tasks |
 | Self-training on **verified** synthetic data beats unverified replay (E6-verified) | +0.238 [0.205, 0.270], 7B | A3; reproduced on PyTorch/CUDA at +0.109 and +0.1675 (E6-torch, A2) |
 | ...but about half that gain is just a bigger data pool (E6-poolctl) | verified minus pool-matched +0.141 [0.106, 0.177] | A3 |
-| A 10%-noisy verifier still helps; precision is what pays (E6-noisyver) | primary +0.0675 [0.043, 0.092] (below the +0.05 bar: INCONCLUSIVE); tested (98% precise) beats plain by +0.105 | A2 |
+| A 10%-noisy verifier still helps; "precision is what pays" (E6-noisyver) — **not supported by E9**, see below | primary +0.0675 [0.043, 0.092] (below the +0.05 bar: INCONCLUSIVE); tested (98% precise) beats plain by +0.105 | A2 |
 | Model-confidence-only filtering does not help (E6-noisyver) | +0.024 [-0.010, 0.057] | A2 |
 
 ## What did not hold, or is unresolved
@@ -41,10 +41,17 @@ kept. The cost of this rigor is that most packets did not promote.
   untouched base (0.674); a competent generator gains nothing from this self-training recipe, filtered or not.
 - E7 (relations): INCONCLUSIVE. E6-llm7b: INCONCLUSIVE.
 
-## Where this goes next (ADR 0008)
-The code line (E8) is closed: a competent 7B generator has no headroom for this recipe, filtered or not. The
-next study (E9, proposed, unbuilt) isolates verifier precision at fixed kept-set size to give the one durable
-finding, "precision is what pays", a clean dose-response instead of the confounded one in E6-noisyver.
+- **E9 (precision dose-response at fixed kept-set size): NO_CANDIDATE.** All-correct vs all-wrong (but
+  visible-consistent) synthetic sets of 40 differ by -0.019 [-0.066, 0.028]; five levels show no trend. This
+  weakens the E6-noisyver reading that "precision is what pays": at constant size the correctness of the
+  synthetic part was not detectable, and the gain over the pool-matched control appears with all-wrong sets too
+  (+0.100). Composition of the rest of the training set is the better explanation (exploratory).
+
+## Where this stands (ADR 0008)
+The code line (E8) is closed, and the controlled precision test (E9) came back null. What remains standing:
+the harness, the toy-world results (E1, E3, E5), and "verified beats unverified replay" at a pool-matched size.
+There is no supported claim that verifier precision itself drives the gain. A next study would need either a
+larger synthetic share than the correct-proposal supply allows or a different lever (real-data share).
 
 ## Corrections of our own claims
 - We described the visible-evidence verifier as an "exact oracle". It is not: only 19-43% of its kept samples are
@@ -54,10 +61,10 @@ finding, "precision is what pays", a clean dose-response instead of the confound
 
 ## What this is not
 Not a general result about intelligence or self-improvement. Synthetic worlds plus one small-model code study.
-The strongest finding (verifier precision matters) is demonstrated in synthetic worlds and not yet in code.
+The one-time strongest finding (verifier precision matters) did not survive a controlled test (E9); no remaining claim about verifier precision is supported.
 
 ## How to check it in about 30 minutes
-0. `python3 scripts/verify_all.py` recomputes all 24 receipts (stdlib only, about a minute).
+0. `python3 scripts/verify_all.py` recomputes all 25 receipts (stdlib only, about a minute).
 1. `uv run pytest -q` (200 tests).
 2. For any row: `python -I validator/recompute.py docs/experiments/<X>-receipt.json <packet.frozen.json>`
    (or `hsi bundle <receipt> <outdir>` to get a self-contained folder).
