@@ -1,6 +1,6 @@
 # ADR 0009: does the synthetic share of the training set matter? (proposed E10)
 
-Status: proposed. Scope only; nothing built, frozen or run. Written after E9 (ADR 0008).
+Status: accepted. Built and frozen as packet e10-v1 (template variant `llm-share`, version 14).
 
 ## Why
 E9 found no dose-response to the correctness of 40 synthetic examples, and every self-trained arm sat at or
@@ -45,3 +45,16 @@ close the line: synthetic experience adds nothing measurable here.
 
 ## Decision needed
 Go / no-go on ~24 h of local MLX compute after the build list, and whether to raise the held-out size (item 4).
+
+## Amendments at build time (2026-10-28)
+- **Levels** are synthetic counts out of 350: 0, 40, 88, 175, 262 (chain names s000..s075, replicates a and b).
+  The quota is a `VerifierSpec.n_synth` on a plain `visible` verifier, so no ground truth is used anywhere in
+  the arms. `cands[arm]` records `synth_target` and `synth_valid`; an unfilled quota is reported, not topped up.
+- **Held-out size raised** (the ADR's item 4): `min_n=300, max_n=600` (E9 ran n=155). Threshold +0.05.
+- **Confirmed:** pinned `real_only` trains on all 350 real examples (manifest `n_real=350`).
+- **Yield check** reused the E9 audit rather than a new GPU run. Visible-consistent proposals per 1,000: base
+  120, d1_verified 325, d1_poolctl 187. The s075 quota needs 262 of 4,307 pool proposals, i.e. 61 per 1,000,
+  so supply has a margin of at least 2x at depth 1. Depth-2 yield depends on each chain's own d1 adapter and is
+  checked by `synth_valid` at run time.
+- **Added secondaries:** s000b vs s000a (chain variance at one setting) and the retrained s000a vs the pinned
+  `real_only`. If those two differ by more than ~0.04, read no other contrast as a share effect.

@@ -50,6 +50,7 @@ class VerifierSpec:
     extra_probes: int = 0  # tested: oracle probe states a proposal must also pass
     p: float | None = None  # dose: target probe-correct share of the kept set
     k: int = 0  # dose: kept-set size (the synthetic quota)
+    n_synth: int | None = None  # visible: synthetic quota override (E10); None = half the examples
     salt: str = ""  # decorrelates the noise of replicate chains
     train_seed_offset: int = 0  # adapter-training seed = packet seed + offset + generation
 
@@ -67,6 +68,8 @@ class VerifierSpec:
                 raise ValueError("a dose verifier needs p in [0, 1] and k > 0")
         elif self.p is not None or self.k:
             raise ValueError("p and k apply to dose verifiers only")
+        if self.n_synth is not None and (self.kind != "visible" or self.n_synth < 0):
+            raise ValueError("n_synth >= 0 applies to visible verifiers only")
         if (self.kind == "tested") != (self.extra_probes > 0):
             raise ValueError("extra_probes > 0 exactly for tested verifiers")
 
@@ -80,6 +83,7 @@ class VerifierSpec:
             extra_probes=int(d.get("extra_probes", 0)),
             p=None if d.get("p") is None else float(d["p"]),
             k=int(d.get("k", 0)),
+            n_synth=None if d.get("n_synth") is None else int(d["n_synth"]),
             salt=str(d.get("salt", "")),
             train_seed_offset=int(d["train_seed_offset"]),
         )

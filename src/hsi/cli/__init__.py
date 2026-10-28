@@ -37,7 +37,7 @@ E1_PARAMS = {
 
 GEN_VARIANTS = {
     "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
-    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver", "llm-dose",
+    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver", "llm-dose", "llm-share",
 }  # fmt: skip
 TERMINATED = GEN_VARIANTS - {"llm-gen"}
 SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
@@ -54,6 +54,7 @@ VERSIONS = {
     "llm-torch": 11,
     "llm-noisyver": 12,
     "llm-dose": 13,
+    "llm-share": 14,
 }
 
 
@@ -111,6 +112,33 @@ DOSE_SECONDARY = [  # exploratory; Bonferroni over 8; never decide the packet
     {"treatment": "d2_dose100a", "baseline": "d2_dose050a"},
     {"treatment": "d2_dose000a", "baseline": "d2_poolctl"},  # wrong-but-consistent vs unverified
     {"treatment": "d2_dose100a", "baseline": "d2_verified"},  # purely correct vs visible-verified
+]
+
+
+# ADR 0009 (v14, E10). Synthetic share of a fixed 350-example training set, visible verifier only
+# (no ground truth anywhere in the arms). Quotas are counts out of 350: 0, 40, 88, 175, 262.
+SHARE_LEVELS = {"s000": 0, "s011": 40, "s025": 88, "s050": 175, "s075": 262}
+SHARE_CHAINS = [
+    {
+        "name": f"{lvl}{rep}", "kind": "visible", "n_synth": n, "salt": rep,
+        "train_seed_offset": 1000 + 100 * i + (50 if rep == "b" else 0),
+    }
+    for i, (lvl, n) in enumerate(SHARE_LEVELS.items())
+    for rep in ("a", "b")
+]  # fmt: skip
+SHARE_ARMS = [
+    "frozen_base", "real_only", "d1_s050a",  # d1 is listed for the guardrail on the guarded chain
+    *[f"d2_{c['name']}" for c in SHARE_CHAINS],
+]  # fmt: skip
+SHARE_SECONDARY = [  # exploratory; Bonferroni over 8; never decide the packet
+    {"treatment": "d2_s050b", "baseline": "d2_s000b"},  # replication of the primary
+    {"treatment": "d2_s011a", "baseline": "d2_s000a"},
+    {"treatment": "d2_s025a", "baseline": "d2_s000a"},
+    {"treatment": "d2_s075a", "baseline": "d2_s000a"},
+    {"treatment": "d2_s075a", "baseline": "d2_s050a"},
+    {"treatment": "d2_s000a", "baseline": "real_only"},  # retrained s=0 vs the pinned real_only
+    {"treatment": "d2_s050a", "baseline": "real_only"},
+    {"treatment": "d2_s000b", "baseline": "d2_s000a"},  # chain-to-chain variance at one setting
 ]
 
 
@@ -762,6 +790,37 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             t["null_hypothesis"] = (
                 "d2 trained on an all-correct kept set does not beat d2 trained on an all-wrong "
                 "(visible-consistent) kept set of the same size by the threshold."
+            )
+        if variant == "llm-share":  # v14: ADR 0009, synthetic share of a fixed total
+            from hsi.paths import run_root
+
+            v9 = "fda4e460ea88bf7b"
+            m9 = json.loads((run_root() / v9 / "learning" / "manifest.json").read_text())
+            p.update(
+                eval_mode="probe", reuse_from=v9, depth=2, verifier_depth=2,
+                families=["rule_induction@tune", "compositional_transfer@tune"],
+                verified_chain=True, control_chain=True,
+                verify_pool_base=1000, verify_pool_worlds=600,
+                audit_base=1600, audit_worlds=300, avoid=[[1000, 1600], [1600, 1900]],
+                min_n=300, max_n=600, pilot_tasks=30, diversity_floor_frac=0.5,
+                guard_suffix="s050a",
+                pinned_adapters={a: c["digest"] for a, c in m9["candidates"].items()},
+                verifier_chains=SHARE_CHAINS,
+                treatment="d2_s050a", baselines=["d2_s000a"],
+                secondary=SHARE_SECONDARY,
+            )  # fmt: skip
+            t["arms"] = SHARE_ARMS
+            t["threshold"] = 0.05
+            t["primary_metric"] = "probe_success_rate_diff_d2_s050a_minus_d2_s000a"
+            t["hypothesis"] = (
+                "At a fixed total of 350 training examples, replacing half of the original "
+                "labelled data with visible-verified synthetic examples improves depth-2 "
+                "generation on fresh "
+                "probe states in unseen in-distribution worlds: d2 at 50% synthetic beats d2 at 0% "
+                "synthetic (a retrained all-real chain)."
+            )
+            t["null_hypothesis"] = (
+                "d2 at 50% synthetic does not beat the all-real chain by the threshold."
             )
     if exp in ("E4", "E6"):
         t["budget"] = {

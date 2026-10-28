@@ -391,3 +391,51 @@ def test_v13_template_preregisters_the_dose_response() -> None:
     assert q["treatment"] == "d2_dose100a" and q["baselines"] == ["d2_dose000a"]
     assert q["guard_suffix"] == "dose100a" and {"d1_dose100a", "d2_dose100a"} <= arms
     assert len(q["pinned_adapters"]) == 13
+
+
+# -- E10 synthetic share (ADR 0009) -------------------------------------------------------------
+
+
+def test_n_synth_applies_to_visible_only() -> None:
+    assert spec(kind="visible", fpr=0.0, n_synth=0).n_synth == 0
+    with pytest.raises(ValueError):
+        spec(n_synth=5)  # noisy
+    with pytest.raises(ValueError):
+        spec(kind="visible", fpr=0.0, n_synth=-1)
+
+
+def test_share_chain_keeps_total_constant_and_reports_fill(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(ls, "verify_texts", lambda texts, block: [True] * len(texts))
+    totals = set()
+    for i, n in enumerate((0, 2, 5)):
+        sub = tmp_path / f"s{i}"
+        (sub / "learning").mkdir(parents=True)
+        llm, cands = FakeLLM(), {}
+        sp = spec(name=f"s{i}", kind="visible", fpr=0.0, n_synth=n)
+        train_chain(small_packet(), sub, llm, DecisionLog(sub / "learning" / "t.jsonl"), cands,
+                    name=sp.name, verify=True, spec=sp, gens=1)  # fmt: skip
+        c = cands[f"d1_s{i}"]
+        assert c["n_synthetic"] == n and c["synth_valid"] and c["shortfall"] == 0
+        totals.add(c["n_synthetic"] + c["n_real"])
+    assert len(totals) == 1
+
+
+def test_v14_template_preregisters_the_share_study() -> None:
+    from hsi.cli import SHARE_LEVELS
+
+    pk = Packet.model_validate(template("E6", "llm-share"), strict=False)
+    q = pk.params
+    assert pk.version == 14 and pk.threshold == 0.05 and q["min_n"] >= 300
+    specs = specs_of(q)
+    assert len(specs) == 2 * len(SHARE_LEVELS) and {s.n_synth for s in specs} == set(
+        SHARE_LEVELS.values()
+    )
+    assert max(SHARE_LEVELS.values()) <= 350 and SHARE_LEVELS["s050"] == 175
+    arms = set(pk.arms)
+    assert {f"d2_{s.name}" for s in specs} <= arms
+    for sec in q["secondary"]:
+        assert {sec["treatment"], sec["baseline"]} <= arms
+    assert q["guard_suffix"] == "s050a" and {"d1_s050a", "d2_s050a"} <= arms
+    assert q["treatment"] == "d2_s050a" and q["baselines"] == ["d2_s000a"]

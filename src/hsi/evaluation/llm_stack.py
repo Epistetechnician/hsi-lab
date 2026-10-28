@@ -331,6 +331,8 @@ def train_chain(
     dose = spec is not None and spec.kind == "dose"
     if dose:
         quota = spec.k  # E9: fixed kept-set size, identical across every dose level
+    elif spec is not None and spec.n_synth is not None:
+        quota = spec.n_synth  # E10: synthetic share of the fixed total; the rest is real data
     rng = random.Random(f"e6llm-{name}/{seed}")
     demos, term = _demos(packet), str(q.get("target_terminator", ""))
     gens = int(gens if gens is not None else q["generations"])
@@ -343,7 +345,7 @@ def train_chain(
         kept: list[tuple[Any, str]] = []
         proposed = n_consistent = n_correct = 0
         sel = DoseSelector(spec) if dose else None
-        for i in range(0, len(order), 8):  # proposals in small blocks; stop at the quota
+        for i in range(0, len(order) if quota else 0, 8):  # blocks; stop at the quota
             block = order[i : i + 8]
             prompts = [few_shot_prompt(s.pairs, demos) for s in block]
             texts = [llm.generate(pr, int(q["gen_max_tokens"])) or "unknown" for pr in prompts]
@@ -439,6 +441,8 @@ def train_chain(
                 precision=n_correct / max(1, len(kept)), accept_rate=len(kept) / max(1, proposed),
                 verifier=spec.name,
             )  # fmt: skip
+            if spec.n_synth is not None:  # E10: an unfilled synthetic quota is reported, not hidden
+                cands[arm].update(synth_target=spec.n_synth, synth_valid=short == 0)
             if sel is not None:  # a chain whose quotas did not fill is reported invalid, not kept
                 cands[arm].update(
                     dose_target=spec.p, dose_realised=sel.realised_p,
