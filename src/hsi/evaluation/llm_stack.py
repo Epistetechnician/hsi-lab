@@ -345,10 +345,16 @@ def train_chain(
         kept: list[tuple[Any, str]] = []
         proposed = n_consistent = n_correct = 0
         sel = DoseSelector(spec) if dose else None
-        for i in range(0, len(order) if quota else 0, 8):  # blocks; stop at the quota
-            block = order[i : i + 8]
+        blk = int(q.get("gen_block", 8))  # >8 needs a backend with generate_many (torch)
+        for i in range(0, len(order) if quota else 0, blk):  # blocks; stop at the quota
+            block = order[i : i + blk]
             prompts = [few_shot_prompt(s.pairs, demos) for s in block]
-            texts = [llm.generate(pr, int(q["gen_max_tokens"])) or "unknown" for pr in prompts]
+            gen = (
+                llm.generate_many(prompts, int(q["gen_max_tokens"]))
+                if blk > 8
+                else [llm.generate(pr, int(q["gen_max_tokens"])) for pr in prompts]
+            )
+            texts = [t or "unknown" for t in gen]
             proposed += len(block)
             cons = verify_texts(texts, block)
             if spec is None:
@@ -527,12 +533,14 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     n, seed = len(syn), int(packet.seeds[0])
     rng = random.Random(f"e6llm/{seed}")
     cands: dict[str, Any] = {}
-    n_adapters = 2 * int(q["generations"]) + (1 if q.get("extra_arms") else 0)
+    n_adapters = (0 if q.get("lean_prepare") else 2 * int(q["generations"])) + (
+        1 if q.get("extra_arms") else 0
+    )
     prog = Progress(run_dir, "pilot:prepare")
     prog.update(0, n_adapters, "starting")
     demos = _demos(packet)
     term = str(q.get("target_terminator", ""))  # end-of-hypothesis marker so generation stops
-    for mode in ("no_replay", "replay"):
+    for mode in () if q.get("lean_prepare") else ("no_replay", "replay"):
         llm.set_adapter(False)  # generation 1 is produced by the frozen base
         for g in range(1, int(q["generations"]) + 1):
             take = syn if mode == "no_replay" else syn[: n // 2]
@@ -627,6 +635,14 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
     for name, verify, flag in CHAINS:
         if q.get(flag):
             train_chain(packet, run_dir, llm, log, cands, name=name, verify=verify)
+    if q.get("lean_prepare"):  # E10 on CUDA: no baseline adapters, only the packet's own chains
+        from hsi.verification.verifiers import specs_of
+
+        depth = int(q.get("verifier_depth", q["generations"]))
+        for sp in specs_of(q):
+            train_chain(
+                packet, run_dir, llm, log, cands, name=sp.name, verify=True, spec=sp, gens=depth
+            )
     _check_pinned(cands, q.get("pinned_adapters"))
     man: dict[str, object] = {
         "packet_digest": canonical_digest(packet.model_dump(mode="json")),
@@ -640,7 +656,11 @@ def prepare_e6_llm(packet: Packet, run_dir: Path) -> None:
         "model_name": llm.name,
         "weights_digest": weights_digest(llm.path),
         "candidates": cands,
-        "diversity_floor": float(q["diversity_floor_frac"]) * cands["d1_no_replay"]["diversity"],
+        "diversity_floor": (
+            0.0
+            if q.get("lean_prepare")
+            else float(q["diversity_floor_frac"]) * cands["d1_no_replay"]["diversity"]
+        ),
         "training_log_head": log.head,
     }
     man["manifest_digest"] = canonical_digest(man)

@@ -37,7 +37,7 @@ E1_PARAMS = {
 
 GEN_VARIANTS = {
     "llm-gen", "llm-gen2", "llm-gen3", "llm-ground", "llm-confirm", "llm-verified",
-    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver", "llm-dose", "llm-share",
+    "llm-poolctl", "llm-ood", "llm-torch", "llm-noisyver", "llm-dose", "llm-share", "llm-share-torch",
 }  # fmt: skip
 TERMINATED = GEN_VARIANTS - {"llm-gen"}
 SEVEN_B = GEN_VARIANTS - {"llm-gen", "llm-gen2"}
@@ -55,6 +55,7 @@ VERSIONS = {
     "llm-noisyver": 12,
     "llm-dose": 13,
     "llm-share": 14,
+    "llm-share-torch": 15,
 }
 
 
@@ -791,7 +792,7 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
                 "d2 trained on an all-correct kept set does not beat d2 trained on an all-wrong "
                 "(visible-consistent) kept set of the same size by the threshold."
             )
-        if variant == "llm-share":  # v14: ADR 0009, synthetic share of a fixed total
+        if variant in ("llm-share", "llm-share-torch"):  # v14/v15: ADR 0009, synthetic share
             from hsi.paths import run_root
 
             v9 = "fda4e460ea88bf7b"
@@ -821,6 +822,17 @@ def template(exp: str, variant: str = "") -> dict[str, object]:
             )
             t["null_hypothesis"] = (
                 "d2 at 50% synthetic does not beat the all-real chain by the threshold."
+            )
+        if variant == "llm-share-torch":  # v15: the same study on PyTorch/CUDA, fresh lock, lean
+            for k in ("reuse_from", "pinned_adapters"):
+                p.pop(k, None)
+            p.update(
+                model="qwen2.5-7b-hf", lean_prepare=True, gen_block=64,
+                verified_chain=False, control_chain=False,
+            )  # fmt: skip
+            t["hypothesis"] = (
+                "Replication on a different stack (PyTorch/CUDA, full-precision Qwen2.5-7B-"
+                "Instruct, fresh held-out lock): " + str(t["hypothesis"])
             )
     if exp in ("E4", "E6"):
         t["budget"] = {

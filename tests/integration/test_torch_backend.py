@@ -76,3 +76,13 @@ def test_train_save_load_roundtrip(llm, tmp_path) -> None:  # type: ignore[no-un
     llm.load_adapter(tmp_path / "a.safetensors")
     assert llm.adapter_digest() == d
     assert isinstance(llm.generate("add 0 1 or", max_tokens=5), str)
+
+
+def test_generate_many_matches_single_generation(llm) -> None:  # type: ignore[no-untyped-def]
+    """Batched greedy decoding (left-padded) must agree with one-at-a-time on nearly every prompt."""
+    from hsi.learning.llm import render_prompt
+
+    prompts = [render_prompt([((i, 2, 3, 4, 5), (i, 2, 3, 4, 0))]) for i in range(8)]
+    one = [llm.generate(p, 12) for p in prompts]
+    many = llm.generate_many(prompts, 12)
+    assert len(many) == len(one) and sum(a == b for a, b in zip(one, many, strict=True)) >= 6

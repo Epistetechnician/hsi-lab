@@ -154,6 +154,12 @@ class TorchLLM:
         text = self.tok.decode(o[0, ids.shape[1] :], skip_special_tokens=True)
         return str(text).strip().split("\n")[0].strip()
 
+    def generate_many(self, prompts: list[str], max_tokens: int = 20) -> list[str]:
+        """Batched greedy `generate`: left-padded, one forward per step for the whole block, each
+        row reduced to its first line exactly as `generate` does (E10 on CUDA, ADR 0009)."""
+        raw = self.complete_many(prompts, max_tokens)
+        return [t.strip().split("\n")[0].strip() for t in raw]
+
     def chat(self, user: str) -> str:
         """Chat-template prompt string ending at the assistant turn (same template as MLX)."""
         msgs = [{"role": "user", "content": user}]

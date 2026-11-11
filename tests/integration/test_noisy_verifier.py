@@ -439,3 +439,46 @@ def test_v14_template_preregisters_the_share_study() -> None:
         assert {sec["treatment"], sec["baseline"]} <= arms
     assert q["guard_suffix"] == "s050a" and {"d1_s050a", "d2_s050a"} <= arms
     assert q["treatment"] == "d2_s050a" and q["baselines"] == ["d2_s000a"]
+
+
+# -- E10 on CUDA (v15): batched proposals, lean prepare ------------------------------------------
+
+
+class BatchLLM(FakeLLM):
+    def __init__(self) -> None:
+        super().__init__()
+        self.blocks: list[int] = []
+
+    def generate(self, prompt: str, max_tokens: int = 20) -> str:
+        raise AssertionError("a batched run must not generate one prompt at a time")
+
+    def generate_many(self, prompts: list[str], max_tokens: int = 20) -> list[str]:
+        self.blocks.append(len(prompts))
+        return ["swap 0 1"] * len(prompts)
+
+
+def test_gen_block_uses_generate_many_and_respects_the_quota(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(ls, "verify_texts", lambda texts, block: [True] * len(texts))
+    (tmp_path / "learning").mkdir()
+    llm, cands = BatchLLM(), {}
+    sp = spec(name="s5", kind="visible", fpr=0.0, n_synth=5)
+    train_chain(small_packet(gen_block=16), tmp_path, llm,
+                DecisionLog(tmp_path / "learning" / "t.jsonl"), cands, name="s5", verify=True,
+                spec=sp, gens=1)  # fmt: skip
+    c = cands["d1_s5"]
+    assert llm.blocks and max(llm.blocks) <= 16 and c["n_synthetic"] == 5 and c["shortfall"] == 0
+    assert c["proposed"] == sum(llm.blocks)  # every generated proposal is counted
+
+
+def test_v15_template_is_the_lean_torch_variant_of_v14() -> None:
+    a = Packet.model_validate(template("E6", "llm-share"), strict=False)
+    b = Packet.model_validate(template("E6", "llm-share-torch"), strict=False)
+    assert b.version == 15 and b.threshold == a.threshold and b.arms == a.arms
+    q = b.params
+    assert q["model"] == "qwen2.5-7b-hf" and q["lean_prepare"] and q["gen_block"] == 64
+    assert "reuse_from" not in q and "pinned_adapters" not in q
+    assert not q["verified_chain"] and not q["control_chain"]
+    assert q["verifier_chains"] == a.params["verifier_chains"]  # same ten chains, same quotas
+    assert q["treatment"] == a.params["treatment"] and q["secondary"] == a.params["secondary"]
