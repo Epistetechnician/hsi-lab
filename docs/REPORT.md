@@ -47,6 +47,10 @@ kept. The cost of this rigor is that most packets did not promote.
   synthetic part was not detectable, and the gain over the pool-matched control appears with all-wrong sets too
   (+0.100). Composition of the rest of the training set is the better explanation (exploratory).
 
+- **E10 (real-data share, torch/H100 replication): INCONCLUSIVE.** 50% vs 0% synthetic share: +0.038 [0.014,
+  0.062] against a +0.05 bar; the replicate chain shows -0.003, and two identical-setting chains differ by 0.021.
+  No share effect is supported; chain variance is of the same size as the effect.
+
 ## Where this stands (ADR 0008)
 The code line (E8) is closed, and the controlled precision test (E9) came back null. What remains standing:
 the harness, the toy-world results (E1, E3, E5), and "verified beats unverified replay" at a pool-matched size.

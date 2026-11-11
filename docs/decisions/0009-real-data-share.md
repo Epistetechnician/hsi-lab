@@ -1,6 +1,6 @@
 # ADR 0009: does the synthetic share of the training set matter? (proposed E10)
 
-Status: accepted. Built and frozen as packet e10-v1 (template variant `llm-share`, version 14).
+Status: accepted. Built and frozen as packet e10-v1 (template variant `llm-share`, version 14); e10-v1 abandoned locally (RAM). Run as e10-v2 on CUDA: INCONCLUSIVE (primary +0.038 [0.014, 0.062]; see docs/experiments/E10.md).
 
 ## Why
 E9 found no dose-response to the correctness of 40 synthetic examples, and every self-trained arm sat at or
