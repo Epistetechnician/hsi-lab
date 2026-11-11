@@ -1,0 +1,210 @@
+{
+  "schema_version": "hsi-packet-v1",
+  "experiment": "E6",
+  "version": 15,
+  "hypothesis": "Replication on a different stack (PyTorch/CUDA, full-precision Qwen2.5-7B-Instruct, fresh held-out lock): At a fixed total of 350 training examples, replacing half of the original labelled data with visible-verified synthetic examples improves depth-2 generation on fresh probe states in unseen in-distribution worlds: d2 at 50% synthetic beats d2 at 0% synthetic (a retrained all-real chain).",
+  "null_hypothesis": "d2 at 50% synthetic does not beat the all-real chain by the threshold.",
+  "arms": [
+    "frozen_base",
+    "real_only",
+    "d1_s050a",
+    "d2_s000a",
+    "d2_s000b",
+    "d2_s011a",
+    "d2_s011b",
+    "d2_s025a",
+    "d2_s025b",
+    "d2_s050a",
+    "d2_s050b",
+    "d2_s075a",
+    "d2_s075b"
+  ],
+  "primary_metric": "probe_success_rate_diff_d2_s050a_minus_d2_s000a",
+  "threshold": 0.05,
+  "guardrails": [
+    "generated-task diversity above pilot floor at every depth",
+    "d3_replay not below d1_replay beyond floor"
+  ],
+  "budget": {
+    "max_tokens": 0,
+    "max_calls": 10000000,
+    "max_wall_seconds": 3600,
+    "max_message_bytes": 0
+  },
+  "seeds": [
+    0
+  ],
+  "stop_rules": [
+    "any digest, schema, split, or budget mismatch"
+  ],
+  "claim_ceiling": "LocalSyntheticExperimentOnly",
+  "nonclaims": [
+    "no general intelligence claim",
+    "not a proof"
+  ],
+  "params": {
+    "pretrain_families": [
+      "rule_induction",
+      "compositional_transfer"
+    ],
+    "support": 8,
+    "n_adapt": 50,
+    "adapt_steps": 300,
+    "adapt_lr": 0.0001,
+    "rank": 8,
+    "pilot_tasks": 30,
+    "min_n": 300,
+    "max_n": 600,
+    "tune_offset": 500000,
+    "families": [
+      "rule_induction@tune",
+      "compositional_transfer@tune"
+    ],
+    "generations": 3,
+    "diversity_floor_frac": 0.5,
+    "non_collapse_floor": 0.02,
+    "treatment": "d2_s050a",
+    "baselines": [
+      "d2_s000a"
+    ],
+    "backbone": "llm",
+    "n_replay": 50,
+    "lora_layers": 8,
+    "lora_scale": 20.0,
+    "adapt_batch": 8,
+    "gen_max_tokens": 20,
+    "n_demos": 2,
+    "eval_mode": "probe",
+    "extra_arms": true,
+    "target_terminator": "\n",
+    "model": "qwen2.5-7b-hf",
+    "n_replay_tune": 50,
+    "depth": 2,
+    "verifier_depth": 2,
+    "verified_chain": false,
+    "control_chain": false,
+    "verify_pool_base": 1000,
+    "verify_pool_worlds": 600,
+    "audit_base": 1600,
+    "audit_worlds": 300,
+    "avoid": [
+      [
+        1000,
+        1600
+      ],
+      [
+        1600,
+        1900
+      ]
+    ],
+    "guard_suffix": "s050a",
+    "verifier_chains": [
+      {
+        "name": "s000a",
+        "kind": "visible",
+        "n_synth": 0,
+        "salt": "a",
+        "train_seed_offset": 1000
+      },
+      {
+        "name": "s000b",
+        "kind": "visible",
+        "n_synth": 0,
+        "salt": "b",
+        "train_seed_offset": 1050
+      },
+      {
+        "name": "s011a",
+        "kind": "visible",
+        "n_synth": 40,
+        "salt": "a",
+        "train_seed_offset": 1100
+      },
+      {
+        "name": "s011b",
+        "kind": "visible",
+        "n_synth": 40,
+        "salt": "b",
+        "train_seed_offset": 1150
+      },
+      {
+        "name": "s025a",
+        "kind": "visible",
+        "n_synth": 88,
+        "salt": "a",
+        "train_seed_offset": 1200
+      },
+      {
+        "name": "s025b",
+        "kind": "visible",
+        "n_synth": 88,
+        "salt": "b",
+        "train_seed_offset": 1250
+      },
+      {
+        "name": "s050a",
+        "kind": "visible",
+        "n_synth": 175,
+        "salt": "a",
+        "train_seed_offset": 1300
+      },
+      {
+        "name": "s050b",
+        "kind": "visible",
+        "n_synth": 175,
+        "salt": "b",
+        "train_seed_offset": 1350
+      },
+      {
+        "name": "s075a",
+        "kind": "visible",
+        "n_synth": 262,
+        "salt": "a",
+        "train_seed_offset": 1400
+      },
+      {
+        "name": "s075b",
+        "kind": "visible",
+        "n_synth": 262,
+        "salt": "b",
+        "train_seed_offset": 1450
+      }
+    ],
+    "secondary": [
+      {
+        "treatment": "d2_s050b",
+        "baseline": "d2_s000b"
+      },
+      {
+        "treatment": "d2_s011a",
+        "baseline": "d2_s000a"
+      },
+      {
+        "treatment": "d2_s025a",
+        "baseline": "d2_s000a"
+      },
+      {
+        "treatment": "d2_s075a",
+        "baseline": "d2_s000a"
+      },
+      {
+        "treatment": "d2_s075a",
+        "baseline": "d2_s050a"
+      },
+      {
+        "treatment": "d2_s000a",
+        "baseline": "real_only"
+      },
+      {
+        "treatment": "d2_s050a",
+        "baseline": "real_only"
+      },
+      {
+        "treatment": "d2_s000b",
+        "baseline": "d2_s000a"
+      }
+    ],
+    "lean_prepare": true,
+    "gen_block": 64
+  }
+}
