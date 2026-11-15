@@ -17,3 +17,13 @@ jobs:
       - run: uv run ruff format --check .
       # torch/mlx-backed integration tests are skipped here (not installed)
       - run: uv run pytest -q -x --ignore=tests/integration/test_torch_backend.py
+      - if: failure()
+        run: |
+          uv run python - <<'PY'
+          import subprocess, sys
+          from hsi.verification.codetests import tasks, tests_for
+          t = tasks()[sorted(tasks())[0]]
+          open("/tmp/m.py","w").write("\n".join([*t.imports, t.code, "", tests_for(t,"plus")]))
+          r = subprocess.run([sys.executable,"-I","/tmp/m.py"],capture_output=True,env={"PATH":"/usr/bin:/bin","PYTHONHASHSEED":"0"})
+          print(sys.executable, r.returncode, r.stderr.decode()[-1500:])
+          PY
