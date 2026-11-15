@@ -1,0 +1,19 @@
+name: ci
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+      - run: uv sync --group dev
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      # torch/mlx-backed integration tests are skipped here (not installed)
+      - run: uv run pytest -q -x -m "not torch" --ignore=tests/integration/test_torch_backend.py

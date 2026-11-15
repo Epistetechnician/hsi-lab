@@ -45,7 +45,7 @@ def kept(run_dir: str, log: str, out: str) -> None:
         cons = 0
         fam_seed: dict[tuple, list] = {}
         for r in rs:
-            fam, split, seed, a = world_of(r["sample_id"])
+            fam, split, seed, _a = world_of(r["sample_id"])
             h = parse_hypothesis(r["text"])
             idx = true_index(h) if h else None
             smp = fam_seed.get((fam, seed))

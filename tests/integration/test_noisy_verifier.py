@@ -39,12 +39,12 @@ def test_spec_validation() -> None:
         spec(kind="visible", fpr=0.1)  # noise belongs to the noisy kind only
     with pytest.raises(ValueError):
         spec(kind="confidence", fpr=0.0)  # a confidence verifier needs tau
-    dup = {"verifier_chains": [dict(name="a", kind="visible", train_seed_offset=1),
-                               dict(name="a", kind="visible", train_seed_offset=2)]}  # fmt: skip
+    dup = {"verifier_chains": [{"name": "a", "kind": "visible", "train_seed_offset": 1},
+                               {"name": "a", "kind": "visible", "train_seed_offset": 2}]}  # fmt: skip
     with pytest.raises(ValueError):
         specs_of(dup)
-    same_seed = {"verifier_chains": [dict(name="a", kind="visible", train_seed_offset=1),
-                                     dict(name="b", kind="visible", train_seed_offset=1)]}  # fmt: skip
+    same_seed = {"verifier_chains": [{"name": "a", "kind": "visible", "train_seed_offset": 1},
+                                     {"name": "b", "kind": "visible", "train_seed_offset": 1}]}  # fmt: skip
     with pytest.raises(ValueError):
         specs_of(same_seed)
 

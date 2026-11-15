@@ -187,7 +187,7 @@ def main(run_dir: Path) -> Path:
                     paired_diff=mean,
                     ci_low=lo,
                     ci_high=hi,
-                )  # fmt: skip
+                )
             )
     allr = [r for rs in res.values() for r in rs]
     gv, held = spec.guardrails(allr, comps, packet)
