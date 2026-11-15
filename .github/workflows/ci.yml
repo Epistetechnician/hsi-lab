@@ -15,5 +15,7 @@ jobs:
       - run: uv sync --group dev
       - run: uv run ruff check .
       - run: uv run ruff format --check .
-      # torch/mlx-backed integration tests are skipped here (not installed)
-      - run: uv run pytest -q -x --ignore=tests/integration/test_torch_backend.py
+      # torch tests skipped (not installed); the deselected test reads a local ~/hsi-runs artifact
+      - run: |
+          uv run pytest -q -x --ignore=tests/integration/test_torch_backend.py \
+          --deselect tests/integration/test_e6_ground.py::test_confirm_template_preregisters_depth2_in_distribution
