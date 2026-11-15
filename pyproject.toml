@@ -19,7 +19,7 @@ torch = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.5", "mypy>=1.10"]
+dev = ["numpy", "pytest>=8", "hypothesis>=6", "ruff>=0.5", "mypy>=1.10"]
 
 [build-system]
 requires = ["hatchling"]
