@@ -16,4 +16,4 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       # torch/mlx-backed integration tests are skipped here (not installed)
-      - run: uv run pytest -q -x -m "not torch" --ignore=tests/integration/test_torch_backend.py
+      - run: uv run pytest -q -x --ignore=tests/integration/test_torch_backend.py
