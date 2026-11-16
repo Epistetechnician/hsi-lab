@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Health gate: identical in git hooks and CI. HYGIENE_FULL=0 skips the slow tests (pre-commit style).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+uv run ruff check .
+uv run ruff format --check .
+if [ "${HYGIENE_FULL:-1}" = "1" ]; then
+  # Skipped: torch tests (torch not installed) and modules that read artifacts from a local ~/hsi-runs.
+  uv run pytest -q \
+    --ignore=tests/integration/test_torch_backend.py \
+    --ignore=tests/integration/test_e6_ground.py \
+    --ignore=tests/integration/test_e6_verified.py \
+    --ignore=tests/integration/test_noisy_verifier.py
+fi
+echo "check ok"

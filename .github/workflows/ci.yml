@@ -13,13 +13,4 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --group dev
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      # Skipped in CI: torch tests (torch not installed) and three modules whose tests read
-      # artifacts from a local ~/hsi-runs directory.
-      - run: |
-          uv run pytest -q \
-            --ignore=tests/integration/test_torch_backend.py \
-            --ignore=tests/integration/test_e6_ground.py \
-            --ignore=tests/integration/test_e6_verified.py \
-            --ignore=tests/integration/test_noisy_verifier.py
+      - run: scripts/check
